@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 自适应图标的背景：与图标底板同一色，遮罩裁掉透明角时不会露出白边 -->
+    <color name="ic_launcher_background">#161E32</color>
+</resources>

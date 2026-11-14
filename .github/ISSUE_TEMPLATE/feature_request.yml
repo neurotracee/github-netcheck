@@ -1,0 +1,65 @@
+name: 改进建议 / 新增点位
+description: 想加一个测试域名，或想改判读、界面、报告
+title: "[建议] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        加点位是最常见的贡献。请说明「为什么值得测」，只写域名不够。
+
+  - type: dropdown
+    id: kind
+    attributes:
+      label: 属于哪一类
+      options:
+        - 新增测试点位
+        - 判读标准 / 阈值
+        - 报告排版 / 界面
+        - Windows 脚本行为
+        - 安卓端行为
+        - 文档
+        - 其它
+    validations:
+      required: true
+
+  - type: input
+    id: host
+    attributes:
+      label: 如果要点位，域名是什么
+      placeholder: "example.com"
+    validations:
+      required: false
+
+  - type: input
+    id: path
+    attributes:
+      label: 建议测的路径
+      description: 必须对方真实存在；根路径经常返回 403，不代表不通
+      placeholder: "/"
+    validations:
+      required: false
+
+  - type: textarea
+    id: why
+    attributes:
+      label: 为什么这个点位值得测
+      description: 对应哪个真实场景？不加代理时会卡在哪一步？
+    validations:
+      required: true
+
+  - type: textarea
+    id: measured
+    attributes:
+      label: 你本地的实测数值（可选）
+      description: 例如「联通宽带直连，TCP 180ms，TLS 经常被重置」
+    validations:
+      required: false
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 你希望的改动
+      description: 越具体越好。涉及两端的改动请说明你愿意同时改 Windows 与安卓
+    validations:
+      required: false

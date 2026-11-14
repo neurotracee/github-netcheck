@@ -1,0 +1,37 @@
+# 构建产物
+build/
+dist/*.apk
+*.apk
+*.aab
+
+# Windows 报告输出（每次运行都会新增一份，不进仓库）
+windows/reports/
+reports/
+
+# 运行时与临时文件
+__pycache__/
+*.py[cod]
+*.log
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+*.iml
+
+# 本机路径配置（各人机器不同，不入仓库）
+android/local.properties
+
+# ---- 安卓端（android/ 内另有 .gitignore，这里再兜一层）----
+.gradle/
+app/build/
+captures/
+
+# ---- 签名文件一律不进仓库 ----
+*.jks
+*.keystore
+keystore.properties
+signing.properties
+
+# ---- 发布暂存（要往 Release 页面拖的包，不进仓库）----
+release/

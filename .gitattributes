@@ -1,0 +1,16 @@
+# 统一换行处理：仓库里存 LF，检出到 Windows 时转 CRLF（与 core.autocrlf=true 一致）
+* text=auto
+
+# 二进制，禁止任何换行/编码转换
+*.png   binary
+*.jpg   binary
+*.ico   binary
+*.apk   binary
+*.jks   binary
+
+# 跟着 Windows 命令行走的脚本，保持 CRLF 更稳妥
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+
+# PowerShell 脚本按 CRLF 走，避免在 5.1 上出现「行尾不对」的报错
+*.ps1   text eol=crlf

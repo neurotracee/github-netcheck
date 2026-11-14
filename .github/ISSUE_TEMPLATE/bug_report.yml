@@ -1,0 +1,84 @@
+name: 缺陷报告
+description: 报告一个测不准、跑不通、或结果显示不对的问题
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        同一个域名在不同网络下结论完全不同，所以请把下面几项填全，否则很难判断。
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: 在哪个端出的问题
+      options:
+        - Windows（netcheck.ps1 / bat）
+        - 安卓 APK
+        - 两端都有
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: 版本号
+      description: 报告页脚或「关于」里能看到，四段式，如 1.0.0.0
+      placeholder: "1.0.0.0"
+    validations:
+      required: true
+
+  - type: input
+    id: env
+    attributes:
+      label: 系统 / 机型
+      description: Windows 版本，或安卓版本 + 机型（例：Windows 11 23H2 / OPPO Find X6 Pro, Android 14）
+    validations:
+      required: true
+
+  - type: input
+    id: network
+    attributes:
+      label: 网络环境
+      description: 运营商 + 接入方式（例：联通宽带 / 移动 5G / 校园网 + Wi-Fi）
+    validations:
+      required: true
+
+  - type: dropdown
+    id: accelerator
+    attributes:
+      label: 有没有开加速 / 代理 / VPN
+      options:
+         - 什么都没开（直连）
+         - 瓦特工具箱（Watt Toolkit）hosts 模式
+         - 系统代理（Clash / v2ray 等）
+         - 安卓 VPN（Clash 类工具）
+         - 不确定
+    validations:
+      required: true
+
+  - type: textarea
+    id: expect
+    attributes:
+      label: 你看到的结果 vs 你认为应该的结果
+      description: 贴报告里那几行（点位名 + 四段数值 + 评级），或直接贴 reports/*.csv 的相关行
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1. 双击 一键网络自检.bat
+        2. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: 截图 / 报错信息
+      description: 控制台红字、报告截图都可以直接拖进来
+    validations:
+      required: false

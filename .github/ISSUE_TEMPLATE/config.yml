@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 先看常见问题（docs/04）
+    url: https://github.com/neurotracee/netcheck/tree/main/docs
+    about: 很多「测出来是红的」其实是正常现象，docs/04-常见问题.md 里有对应解释。
+  - name: 检测方法与判读标准（docs/03）
+    url: https://github.com/neurotracee/netcheck/blob/main/README.md
+    about: 四段计时的含义、评级阈值、DoH 对照怎么读，先从 README 的「测的是什么」「判读」两节看起。
