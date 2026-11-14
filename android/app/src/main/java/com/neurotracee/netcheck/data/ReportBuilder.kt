@@ -178,7 +178,7 @@ object ReportBuilder {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>网络连通性自检报告</title>
+<title>GitHub 网络自检报告</title>
 <style>
 :root{
   --bg:#f4f6f8; --card:#ffffff; --ink:#1a2027; --sub:#6b7785; --line:#e5e9ee;

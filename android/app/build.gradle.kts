@@ -14,7 +14,7 @@ val keystoreProps = Properties().apply {
 // 版本号统一四段：主.次.修订.补丁（与 Windows 端完全一致，见 CONTRIBUTING.md）。
 // versionCode 由 versionName 直接算出来，只改这一个字符串，不会再出现两处对不上。
 // 映射：主*1000000 + 次*10000 + 修订*100 + 补丁（例：1.0.1.0 → 1000100）。
-val appVersionName = "1.1.0.2"
+val appVersionName = "1.1.0.3"
 val appVersionCode = appVersionName
     .split(".")
     .map { it.trim().toInt() }
@@ -40,6 +40,11 @@ android {
                 storePassword = keystoreProps.getProperty("storePassword")
                 keyAlias = keystoreProps.getProperty("keyAlias")
                 keyPassword = keystoreProps.getProperty("keyPassword")
+                // v1（JAR）签名留作老启动器/老 ROM 的兜底，v2 + v3 是主力；
+                // v3 才是 9.0 以后系统校验的那一层，只留 v2 在部分 ROM 上会被判「签名信息不完整」。
+                enableV1Signing = true
+                enableV2Signing = true
+                enableV3Signing = true
             }
         }
     }

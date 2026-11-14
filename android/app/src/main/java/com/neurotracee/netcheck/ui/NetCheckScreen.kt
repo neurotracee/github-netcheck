@@ -127,7 +127,7 @@ fun NetCheckScreen(
                                     vm.message = "报告已存到你选的文件夹：${file.name}"
                                 } else {
                                     context.startActivity(
-                                        vm.store().shareIntent(file, "text/html", "网络连通性自检报告")
+                                        vm.store().shareIntent(file, "text/html", "GitHub 网络自检报告")
                                     )
                                 }
                             }
@@ -143,7 +143,7 @@ fun NetCheckScreen(
                                     vm.message = "CSV 已存到你选的文件夹：${file.name}"
                                 } else {
                                     context.startActivity(
-                                        vm.store().shareIntent(file, "text/csv", "网络连通性自检数据")
+                                        vm.store().shareIntent(file, "text/csv", "GitHub 网络自检数据")
                                     )
                                 }
                             }
@@ -205,14 +205,14 @@ private fun Header(p: Palette, run: RunResult?, idleHint: String, onSettings: ()
         Row(verticalAlignment = Alignment.Top) {
             Column(Modifier.weight(1f)) {
                 Text(
-                    "NET CHECK · 本机自检",
+                    "GITHUB NET CHECK · 本机自检",
                     fontSize = 10.5.sp,
                     letterSpacing = 2.sp,
                     color = p.sub,
                     fontWeight = FontWeight.Medium
                 )
                 Spacer(Modifier.height(6.dp))
-                Text("网络连通性自检", fontSize = 24.sp, fontWeight = FontWeight.SemiBold, color = p.ink)
+                Text("GitHub 网络自检", fontSize = 24.sp, fontWeight = FontWeight.SemiBold, color = p.ink)
             }
             Box(
                 Modifier

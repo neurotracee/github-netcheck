@@ -1,10 +1,10 @@
 ﻿# ============================================================
-#  netcheck.ps1 —— 本机网络连通性自检（Windows 端）
+#  netcheck.ps1 —— GitHub 网络自检（Windows 端）
 #  纯 PowerShell 实现，不安装任何东西，不联网上传任何数据
 #  测四项：DNS 解析 / TCP 建连 / TLS 握手 / HTTPS 首字节
 #  输出：控制台结果 + reports 目录下的 HTML 可视化报告
 #
-#  版本：1.1.0.2
+#  版本：1.1.0.3
 #  开源协议：Apache License 2.0
 #  原项目地址：https://github.com/neurotracee/netcheck
 #  镜像（Gitee）：https://gitee.com/bio234/netcheck
@@ -25,7 +25,7 @@ param(
     [switch]$CheckUpdate  # 只查最新版本号，不测
 )
 
-$script:AppVersion = '1.1.0.2'
+$script:AppVersion = '1.1.0.3'
 $script:ProjectUrl = 'https://github.com/neurotracee/netcheck'
 $script:MirrorUrl  = 'https://gitee.com/bio234/netcheck'
 
@@ -90,21 +90,21 @@ function Show-AboutWindow {
     Add-Type -AssemblyName System.Drawing
     $font = New-Object System.Drawing.Font('Microsoft YaHei UI', 9)
     $form = New-Object System.Windows.Forms.Form
-    $form.Text = '关于与开源信息 · 网络连通性自检'
+    $form.Text = '关于与开源信息 · GitHub 网络自检'
     $form.Size = New-Object System.Drawing.Size(620, 640)
     $form.StartPosition = 'CenterScreen'
     $form.BackColor = [System.Drawing.Color]::FromArgb(244, 246, 248)
     $form.Font = $font
 
     $title = New-Object System.Windows.Forms.Label
-    $title.Text = '网络连通性自检　v' + $script:AppVersion
+    $title.Text = 'GitHub 网络自检　v' + $script:AppVersion
     $title.Font = New-Object System.Drawing.Font('Microsoft YaHei UI', 15, [System.Drawing.FontStyle]::Bold)
     $title.AutoSize = $true
     $title.Location = New-Object System.Drawing.Point(24, 20)
     $form.Controls.Add($title)
 
     $sub = New-Object System.Windows.Forms.Label
-    $sub.Text = '纯 PowerShell 实现的网络连通性自检：DNS / TCP / TLS / HTTP 四段分别计时'
+    $sub.Text = '纯 PowerShell 实现的 GitHub 网络自检：DNS / TCP / TLS / HTTP 四段分别计时'
     $sub.AutoSize = $true
     $sub.ForeColor = [System.Drawing.Color]::FromArgb(107, 119, 133)
     $sub.Location = New-Object System.Drawing.Point(26, 58)
@@ -193,7 +193,7 @@ function Show-SettingsWindow {
     Add-Type -AssemblyName System.Drawing
     $font = New-Object System.Drawing.Font('Microsoft YaHei UI', 9)
     $form = New-Object System.Windows.Forms.Form
-    $form.Text = '设置 · 网络连通性自检'
+    $form.Text = '设置 · GitHub 网络自检'
     $form.Size = New-Object System.Drawing.Size(600, 340)
     $form.StartPosition = 'CenterScreen'
     $form.BackColor = [System.Drawing.Color]::FromArgb(244, 246, 248)
@@ -553,7 +553,7 @@ if ($Settings) {
 }
 if ($CheckUpdate) {
     Write-Host ''
-    Write-Host ('  网络连通性自检 v' + $script:AppVersion + ' · 检查更新') -ForegroundColor Cyan
+    Write-Host ('  GitHub 网络自检 v' + $script:AppVersion + ' · 检查更新') -ForegroundColor Cyan
     $u = Invoke-UpdateCheck
     $color = 'Cyan'
     if ($u.HasNew) { $color = 'Yellow' }
@@ -569,7 +569,7 @@ if ($CheckUpdate) {
 # ---------- 开始测试 ----------
 
 Write-Host ''
-Write-Host ('  网络连通性自检 v' + $script:AppVersion + '   GitHub / Hugging Face / Docker') -ForegroundColor Cyan
+Write-Host ('  GitHub 网络自检 v' + $script:AppVersion + '   GitHub / Hugging Face / Docker') -ForegroundColor Cyan
 Write-Host '  ---------------------------------------------------------' -ForegroundColor DarkGray
 Write-Host ('  作者：项目创作时为初中生 · 开发：豆包工作任务的 Agent × DeepSeek-V4.1-Flash') -ForegroundColor DarkGray
 Write-Host ('  开源协议 Apache-2.0 · 原项目 ' + $script:ProjectUrl) -ForegroundColor DarkGray
@@ -758,7 +758,7 @@ $html = @'
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>网络连通性自检报告</title>
+<title>GitHub 网络自检报告</title>
 <style>
 :root{
   --bg:#f4f6f8; --card:#ffffff; --ink:#1a2027; --sub:#6b7785; --line:#e5e9ee;

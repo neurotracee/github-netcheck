@@ -287,12 +287,12 @@ fun AboutSheet(versionName: String, onDismiss: () -> Unit, onToast: (String) -> 
                 .padding(horizontal = 18.dp)
                 .padding(top = 18.dp, bottom = 26.dp)
         ) {
-            Text(t("网络连通性自检", "NetCheck"), fontSize = 22.sp, fontWeight = FontWeight.SemiBold, color = p.ink)
+            Text(t("GitHub 网络自检", "GitHub Net Check"), fontSize = 22.sp, fontWeight = FontWeight.SemiBold, color = p.ink)
             Spacer(Modifier.height(3.dp))
             Text("v$versionName", fontSize = 12.sp, color = p.sub)
             Spacer(Modifier.height(6.dp))
             Text(
-                t("本地离线运行的网络连通性自检工具：Windows 脚本 + 安卓 APK，同一套点位与评级。",
+                t("本地离线运行的 GitHub 网络自检工具：Windows 脚本 + 安卓 APK，同一套点位与评级。",
                     "An offline network reachability checker: Windows script + Android APK, same targets and grading."),
                 fontSize = 12.5.sp, color = p.sub, lineHeight = 20.sp
             )

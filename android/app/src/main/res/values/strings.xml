@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">网络自检</string>
-    <string name="app_full_name">网络连通性自检</string>
+    <string name="app_name">GitHub 网络自检</string>
+    <string name="app_full_name">GitHub 网络自检</string>
 </resources>

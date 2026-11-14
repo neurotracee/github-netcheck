@@ -1,6 +1,6 @@
 # 第三方组件声明 / Third-Party Notices
 
-本项目（网络连通性自检，Windows 与安卓双端）整体以 **Apache License 2.0** 授权发布，
+本项目（GitHub 网络自检，Windows 与安卓双端）整体以 **Apache License 2.0** 授权发布，
 署名与出处要求见 **[ADDITIONAL-TERMS.md](ADDITIONAL-TERMS.md)**。
 
 简而言之：二次开发、商用、闭源分发都可以，但**必须保留作者署名，并在程序里标注原项目地址**
@@ -94,5 +94,5 @@ gradle assembleRelease
 
 ## 六、名称与图标
 
-程序名称「网络连通性自检 / NetCheck」与图标不在授权范围内（Apache-2.0 第 6 条商标条款）。
+程序名称「GitHub 网络自检 / NetCheck」与图标不在授权范围内（Apache-2.0 第 6 条商标条款）。
 二次发布请改名、换图标。

@@ -1,6 +1,6 @@
 # 署名与出处要求 · Attribution & Notice Terms
 
-本文件说明「网络连通性自检 / NetCheck」在 **Apache License 2.0** 之下，
+本文件说明「GitHub 网络自检 / NetCheck」在 **Apache License 2.0** 之下，
 二次开发、分发、商用时必须做到的事情。它与 [LICENSE](LICENSE)、[NOTICE.md](NOTICE.md)
 一起构成完整的授权条件。
 
@@ -123,7 +123,7 @@ This project is licensed under the **Apache License 2.0**. Attribution requireme
    imply endorsement by the original author.
 4. **Ship the license and notice** (§4(a)(d)): distribute `LICENSE` and `NOTICE.md` with any
    binary or script you redistribute.
-5. **No endorsement, no trademark use** (§6): the names "网络连通性自检" / "NetCheck" and the
+5. **No endorsement, no trademark use** (§6): the names "GitHub 网络自检" / "NetCheck" and the
    application icon are **not** licensed. Rename your fork.
 6. **Commercial use and closed-source redistribution are permitted.** Apache-2.0 has no
    copyleft obligation — unlike the author's other project (PDF Privacy Masker, AGPL-3.0),

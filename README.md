@@ -1,4 +1,4 @@
-# 网络连通性自检
+# GitHub 网络自检
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](https://github.com/neurotracee/netcheck/blob/main/LICENSE)
 [![Latest release](https://img.shields.io/github/v/release/neurotracee/netcheck?label=latest)](https://github.com/neurotracee/netcheck/releases/latest)
@@ -6,7 +6,7 @@
 [![Gitee](https://img.shields.io/badge/Gitee-mirror-c71d23.svg)](https://gitee.com/bio234/netcheck)
 [![selfcheck](https://github.com/neurotracee/netcheck/actions/workflows/ci.yml/badge.svg)](https://github.com/neurotracee/netcheck/actions/workflows/ci.yml)
 
-**中文** | [English](#netcheck--network-connectivity-self-check)
+**中文** | [English](#netcheck--github-network-self-check)
 
 > **本项目与 PDF 隐私打码工具同源同作者。** GitHub 仓库建得更早，Gitee 是同一名开发者维护的国内镜像
 > （https://gitee.com/bio234/netcheck），两边内容一致，不存在谁抄谁。
@@ -15,7 +15,11 @@
 > GitHub https://github.com/neurotracee/pdf-privacy-masker ｜ Gitee https://gitee.com/bio234/pdf-privacy-masker 。
 > 那个项目用 AGPL-3.0，本项目用 Apache-2.0，协议不同，别混用。
 
-一个纯本地、零依赖的网络连通性自检工具：**不代理、不加速、不改 hosts，只测量**。
+一个纯本地、零依赖的网络连通性自检工具，专门盯着**中国大陆能不能连上 GitHub 系服务**：**不代理、不加速、不改 hosts，只测量**。
+
+> **关于名字**：本项目原名「网络连通性自检」，容易被理解成泛泛的测网速工具。它的实际用途是排查 GitHub（含 Pages、raw、
+> API、对象存储、克隆下载）以及 Hugging Face、Docker 这些常被卡住的开发资源，所以从 1.1.0.3 起两端统一改名为 **GitHub 网络自检**；
+> 仓库名 `netcheck`、包名 `com.neurotracee.netcheck` 与脚本名 `netcheck.ps1` 都没有变。
 
 它把 14 个常被卡住的目标逐个测一遍，每个目标拆成 **DNS 解析 → TCP 建连 → TLS 握手 → HTTP 首字节** 四段分别计时，
 出一份 HTML 报告，一眼能看出是「解析不出来」「连不上」「能连上但握手被掐」还是「链路能用但很慢」。
@@ -37,6 +41,18 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 没有存储、位置、通讯录、短信、相机权限，也没有任何统计 / 广告 / 崩溃上报 SDK（可对照
 [AndroidManifest.xml](android/app/src/main/AndroidManifest.xml) 与 [NOTICE.md](NOTICE.md) 自行核对）。
 签名证书指纹写在 Release 说明里，可以自己验。
+
+**关于签名本身**（1.1.0.3 起）：APK 用 **APK Signature Scheme v2 + v3** 双重签名（v2 供 Android 7–8 校验，v3 供 9 及以上校验，
+比只签 v2 更稳，部分国产 ROM 的安装器会严格检查 v3）。证书是自签的，DN 为
+`CN=NetCheck, OU=OpenSource, O=neurotracee, L=Datong, ST=Shanxi, C=CN`，
+SHA-256 指纹 `c43205775efaf5d088b646d6999e81e08213c43969b3140b541c29d0c7bb8b5a`——自行核对命令：
+
+```text
+apksigner verify -v --print-certs NetCheck-<版本号>.apk
+```
+
+自签证书的含义只是「没有商业 CA 背书」，不等于不安全；**它不是应用商店的护照，也不影响覆盖升级**。
+从 1.0.0.0 到 1.1.0.3 一直是同一把密钥，所以旧版可以直接覆盖安装，不用卸载。
 
 **③ 它到底连了什么网。**
 联网权限只有一项 `INTERNET`，只用在三件事：**启动时自动检查更新（可在设置里关掉）**、
@@ -109,7 +125,7 @@ https://gitee.com/bio234/netcheck      # mirror / 镜像（国内访问更快）
 - **随分发附带协议与 NOTICE**：分发 APK 或脚本时，把 `LICENSE` 与 `NOTICE.md` 一并给出（第 4 条 (a)(d)）。
 - **保留修改标记**：改过的源文件要写明改了什么（第 4 条 (b)）。
 - **不要用作者的名义做背书**：不能暗示原作者为你的版本担保（第 6 条）。
-- **换个名字**：程序名「网络连通性自检 / NetCheck」与图标不在授权范围内（第 6 条商标条款），
+- **换个名字**：程序名「GitHub 网络自检 / NetCheck」与图标不在授权范围内（第 6 条商标条款），
   fork 请改名换图标，避免别人误认。
 
 需要闭源商用？**Apache-2.0 允许**，但上面三条署名与出处要求仍然有效。
@@ -175,6 +191,7 @@ https://gitee.com/bio234/netcheck      # mirror / 镜像（国内访问更快）
 
 ```text
   网络连通性自检 v1.1.0.1   GitHub / Hugging Face / Docker
+  （下面这段是 1.1.0.1 时的真实输出，当时还叫「网络连通性自检」；1.1.0.3 起同名位置显示为「GitHub 网络自检」）
   ---------------------------------------------------------
   作者：项目创作时为初中生 · 开发：豆包工作任务的 Agent × DeepSeek-V4.1-Flash
   开源协议 Apache-2.0 · 原项目 https://github.com/neurotracee/netcheck
@@ -439,9 +456,9 @@ limitations under the License.
 
 ---
 
-# NetCheck — Network Connectivity Self Check
+# NetCheck — GitHub Network Self-Check
 
-[中文](#网络连通性自检) | **English**
+[中文](#github-网络自检) | **English**
 
 > **This project has the same author as PDF Privacy Masker.** The GitHub repository was created first;
 > Gitee (https://gitee.com/bio234/netcheck) is the developer's own mirror for faster access in mainland China.
