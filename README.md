@@ -35,19 +35,19 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 
 ## 下载（先点这里）
 
-**当前版本 v1.1.1.0**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
+**当前版本 v1.1.2.0**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
 
 | 你要的 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
 | 最新下载页 | https://github.com/neurotracee/github-netcheck/releases/latest | https://gitee.com/bio234/github-netcheck/releases/latest |
-| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.1.0/NetCheck-1.1.1.0.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.1.0/NetCheck-1.1.1.0.apk |
-| Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.1.0/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.1.0/NetCheck-Windows.zip |
+| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.2.0/NetCheck-1.1.2.0.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.2.0/NetCheck-1.1.2.0.apk |
+| Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.2.0/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.2.0/NetCheck-Windows.zip |
 | 仓库首页 | https://github.com/neurotracee/github-netcheck | https://gitee.com/bio234/github-netcheck |
 
 解压 Windows 包后双击 **一键网络自检.bat**；APK 直接安装（系统会提示「未知来源」，原因见下一节）。
 校验值（SHA-256）写在 [Release 说明](https://github.com/neurotracee/github-netcheck/releases/latest) 里，下载后可用 `certutil -hashfile <文件名> SHA256` 自己核一遍。
 
-**版本说明**：这是四段版本号（主.次.修订.补丁），小修小改只加最后一段，所以 1.1.0.3 → 1.1.1.0 属于功能级更新（加了「先问我」和分平台版本号），不是大版本。
+**版本说明**：这是四段版本号（主.次.修订.补丁），小修小改只加最后一段，所以 1.1.1.0 → 1.1.2.0 属于功能级更新（加了「更新源默认 Gitee」的判定），不是大版本。
 
 ## 装之前先看三件事
 
@@ -100,7 +100,7 @@ hosts 里那 2 条本地映射把 GitHub Pages 顶成了 127.0.0.1，所以它�
 | 界面 | 说明 |
 | --- | --- |
 | 主界面 | 标题区 + 环境标签 + 两个按钮 + 四张汇总卡 + 逐条结果卡（点一条展开细节） |
-| 设置页 | 界面语言 / 外观 / 报告保存位置 / 更新检查方式 / 更新源（Gitee 或 GitHub）/ 版本与检查更新 / 关于入口 |
+| 设置页 | 界面语言 / 外观 / 报告保存位置 / 更新检查方式 / 更新源（自动默认 Gitee / 只用 Gitee / 只用 GitHub）/ 版本与检查更新 / 关于入口 |
 | 关于页 | 指导作者、开发（豆包工作任务的 Agent × DeepSeek-V4.1-Flash）、协议、两个地址、隐私、三条硬要求、维护节奏 |
 
 Windows 端是控制台 + 两个 WinForms 窗口：菜单式 BAT 选 `1` 直接自检，选 `3` 弹关于窗、选 `4` 弹设置窗、选 `5` 只查更新。
@@ -294,26 +294,29 @@ hosts 把域名指向 127.0.0.1
 
 ## 版本号与更新检查（只发一端时，另一端不会被误报）
 
-版本号是四段 `主.次.修订.补丁`，例如 `1.1.1.0`：
+版本号是四段 `主.次.修订.补丁`，例如 `1.1.2.0`：
 
 - 只改文案、修小 bug → 只动**第四段**（`1.1.0.3` → `1.1.0.4`）；
-- 加了新功能 → 动**第三段**（`1.1.0.x` → `1.1.1.0`）；
+- 加了新功能 → 动**第三段**（`1.1.1.x` → `1.1.2.0`）；
 - 前两段基本不动，动了就是大版本，别轻易用。
 
 仓库根目录有一份 `version.json`，**按平台分开写版本号**：
 
 ```json
 {
-  "android": { "version": "1.1.1.0", "url": "https://github.com/neurotracee/github-netcheck/releases" },
-  "windows": { "version": "1.1.1.0", "url": "https://github.com/neurotracee/github-netcheck/releases" }
+  "android": { "version": "1.1.2.0", "url": "https://github.com/neurotracee/github-netcheck/releases" },
+  "windows": { "version": "1.1.2.0", "url": "https://github.com/neurotracee/github-netcheck/releases" }
 }
 ```
 
 两端的「检查更新」都先读这个文件，**只认自己那一段**：只发 Windows 更新、把 `windows.version` 改成 `1.1.0.4`，
-安卓端读到的仍是 `1.1.1.0`，就不会莫名弹出「有新版本」；反过来也一样。
+安卓端读到的仍是 `1.1.2.0`，就不会莫名弹出「有新版本」；反过来也一样。
 这修掉了以前「发一次 Release，两端都提示更新但只有一端真变了」的逻辑 bug。
 读不到 `version.json` 时才会退回读 Release（发布版本）的 tag，所以老环境也不会瞎。
 
+**更新源默认 Gitee**：两端都只在「界面语言不是中文」且「系统时区不是 UTC+8」同时成立时（明确迹象说明大概率不在中国大陆），
+才默认改走 GitHub；任何一条判断不出来（中文界面 / 时区 +8 / 读不到）一律走 Gitee。
+用户可在设置里手动锁定「只用 Gitee」或「只用 GitHub」；选中的源连不上会自动换另一个再试一次。
 
 ## 怎么用
 
@@ -351,7 +354,7 @@ hosts 把域名指向 127.0.0.1
 3. 打开应用，点 **开始自检**。测的过程中能看到「正在测试 3 / 14 · GitHub API 接口」。
 4. 测完：每行可点开看细节（状态码、DoH 对照、四段耗时）；点 **导出报告** 把 HTML 交给你（见下面的保存位置说明），点 **分享 CSV** 导出原始数据。
 5. 右上角 **齿轮** 进设置：界面语言（中文 / English）、外观（跟随系统 / 浅色 / 深色）、
-   报告保存位置、更新检查方式、更新源（Gitee / GitHub）、版本与更新；最下面是 **关于与开源信息**
+   报告保存位置、更新检查方式、更新源（自动默认 Gitee / 只用 Gitee / 只用 GitHub）、版本与更新；最下面是 **关于与开源信息**
    （署名、协议、两个地址、隐私说明、二次开发三条硬要求）。
 
 **报告保存位置**：默认走系统分享面板（发微信、发邮件、存到「文件」都行）；在设置里选了一个文件夹之后，

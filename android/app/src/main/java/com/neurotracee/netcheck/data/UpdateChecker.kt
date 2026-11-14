@@ -20,10 +20,11 @@ object UpdateChecker {
     private const val GITEE_URL = "https://gitee.com/api/v5/repos/bio234/github-netcheck/releases/latest"
     private const val GITHUB_URL = "https://api.github.com/repos/neurotracee/github-netcheck/releases/latest"
 
-    /** source: 0 Gitee · 1 GitHub。返回 Result，失败时带一句人话。 */
+    /** source: -1 自动 · 0 Gitee · 1 GitHub。返回 Result，失败时带一句人话。 */
     fun check(source: Int, timeoutMs: Int = 8000): Result<Info> {
-        val order = if (source == 1) listOf(GITHUB_VER, GITEE_VER) else listOf(GITEE_VER, GITHUB_VER)
-        val fallback = if (source == 1) listOf(GITHUB_URL, GITEE_URL) else listOf(GITEE_URL, GITHUB_URL)
+        val resolved = resolveSource(source)
+        val order = if (resolved == 1) listOf(GITHUB_VER, GITEE_VER) else listOf(GITEE_VER, GITHUB_VER)
+        val fallback = if (resolved == 1) listOf(GITHUB_URL, GITEE_URL) else listOf(GITEE_URL, GITHUB_URL)
         var last: String = "拿不到更新信息"
         for (url in order) {
             try {
@@ -75,8 +76,24 @@ object UpdateChecker {
         }
     }
 
-    private fun friendly(url: String, t: Throwable): String = when {
-        t is java.net.SocketTimeoutException -> "连接超时（换一个更新源再试）"
+    /**
+     * 更新源判定：默认 Gitee。
+     * 只有出现「明确证据」说明用户大概率不在中国大陆时，才默认 GitHub：
+     * 界面语言不是中文，且系统时区偏移不是 UTC+8。
+     * 任何一条无法确认（语言是中文 / 时区是 +8 / 读不到）→ 仍然走 Gitee。
+     * 用户在设置里明确选了 Gitee 或 GitHub 时，直接照用户的选择。
+     */
+    fun resolveSource(pref: Int): Int {
+        if (pref == 0 || pref == 1) return pref
+        val lang = java.util.Locale.getDefault().language
+        val zone = java.util.TimeZone.getDefault()
+        val offsetHours = zone.getRawOffset() / 3_600_000
+        val inChinaZone = offsetHours == 8
+        val chineseUi = lang == "zh"
+        return if (!chineseUi && !inChinaZone) 1 else 0
+    }
+
+    private fun friendly(url: String, t: Throwable): String = when {        t is java.net.SocketTimeoutException -> "连接超时（换一个更新源再试）"
         t is java.net.UnknownHostException -> "域名解析失败（可能没网或被拦）"
         t is javax.net.ssl.SSLException -> "握手失败（链路被重置）"
         else -> t.message ?: "读取失败"

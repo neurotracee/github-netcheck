@@ -25,9 +25,9 @@ class Prefs(context: Context) {
         get() = sp.getBoolean(KEY_AUTO_UPDATE, true)
         set(v) = sp.edit().putBoolean(KEY_AUTO_UPDATE, v).apply()
 
-    /** 0 Gitee（国内默认）· 1 GitHub */
+    /** -1 自动（默认 Gitee，只有明确判定在境外才走 GitHub）· 0 Gitee · 1 GitHub */
     var updateSource: Int
-        get() = sp.getInt(KEY_SOURCE, 0)
+        get() = sp.getInt(KEY_SOURCE, -1)
         set(v) = sp.edit().putInt(KEY_SOURCE, v).apply()
 
     /** 报告保存目录（SAF 授权的目录 Uri，空表示未设置：导出时走系统分享面板） */

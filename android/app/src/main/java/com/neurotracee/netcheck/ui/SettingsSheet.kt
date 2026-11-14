@@ -191,12 +191,18 @@ fun SettingsSheet(
             Label(p, t("更新源", "Update source"))
             Segmented(
                 p = p,
-                options = listOf(t("Gitee（建议中国大陆用户）", "Gitee (mainland)") to 0, "GitHub" to 1),
+                options = listOf(
+                    t("自动（默认 Gitee）", "Auto (Gitee first)") to -1,
+                    "Gitee" to 0,
+                    "GitHub" to 1
+                ),
                 selected = source,
                 onSelect = { source = it; prefs.updateSource = it }
             )
-            Hint(p, t("选中的源连不上会自动换另一个再试；本应用没有后台常驻联网。",
-                "If the chosen source fails it retries the other one. No background networking."))
+            Hint(p, t("默认走 Gitee；只有语言不是中文、时区也不是 UTC+8 这种明确迹象才默认 GitHub，判断不出来仍然走 Gitee。当前实际使用：" +
+                    if (UpdateChecker.resolveSource(source) == 1) "GitHub" else "Gitee",
+                "Gitee by default; GitHub only when the language is non-Chinese AND the time zone is not UTC+8. Now using: " +
+                    if (UpdateChecker.resolveSource(source) == 1) "GitHub" else "Gitee"))
 
             // 版本与更新
             Label(p, t("版本与更新", "Version"))

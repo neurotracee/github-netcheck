@@ -4,7 +4,7 @@
 #  测四项：DNS 解析 / TCP 建连 / TLS 握手 / HTTPS 首字节
 #  输出：控制台结果 + reports 目录下的 HTML 可视化报告
 #
-#  版本：1.1.1.0
+#  版本：1.1.2.0
 #  开源协议：Apache License 2.0
 #  原项目地址：https://github.com/neurotracee/github-netcheck
 #  镜像（Gitee）：https://gitee.com/bio234/github-netcheck
@@ -25,7 +25,7 @@ param(
     [switch]$CheckUpdate  # 只查最新版本号，不测
 )
 
-$script:AppVersion = '1.1.1.0'
+$script:AppVersion = '1.1.2.0'
 $script:ProjectUrl = 'https://github.com/neurotracee/github-netcheck'
 $script:MirrorUrl  = 'https://gitee.com/bio234/github-netcheck'
 
@@ -62,6 +62,7 @@ $script:AutoOpen = $false
 $script:AutoCheckUpdate = $true
 $script:AskBeforeReport = $true
 $script:SaveReport = $true
+$script:UpdateSource = 'auto'   # auto（默认 Gitee，只有明确迹象在境外才 GitHub）/ gitee / github
 
 $cfg = $null
 if (Test-Path -LiteralPath $script:SettingsFile) {
@@ -76,12 +77,13 @@ if ($cfg) {
     if ($cfg.PSObject.Properties['AutoCheckUpdate']) { $script:AutoCheckUpdate = [bool]$cfg.AutoCheckUpdate }
     if ($cfg.PSObject.Properties['AskBeforeReport']) { $script:AskBeforeReport = [bool]$cfg.AskBeforeReport }
     if ($cfg.PSObject.Properties['SaveReport']) { $script:SaveReport = [bool]$cfg.SaveReport }
+    if ($cfg.PSObject.Properties['UpdateSource'] -and $cfg.UpdateSource) { $script:UpdateSource = [string]$cfg.UpdateSource }
     if ($cfg.PSObject.Properties['TimeoutMs'] -and [int]$cfg.TimeoutMs -gt 0) { $script:TimeoutMs = [int]$cfg.TimeoutMs }
 }
 if (-not (Test-Path -LiteralPath $ReportDir)) { New-Item -ItemType Directory -Path $ReportDir -Force | Out-Null }
 
 function Save-LocalSettings {
-    param([string]$Dir, [bool]$AutoOpen, [int]$TimeoutMs, [bool]$AutoCheckUpdate = $true, [bool]$AskBeforeReport = $true, [bool]$SaveReport = $true)
+    param([string]$Dir, [bool]$AutoOpen, [int]$TimeoutMs, [bool]$AutoCheckUpdate = $true, [bool]$AskBeforeReport = $true, [bool]$SaveReport = $true, [string]$UpdateSource = 'auto')
     $obj = [ordered]@{
         ReportDir       = $Dir
         AutoOpen        = $AutoOpen
@@ -89,6 +91,7 @@ function Save-LocalSettings {
         AutoCheckUpdate = $AutoCheckUpdate
         AskBeforeReport = $AskBeforeReport
         SaveReport      = $SaveReport
+        UpdateSource    = $UpdateSource
     }
     ($obj | ConvertTo-Json) | Set-Content -LiteralPath $script:SettingsFile -Encoding UTF8
 }
@@ -203,7 +206,7 @@ function Show-SettingsWindow {
     $font = New-Object System.Drawing.Font('Microsoft YaHei UI', 9)
     $form = New-Object System.Windows.Forms.Form
     $form.Text = '设置 · GitHub 网络自检'
-    $form.Size = New-Object System.Drawing.Size(600, 420)
+    $form.Size = New-Object System.Drawing.Size(600, 470)
     $form.StartPosition = 'CenterScreen'
     $form.BackColor = [System.Drawing.Color]::FromArgb(244, 246, 248)
     $form.Font = $font
@@ -290,15 +293,47 @@ function Show-SettingsWindow {
     $updHint.Location = New-Object System.Drawing.Point(44, 290)
     $form.Controls.Add($updHint)
 
+    # 更新源：默认 Gitee，只有明确迹象说明在境外才走 GitHub
+    $l3 = New-Object System.Windows.Forms.Label
+    $l3.Text = '更新源'
+    $l3.AutoSize = $true
+    $l3.Location = New-Object System.Drawing.Point(26, 322)
+    $form.Controls.Add($l3)
+
+    $cboSrc = New-Object System.Windows.Forms.ComboBox
+    $cboSrc.DropDownStyle = 'DropDownList'
+    $cboSrc.Size = New-Object System.Drawing.Size(240, 26)
+    $cboSrc.Location = New-Object System.Drawing.Point(86, 318)
+    [void]$cboSrc.Items.Add('自动（默认 Gitee）')
+    [void]$cboSrc.Items.Add('只用 Gitee')
+    [void]$cboSrc.Items.Add('只用 GitHub')
+    switch ($script:UpdateSource) {
+        'gitee'  { $cboSrc.SelectedIndex = 1 }
+        'github' { $cboSrc.SelectedIndex = 2 }
+        default  { $cboSrc.SelectedIndex = 0 }
+    }
+    $form.Controls.Add($cboSrc)
+
+    $srcHint = New-Object System.Windows.Forms.Label
+    $srcHint.Text = ('默认 Gitee；语言非中文且时区不是 UTC+8 才自动改走 GitHub。当前实际使用：' +
+        $(if (Resolve-UpdateSource -eq 'gitee') { 'Gitee' } else { 'GitHub' }))
+    $srcHint.AutoSize = $true
+    $srcHint.ForeColor = [System.Drawing.Color]::FromArgb(107, 119, 133)
+    $srcHint.Location = New-Object System.Drawing.Point(86, 346)
+    $form.Controls.Add($srcHint)
+
     $save = New-Object System.Windows.Forms.Button
     $save.Text = '保存'
     $save.Size = New-Object System.Drawing.Size(96, 32)
-    $save.Location = New-Object System.Drawing.Point(382, 326)
+    $save.Location = New-Object System.Drawing.Point(382, 380)
     $save.BackColor = [System.Drawing.Color]::FromArgb(18, 161, 80)
     $save.ForeColor = [System.Drawing.Color]::White
     $save.FlatStyle = 'Flat'
     $save.Add_Click({
-        Save-LocalSettings -Dir $box.Text -AutoOpen $chk.Checked -TimeoutMs ([int]$num.Value) -AutoCheckUpdate $chkUpd.Checked -AskBeforeReport $chkAsk.Checked -SaveReport $script:SaveReport
+        $srcVal = 'auto'
+        if ($cboSrc.SelectedIndex -eq 1) { $srcVal = 'gitee' }
+        elseif ($cboSrc.SelectedIndex -eq 2) { $srcVal = 'github' }
+        Save-LocalSettings -Dir $box.Text -AutoOpen $chk.Checked -TimeoutMs ([int]$num.Value) -AutoCheckUpdate $chkUpd.Checked -AskBeforeReport $chkAsk.Checked -SaveReport $script:SaveReport -UpdateSource $srcVal
         [System.Windows.Forms.MessageBox]::Show('已保存。下次运行按新设置来。', '设置')
         $form.Close()
     })
@@ -307,7 +342,7 @@ function Show-SettingsWindow {
     $cancel = New-Object System.Windows.Forms.Button
     $cancel.Text = '取消'
     $cancel.Size = New-Object System.Drawing.Size(96, 32)
-    $cancel.Location = New-Object System.Drawing.Point(486, 328)
+    $cancel.Location = New-Object System.Drawing.Point(486, 380)
     $cancel.FlatStyle = 'Flat'
     $cancel.Add_Click({ $form.Close() })
     $form.Controls.Add($cancel)
@@ -563,10 +598,26 @@ function Get-RemoteVersion {
     return $m.Groups[1].Value
 }
 
+# 更新源顺序：默认 Gitee。
+# 只有「明确迹象」说明大概率不在中国大陆时才默认 GitHub ——
+# 系统语言不是中文，且时区也不是 UTC+8；判断不出来一律走 Gitee。
+function Resolve-UpdateSource {
+    if ($script:UpdateSource -eq 'gitee') { return 'gitee' }
+    if ($script:UpdateSource -eq 'github') { return 'github' }
+    $chineseUi = $false
+    try { $chineseUi = ([Globalization.CultureInfo]::CurrentUICulture.TwoLetterISOLanguageName -eq 'zh') } catch { }
+    $offsetHours = 0
+    try { $offsetHours = [TimeZoneInfo]::Local.BaseUtcOffset.TotalHours } catch { }
+    if ((-not $chineseUi) -and ($offsetHours -ne 8)) { return 'github' }
+    return 'gitee'
+}
+
 function Invoke-UpdateCheck {
     param([int]$TimeoutMs = 5000)
     $errs = @()
-    foreach ($s in @('gitee', 'github')) {
+    $first = Resolve-UpdateSource
+    $order = @($first, $(if ($first -eq 'gitee') { 'github' } else { 'gitee' }))
+    foreach ($s in $order) {
         $srcName = 'Gitee'
         if ($s -eq 'github') { $srcName = 'GitHub' }
         $tag = Get-RemoteVersion -Source $s -TimeoutMs $TimeoutMs
