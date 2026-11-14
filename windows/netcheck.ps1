@@ -4,7 +4,7 @@
 #  测四项：DNS 解析 / TCP 建连 / TLS 握手 / HTTPS 首字节
 #  输出：控制台结果 + reports 目录下的 HTML 可视化报告
 #
-#  版本：1.1.3.0
+#  版本：1.1.3.1
 #  开源协议：Apache License 2.0
 #  原项目地址：https://github.com/neurotracee/github-netcheck
 #  镜像（Gitee）：https://gitee.com/bio234/github-netcheck
@@ -25,7 +25,7 @@ param(
     [switch]$CheckUpdate  # 只查最新版本号，不测
 )
 
-$script:AppVersion = '1.1.3.0'
+$script:AppVersion = '1.1.3.1'
 $script:ProjectUrl = 'https://github.com/neurotracee/github-netcheck'
 $script:MirrorUrl  = 'https://gitee.com/bio234/github-netcheck'
 
@@ -674,6 +674,7 @@ function Show-UpdatePrompt {
 
     $t2 = New-Object System.Windows.Forms.Label
     $t2.Text = '不更新也一模一样用，只是新版顺手修了几个小毛病，用起来更稳。' + "`r`n" +
+               '下载的是单文件便携版，覆盖旧的那一个即可，设置与历史报告都会保留。' + "`r`n" +
                '下次打开还会再提醒一次，到时候想换也来得及。'
     $t2.AutoSize = $true
     $t2.ForeColor = [System.Drawing.Color]::FromArgb(107, 119, 133)

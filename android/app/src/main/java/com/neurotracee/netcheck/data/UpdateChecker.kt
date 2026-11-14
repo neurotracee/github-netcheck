@@ -13,7 +13,8 @@ import java.net.URL
  */
 object UpdateChecker {
 
-    data class Info(val tag: String, val url: String)
+    /** tag = 远端版本号；url = 发布页；apk = 本平台安装包直链（可能为空，退化为发布页） */
+    data class Info(val tag: String, val url: String, val apk: String = "")
 
     private const val GITEE_VER = "https://gitee.com/bio234/github-netcheck/raw/main/version.json"
     private const val GITHUB_VER = "https://raw.githubusercontent.com/neurotracee/github-netcheck/main/version.json"
@@ -51,7 +52,8 @@ object UpdateChecker {
         val ver = self.optString("version")
         if (ver.isBlank()) throw IllegalStateException("没有版本号")
         val page = self.optString("url")
-        return Info(ver.trim(), page.ifBlank { url })
+        val apk = self.optString("apk")
+        return Info(ver.trim(), page.ifBlank { url }, apk.trim())
     }
 
     private fun fetchRelease(url: String, timeoutMs: Int): Info {
@@ -59,7 +61,18 @@ object UpdateChecker {
         val tag = obj.optString("tag_name")
         val html = obj.optString("html_url")
         if (tag.isBlank()) throw IllegalStateException("没有版本号")
-        return Info(tag.trim(), html.ifBlank { url })
+        // 只认本平台的安装包，只给另一端发过包时 apk 为空 → 退化为发布页
+        var apk = ""
+        obj.optJSONArray("assets")?.let { arr ->
+            for (i in 0 until arr.length()) {
+                val name = arr.optJSONObject(i)?.optString("name").orEmpty()
+                if (name.lowercase().endsWith(".apk")) {
+                    apk = arr.optJSONObject(i)?.optString("browser_download_url").orEmpty()
+                    break
+                }
+            }
+        }
+        return Info(tag.trim(), html.ifBlank { url }, apk.trim())
     }
 
     private fun get(url: String, timeoutMs: Int): String {
