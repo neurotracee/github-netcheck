@@ -36,3 +36,4 @@ signing.properties
 # ---- 发布暂存（要往 Release 页面拖的包，不进仓库）----
 release/
 windows/settings.json
+dist/
