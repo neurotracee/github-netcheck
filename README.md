@@ -1,15 +1,15 @@
 # GitHub 网络自检
 
-[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](https://github.com/neurotracee/netcheck/blob/main/LICENSE)
-[![Latest release](https://img.shields.io/github/v/release/neurotracee/netcheck?label=latest)](https://github.com/neurotracee/netcheck/releases/latest)
-[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Android-blue.svg)](https://github.com/neurotracee/netcheck/releases)
-[![Gitee](https://img.shields.io/badge/Gitee-mirror-c71d23.svg)](https://gitee.com/bio234/netcheck)
-[![selfcheck](https://github.com/neurotracee/netcheck/actions/workflows/ci.yml/badge.svg)](https://github.com/neurotracee/netcheck/actions/workflows/ci.yml)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](https://github.com/neurotracee/github-netcheck/blob/main/LICENSE)
+[![Latest release](https://img.shields.io/github/v/release/neurotracee/github-netcheck?label=latest)](https://github.com/neurotracee/github-netcheck/releases/latest)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Android-blue.svg)](https://github.com/neurotracee/github-netcheck/releases)
+[![Gitee](https://img.shields.io/badge/Gitee-mirror-c71d23.svg)](https://gitee.com/bio234/github-netcheck)
+[![selfcheck](https://github.com/neurotracee/github-netcheck/actions/workflows/ci.yml/badge.svg)](https://github.com/neurotracee/github-netcheck/actions/workflows/ci.yml)
 
 **中文** | [English](#netcheck--github-network-self-check)
 
 > **本项目与 PDF 隐私打码工具同源同作者。** GitHub 仓库建得更早，Gitee 是同一名开发者维护的国内镜像
-> （https://gitee.com/bio234/netcheck），两边内容一致，不存在谁抄谁。
+> （https://gitee.com/bio234/github-netcheck），两边内容一致，不存在谁抄谁。
 >
 > 作者的另一项目：**PDF 隐私打码工具**（本地离线给 PDF 打码，不上传文件）——
 > GitHub https://github.com/neurotracee/pdf-privacy-masker ｜ Gitee https://gitee.com/bio234/pdf-privacy-masker 。
@@ -19,7 +19,9 @@
 
 > **关于名字**：本项目原名「网络连通性自检」，容易被理解成泛泛的测网速工具。它的实际用途是排查 GitHub（含 Pages、raw、
 > API、对象存储、克隆下载）以及 Hugging Face、Docker 这些常被卡住的开发资源，所以从 1.1.0.3 起两端统一改名为 **GitHub 网络自检**；
-> 仓库名 `netcheck`、包名 `com.neurotracee.netcheck` 与脚本名 `netcheck.ps1` 都没有变。
+> 仓库名也从 `netcheck` 改成了 **`github-netcheck`**（GitHub 与 Gitee 两边一起改，旧链接会跳转到新地址），
+> 免得仓库名里只剩下一个宽泛的「网络检查」。包名 `com.neurotracee.netcheck` 与脚本名 `netcheck.ps1` 没动——
+> 包名一改，手机上装过的旧版就没法覆盖升级了。
 
 **关键词（给搜索用的标签）**：GitHub 连不上 排查 · GitHub 加速检测 · GitHub Pages 打不开 · raw.githubusercontent 加载失败 ·
 网络连通性自检 · 连通性检测 · DNS 解析 / TCP 建连 / TLS 握手 / HTTP 首字节（四段分别计时）· 延迟测试 · hosts 映射检查 · 系统代理检查 ·
@@ -61,8 +63,8 @@ apksigner verify -v --print-certs NetCheck-<版本号>.apk
 **③ 它到底连了什么网。**
 联网权限只有一项 `INTERNET`，只用在三件事：**启动时自动检查更新（可在设置里关掉）**、
 **手动点「检查更新」**、**测那 14 个点位的延迟**。
-检查更新只连**两个仓库**——国内 Gitee（https://gitee.com/bio234/netcheck）、国外 GitHub
-（https://github.com/neurotracee/netcheck），由脚本按可用的那个自动择一，读一行公开的版本号。
+检查更新只连**两个仓库**——国内 Gitee（https://gitee.com/bio234/github-netcheck）、国外 GitHub
+（https://github.com/neurotracee/github-netcheck），由脚本按可用的那个自动择一，读一行公开的版本号。
 **不上传任何信息、不传文件、不带账号、不带设备标识**；测延迟时也只发连接和一次响应头读取，不提交内容。
 
 ![图标](assets/icon/netcheck-1024-plate.png)
@@ -98,8 +100,8 @@ apksigner verify -v --print-certs NetCheck-<版本号>.apk
 ### ② 在程序里标注原项目地址
 
 ```
-https://github.com/neurotracee/netcheck
-https://gitee.com/bio234/netcheck      # mirror / 镜像（国内访问更快）
+https://github.com/neurotracee/github-netcheck
+https://gitee.com/bio234/github-netcheck      # mirror / 镜像（国内访问更快）
 ```
 
 **必须让使用者看得见**——「关于」窗口、首页页脚、帮助菜单、报告页脚、`--about` 输出，任选一处即可。
@@ -109,7 +111,7 @@ https://gitee.com/bio234/netcheck      # mirror / 镜像（国内访问更快）
 
 | 位置 | 内容 |
 | --- | --- |
-| 安卓端首页页脚 | `原项目地址：https://github.com/neurotracee/netcheck` + `镜像（Gitee）：gitee.com/bio234/netcheck`（两行可点，点了复制） |
+| 安卓端首页页脚 | `原项目地址：https://github.com/neurotracee/github-netcheck` + `镜像（Gitee）：gitee.com/bio234/github-netcheck`（两行可点，点了复制） |
 | 生成的 HTML 报告 | 报告页脚同样两行地址 |
 | Windows 端 | 控制台首行与说明文档首屏 |
 
@@ -117,8 +119,8 @@ https://gitee.com/bio234/netcheck      # mirror / 镜像（国内访问更快）
 
 只要你不是拿原版原样分发，就在程序里显著注明：
 
-> 本程序基于 https://github.com/neurotracee/netcheck
-> （镜像：https://gitee.com/bio234/netcheck）修改，非原作者发布。
+> 本程序基于 https://github.com/neurotracee/github-netcheck
+> （镜像：https://gitee.com/bio234/github-netcheck）修改，非原作者发布。
 
 依据 Apache-2.0 第 4 条 (b) 项：修改过的文件必须带上「已修改」的显著说明。
 
@@ -198,7 +200,7 @@ https://gitee.com/bio234/netcheck      # mirror / 镜像（国内访问更快）
   （下面这段是 1.1.0.1 时的真实输出，当时还叫「网络连通性自检」；1.1.0.3 起同名位置显示为「GitHub 网络自检」）
   ---------------------------------------------------------
   作者：项目创作时为初中生 · 开发：豆包工作任务的 Agent × DeepSeek-V4.1-Flash
-  开源协议 Apache-2.0 · 原项目 https://github.com/neurotracee/netcheck
+  开源协议 Apache-2.0 · 原项目 https://github.com/neurotracee/github-netcheck
   系统代理：未开启（直连模式）
   hosts 记录：发现 45 条本地映射（可能来自瓦特工具箱等加速工具）
   本机 443 端口：有程序在监听（本地反代很可能在运行）
@@ -278,7 +280,7 @@ hosts 把域名指向 127.0.0.1
 
 ### 方式一：Windows，双击就跑
 
-1. 到 **[Releases 页面](https://github.com/neurotracee/netcheck/releases/latest)** 下载 `NetCheck-Windows.zip`（或直接下载仓库里 `windows/` 目录的两个文件；国内网络慢可以去 [Gitee 发布页](https://gitee.com/bio234/netcheck/releases/latest)，两边是同一个包）。
+1. 到 **[Releases 页面](https://github.com/neurotracee/github-netcheck/releases/latest)** 下载 `NetCheck-Windows.zip`（或直接下载仓库里 `windows/` 目录的两个文件；国内网络慢可以去 [Gitee 发布页](https://gitee.com/bio234/github-netcheck/releases/latest)，两边是同一个包）。
 2. 解压，双击 **一键网络自检.bat**，会出现一个菜单：
 
    ```
@@ -299,7 +301,7 @@ hosts 把域名指向 127.0.0.1
 
 ### 方式二：安卓，装 APK
 
-1. 到 **[Releases 页面](https://github.com/neurotracee/netcheck/releases/latest)** 下载 `NetCheck-<版本号>.apk`（Android 8.0 及以上，通用包，不挑 CPU 架构）。
+1. 到 **[Releases 页面](https://github.com/neurotracee/github-netcheck/releases/latest)** 下载 `NetCheck-<版本号>.apk`（Android 8.0 及以上，通用包，不挑 CPU 架构）。
 2. 点开安装；系统提示「未知来源」时，允许当前文件管理器安装即可。
 3. 打开应用，点 **开始自检**。测的过程中能看到「正在测试 3 / 14 · GitHub API 接口」。
 4. 测完：每行可点开看细节（状态码、DoH 对照、四段耗时）；点 **导出报告** 把 HTML 交给你（见下面的保存位置说明），点 **分享 CSV** 导出原始数据。
@@ -442,7 +444,7 @@ limitations under the License.
 
 这个项目由个人在业余时间维护，取舍很直白：**测不准、判读误导、结果不稳定**这类问题优先处理；界面润色、锦上添花的功能可以慢慢来。代码全部公开，任何人不经询问就可以 fork 自行改进，不必等作者回复。
 
-- **报缺陷**：到 [Issues](https://github.com/neurotracee/netcheck/issues/new/choose) 按模板填，写清版本号、系统/机型、哪几个点位、报告截图。两端 Issues 都开着，Gitee 那边也行（[Gitee Issues](https://gitee.com/bio234/netcheck/issues)）。
+- **报缺陷**：到 [Issues](https://github.com/neurotracee/github-netcheck/issues/new/choose) 按模板填，写清版本号、系统/机型、哪几个点位、报告截图。两端 Issues 都开着，Gitee 那边也行（[Gitee Issues](https://gitee.com/bio234/github-netcheck/issues)）。
 - **提改进 / 提代码**：先看 [CONTRIBUTING.md](CONTRIBUTING.md)，里面有目录结构、怎么跑自检、以及提交时会被要求做什么。
 - **回复可能不快**：看到了会处理，没回不代表没看见，也不代表被否掉。
 
@@ -465,7 +467,7 @@ limitations under the License.
 [中文](#github-网络自检) | **English**
 
 > **This project has the same author as PDF Privacy Masker.** The GitHub repository was created first;
-> Gitee (https://gitee.com/bio234/netcheck) is the developer's own mirror for faster access in mainland China.
+> Gitee (https://gitee.com/bio234/github-netcheck) is the developer's own mirror for faster access in mainland China.
 
 A local-only, dependency-free connectivity probe. **It does not proxy, does not accelerate, does not touch hosts — it only measures.**
 

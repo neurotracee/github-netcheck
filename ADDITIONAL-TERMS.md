@@ -31,8 +31,8 @@
 必须让程序的使用者**看得见**这个地址：
 
 ```
-https://github.com/neurotracee/netcheck
-https://gitee.com/bio234/netcheck      （国内镜像，两处写任一处或都写均可）
+https://github.com/neurotracee/github-netcheck
+https://gitee.com/bio234/github-netcheck      （国内镜像，两处写任一处或都写均可）
 ```
 
 依据：第 4 条 (d) 项 —— 作品包含 NOTICE 文件时，衍生作品必须附带其中署名声明的可读副本，
@@ -45,8 +45,8 @@ https://gitee.com/bio234/netcheck      （国内镜像，两处写任一处或�
 
 如果你改过代码、改过界面、改过功能，必须在程序里**显著注明**：
 
-> 本程序基于 https://github.com/neurotracee/netcheck
-> （镜像：https://gitee.com/bio234/netcheck）修改，非原作者发布。
+> 本程序基于 https://github.com/neurotracee/github-netcheck
+> （镜像：https://gitee.com/bio234/github-netcheck）修改，非原作者发布。
 
 这一条是为了避免别人误以为改动后的版本是原作者做的——尤其是当你的版本有 bug、
 有隐私风险、或者开始收费的时候。
@@ -116,7 +116,7 @@ This project is licensed under the **Apache License 2.0**. Attribution requireme
    `Advisor: was a junior high school student when this project was created` and
    `Developed by Doubao Work Agent × DeepSeek-V4.1-Flash`.
 2. **Display the original project URL** (§4(d), because this repository ships a NOTICE file):
-   `https://github.com/neurotracee/netcheck` (mirror: `https://gitee.com/bio234/netcheck`),
+   `https://github.com/neurotracee/github-netcheck` (mirror: `https://gitee.com/bio234/github-netcheck`),
    somewhere the end user can actually see it — an About screen, a footer, a report footer,
    or command-line output.
 3. **Mark modified files** (§4(b)): state clearly that the version was modified and must not

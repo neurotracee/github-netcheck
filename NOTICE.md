@@ -4,7 +4,7 @@
 署名与出处要求见 **[ADDITIONAL-TERMS.md](ADDITIONAL-TERMS.md)**。
 
 简而言之：二次开发、商用、闭源分发都可以，但**必须保留作者署名，并在程序里标注原项目地址**
-`https://github.com/neurotracee/netcheck`（国内镜像：`https://gitee.com/bio234/netcheck`）。
+`https://github.com/neurotracee/github-netcheck`（国内镜像：`https://gitee.com/bio234/github-netcheck`）。
 
 下面按平台列出用到的第三方组件，各自的授权与版权归其作者所有。
 
@@ -64,8 +64,8 @@ https://dns.alidns.com/resolve?name=<域名>&type=A
 ```
 指导作者：项目创作时为初中生 —— 只负责提需求、定判读标准、验收与反馈问题
 开发    ：豆包工作任务的 Agent × DeepSeek-V4.1-Flash（Agent 由豆包工作任务提供，模型为 DeepSeek V4.1-Flash）
-原项目  ：https://github.com/neurotracee/netcheck
-镜像    ：https://gitee.com/bio234/netcheck
+原项目  ：https://github.com/neurotracee/github-netcheck
+镜像    ：https://gitee.com/bio234/github-netcheck
 ```
 
 > 名词说明：**Agent 来自豆包工作任务，模型来自 DeepSeek（V4.1-Flash）**。两者都不是腾讯的产品，

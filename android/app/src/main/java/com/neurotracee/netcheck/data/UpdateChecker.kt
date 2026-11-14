@@ -12,8 +12,8 @@ object UpdateChecker {
 
     data class Info(val tag: String, val url: String)
 
-    private const val GITEE_URL = "https://gitee.com/api/v5/repos/bio234/netcheck/releases/latest"
-    private const val GITHUB_URL = "https://api.github.com/repos/neurotracee/netcheck/releases/latest"
+    private const val GITEE_URL = "https://gitee.com/api/v5/repos/bio234/github-netcheck/releases/latest"
+    private const val GITHUB_URL = "https://api.github.com/repos/neurotracee/github-netcheck/releases/latest"
 
     /** source: 0 Gitee · 1 GitHub。返回 Result，失败时带一句人话。 */
     fun check(source: Int, timeoutMs: Int = 8000): Result<Info> {

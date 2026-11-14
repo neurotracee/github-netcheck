@@ -46,8 +46,8 @@ import com.neurotracee.netcheck.data.UpdateChecker
 import android.os.Handler
 import android.os.Looper
 
-private const val PROJECT_URL = "https://github.com/neurotracee/netcheck"
-private const val MIRROR_URL = "https://gitee.com/bio234/netcheck"
+private const val PROJECT_URL = "https://github.com/neurotracee/github-netcheck"
+private const val MIRROR_URL = "https://gitee.com/bio234/github-netcheck"
 
 /** 设置面板：外观 / 语言 / 报告保存位置 / 更新检查 / 版本与更新 / 关于。 */
 @OptIn(ExperimentalMaterial3Api::class)

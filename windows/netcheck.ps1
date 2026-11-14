@@ -6,8 +6,8 @@
 #
 #  版本：1.1.0.3
 #  开源协议：Apache License 2.0
-#  原项目地址：https://github.com/neurotracee/netcheck
-#  镜像（Gitee）：https://gitee.com/bio234/netcheck
+#  原项目地址：https://github.com/neurotracee/github-netcheck
+#  镜像（Gitee）：https://gitee.com/bio234/github-netcheck
 #  指导作者：项目创作时为初中生；需求、判读规则与验收测试由本人完成
 #  开发：豆包工作任务的 Agent × DeepSeek-V4.1-Flash
 #
@@ -26,8 +26,8 @@ param(
 )
 
 $script:AppVersion = '1.1.0.3'
-$script:ProjectUrl = 'https://github.com/neurotracee/netcheck'
-$script:MirrorUrl  = 'https://gitee.com/bio234/netcheck'
+$script:ProjectUrl = 'https://github.com/neurotracee/github-netcheck'
+$script:MirrorUrl  = 'https://gitee.com/bio234/github-netcheck'
 
 $ErrorActionPreference = 'Continue'
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -510,9 +510,9 @@ function Compare-VersionText {
 function Get-RemoteVersion {
     param([string]$Source = 'gitee', [int]$TimeoutMs = 5000)
     if ($Source -eq 'github') {
-        $resp = Invoke-Https -HostName 'api.github.com' -Path '/repos/neurotracee/netcheck/releases/latest' -TimeoutMs $TimeoutMs -Accept 'application/vnd.github+json'
+        $resp = Invoke-Https -HostName 'api.github.com' -Path '/repos/neurotracee/github-netcheck/releases/latest' -TimeoutMs $TimeoutMs -Accept 'application/vnd.github+json'
     } else {
-        $resp = Invoke-Https -HostName 'gitee.com' -Path '/api/v5/repos/bio234/netcheck/releases/latest' -TimeoutMs $TimeoutMs -Accept 'application/json'
+        $resp = Invoke-Https -HostName 'gitee.com' -Path '/api/v5/repos/bio234/github-netcheck/releases/latest' -TimeoutMs $TimeoutMs -Accept 'application/json'
     }
     if (-not $resp.Ok) { return $null }
     $m = [regex]::Match($resp.Body, '"tag_name"\s*:\s*"([^"]+)"')

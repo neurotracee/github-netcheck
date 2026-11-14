@@ -286,7 +286,7 @@ __ADVICE__
     报告中若某域名 IP 显示为 127.0.0.1，说明它被 hosts 指向本机，实际流量走的是本地反代而不是直连。<br>
     <br>
     版本 __VERSION__　·　Apache License 2.0　·　测试全程在本机完成，不上传任何数据<br>
-    原项目地址：https://github.com/neurotracee/netcheck　（镜像：https://gitee.com/bio234/netcheck）
+    原项目地址：https://github.com/neurotracee/github-netcheck　（镜像：https://gitee.com/bio234/github-netcheck）
   </div>
 </div>
 </body>

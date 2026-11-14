@@ -15,8 +15,8 @@ echo   -----------------------------------------------------------
 echo   作者：项目创作时为初中生（只负责提需求、定判读标准、验收与反馈）
 echo   开发：豆包工作任务的 Agent x DeepSeek-V4.1-Flash（Agent 属豆包，模型属 DeepSeek）
 echo   协议：Apache License 2.0
-echo   原项目：https://github.com/neurotracee/netcheck
-echo   镜像：  https://gitee.com/bio234/netcheck
+echo   原项目：https://github.com/neurotracee/github-netcheck
+echo   镜像：  https://gitee.com/bio234/github-netcheck
 echo   -----------------------------------------------------------
 echo    [1] 开始自检（14 个点位，约 30 秒）
 echo    [2] 只测 GitHub 系（更快）

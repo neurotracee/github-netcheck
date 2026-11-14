@@ -61,8 +61,8 @@ import com.neurotracee.netcheck.model.TargetResult
 import com.neurotracee.netcheck.model.Verdict
 import com.neurotracee.netcheck.net.Targets
 
-private const val PROJECT_URL = "https://github.com/neurotracee/netcheck"
-private const val MIRROR_URL = "https://gitee.com/bio234/netcheck"
+private const val PROJECT_URL = "https://github.com/neurotracee/github-netcheck"
+private const val MIRROR_URL = "https://gitee.com/bio234/github-netcheck"
 
 @Composable
 fun NetCheckScreen(
