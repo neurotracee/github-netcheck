@@ -101,8 +101,13 @@ private val DarkScheme = darkColorScheme(
 )
 
 @Composable
-fun NetCheckTheme(content: @Composable () -> Unit) {
-    val dark = isSystemInDarkTheme()
+fun NetCheckTheme(themeMode: Int = 0, content: @Composable () -> Unit) {
+    // 0 跟随系统 · 1 浅色 · 2 深色（设置里可选，默认跟随系统）
+    val dark = when (themeMode) {
+        1 -> false
+        2 -> true
+        else -> isSystemInDarkTheme()
+    }
     CompositionLocalProvider(LocalPalette provides if (dark) DarkPalette else LightPalette) {
         MaterialTheme(
             colorScheme = if (dark) DarkScheme else LightScheme,

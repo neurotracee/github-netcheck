@@ -65,11 +65,18 @@ private const val PROJECT_URL = "https://github.com/neurotracee/netcheck"
 private const val MIRROR_URL = "https://gitee.com/bio234/netcheck"
 
 @Composable
-fun NetCheckScreen(vm: MainViewModel = viewModel()) {
+fun NetCheckScreen(
+    prefs: com.neurotracee.netcheck.data.Prefs,
+    onThemeChanged: (Int) -> Unit,
+    onLangChanged: (com.neurotracee.netcheck.ui.Lang) -> Unit,
+    vm: MainViewModel = viewModel()
+) {
     val p = LocalPalette.current
     val context = LocalContext.current
     val clipboard = LocalClipboardManager.current
     var expanded by remember { mutableStateOf<Int?>(null) }
+    var showSettings by remember { mutableStateOf(false) }
+    var showAbout by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -86,7 +93,10 @@ fun NetCheckScreen(vm: MainViewModel = viewModel()) {
                 Header(
                     p = p,
                     run = vm.run,
-                    idleHint = "${Targets.all.size} 个目标 · 逐项测 DNS / TCP / TLS / HTTP 四段耗时"
+                    idleHint = if (LocalLang.current == com.neurotracee.netcheck.ui.Lang.EN)
+                        "${Targets.all.size} targets · DNS / TCP / TLS / HTTP timed separately"
+                    else "${Targets.all.size} 个目标 · 逐项测 DNS / TCP / TLS / HTTP 四段耗时",
+                    onSettings = { showSettings = true }
                 )
             }
 
@@ -109,17 +119,33 @@ fun NetCheckScreen(vm: MainViewModel = viewModel()) {
                         onExportHtml = {
                             val file = vm.exportHtml()
                             if (file != null) {
-                                context.startActivity(
-                                    vm.store().shareIntent(file, "text/html", "网络连通性自检报告")
-                                )
+                                val tree = prefs.saveTreeUri
+                                val saved = tree?.let {
+                                    vm.store().saveToTree(android.net.Uri.parse(it), file.name, "text/html", file.readBytes())
+                                }
+                                if (saved != null) {
+                                    vm.message = "报告已存到你选的文件夹：${file.name}"
+                                } else {
+                                    context.startActivity(
+                                        vm.store().shareIntent(file, "text/html", "网络连通性自检报告")
+                                    )
+                                }
                             }
                         },
                         onExportCsv = {
                             val file = vm.exportCsv()
                             if (file != null) {
-                                context.startActivity(
-                                    vm.store().shareIntent(file, "text/csv", "网络连通性自检数据")
-                                )
+                                val tree = prefs.saveTreeUri
+                                val saved = tree?.let {
+                                    vm.store().saveToTree(android.net.Uri.parse(it), file.name, "text/csv", file.readBytes())
+                                }
+                                if (saved != null) {
+                                    vm.message = "CSV 已存到你选的文件夹：${file.name}"
+                                } else {
+                                    context.startActivity(
+                                        vm.store().shareIntent(file, "text/csv", "网络连通性自检数据")
+                                    )
+                                }
                             }
                         }
                     )
@@ -147,25 +173,58 @@ fun NetCheckScreen(vm: MainViewModel = viewModel()) {
             item { Spacer(Modifier.navigationBarsPadding()) }
         }
     }
+
+    if (showSettings) {
+        SettingsSheet(
+            prefs = prefs,
+            versionName = BuildConfig.VERSION_NAME,
+            onDismiss = { showSettings = false },
+            onOpenAbout = { showSettings = false; showAbout = true },
+            onToast = { vm.message = it },
+            onThemeChanged = onThemeChanged,
+            onLangChanged = onLangChanged
+        )
+    }
+    if (showAbout) {
+        AboutSheet(
+            versionName = BuildConfig.VERSION_NAME,
+            onDismiss = { showAbout = false },
+            onToast = { vm.message = it }
+        )
+    }
 }
 
 @Composable
-private fun Header(p: Palette, run: RunResult?, idleHint: String) {
+private fun Header(p: Palette, run: RunResult?, idleHint: String, onSettings: () -> Unit) {
     val meta = if (run != null) {
         "${ReportBuilder.timeStamp(run.startedAtMillis)}　·　${run.total} 个目标　·　用时 ${run.elapsedSec} 秒"
     } else {
         idleHint
     }
     Column(Modifier.padding(bottom = 2.dp)) {
-        Text(
-            "NET CHECK · 本机自检",
-            fontSize = 10.5.sp,
-            letterSpacing = 2.sp,
-            color = p.sub,
-            fontWeight = FontWeight.Medium
-        )
-        Spacer(Modifier.height(6.dp))
-        Text("网络连通性自检", fontSize = 24.sp, fontWeight = FontWeight.SemiBold, color = p.ink)
+        Row(verticalAlignment = Alignment.Top) {
+            Column(Modifier.weight(1f)) {
+                Text(
+                    "NET CHECK · 本机自检",
+                    fontSize = 10.5.sp,
+                    letterSpacing = 2.sp,
+                    color = p.sub,
+                    fontWeight = FontWeight.Medium
+                )
+                Spacer(Modifier.height(6.dp))
+                Text("网络连通性自检", fontSize = 24.sp, fontWeight = FontWeight.SemiBold, color = p.ink)
+            }
+            Box(
+                Modifier
+                    .size(34.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .clickable { onSettings() }
+                    .padding(0.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("⚙", fontSize = 19.sp, color = p.sub)
+            }
+        }
         Spacer(Modifier.height(4.dp))
         Text(meta, fontSize = 12.sp, color = p.sub)
         Spacer(Modifier.height(2.dp))

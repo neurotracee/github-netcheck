@@ -3,6 +3,7 @@ package com.neurotracee.netcheck.data
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.provider.DocumentsContract
 import androidx.core.content.FileProvider
 import com.neurotracee.netcheck.BuildConfig
 import com.neurotracee.netcheck.model.RunResult
@@ -37,6 +38,23 @@ class ReportStore(private val context: Context) {
 
     fun uriOf(file: File): Uri =
         FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+
+    /**
+     * 写进用户在设置里选的文件夹（SAF 授权的目录树）。
+     * 不用额外的 documentfile 依赖，直接走 DocumentsContract；失败返回 null，由调用方回退到分享面板。
+     */
+    fun saveToTree(treeUri: Uri, displayName: String, mime: String, bytes: ByteArray): Uri? {
+        return runCatching {
+            val docUri = DocumentsContract.buildDocumentUriUsingTree(
+                treeUri,
+                DocumentsContract.getTreeDocumentId(treeUri)
+            )
+            val child = DocumentsContract.createDocument(context.contentResolver, docUri, mime, displayName)
+                ?: return null
+            context.contentResolver.openOutputStream(child)?.use { it.write(bytes) }
+            child
+        }.getOrNull()
+    }
 
     fun shareIntent(file: File, mime: String, title: String): Intent {
         val uri = uriOf(file)

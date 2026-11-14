@@ -1,14 +1,32 @@
 ﻿# ============================================================
-#  netcheck.ps1 —— 本机网络连通性自检
+#  netcheck.ps1 —— 本机网络连通性自检（Windows 端）
 #  纯 PowerShell 实现，不安装任何东西，不联网上传任何数据
 #  测四项：DNS 解析 / TCP 建连 / TLS 握手 / HTTPS 首字节
 #  输出：控制台结果 + reports 目录下的 HTML 可视化报告
+#
+#  版本：1.1.0.0
+#  开源协议：Apache License 2.0
+#  原项目地址：https://github.com/neurotracee/netcheck
+#  镜像（Gitee）：https://gitee.com/bio234/netcheck
+#  指导作者：项目创作时为初中生；需求、判读规则与验收测试由本人完成
+#  开发：豆包工作任务 × DeepSeek-V4.1-Flash
+#
+#  二次开发 / 商用三条硬要求：
+#   ① 保留上面「指导作者：项目创作时为初中生」的署名，不得删改
+#   ② 在你的程序里标注原项目地址，让使用者看得见（关于页 / 页脚 / 帮助菜单均可）
+#   ③ 改动过的版本请注明「本程序基于该地址修改，非原作者发布」
 # ============================================================
 
 param(
     [switch]$NoBrowser,   # 加这个参数则不自动打开报告
-    [switch]$Quick        # 加这个参数只测 GitHub 系（少测几个，快一点）
+    [switch]$Quick,       # 加这个参数只测 GitHub 系（少测几个，快一点）
+    [switch]$About,       # 只弹「关于与开源信息」窗口，不测
+    [switch]$Settings     # 只弹设置窗口（报告目录 / 自动打开 / 超时），不测
 )
+
+$script:AppVersion = '1.1.0.0'
+$script:ProjectUrl = 'https://github.com/neurotracee/netcheck'
+$script:MirrorUrl  = 'https://gitee.com/bio234/netcheck'
 
 $ErrorActionPreference = 'Continue'
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -36,6 +54,223 @@ if ([string]::IsNullOrEmpty($ScriptDir)) {
 }
 $ReportDir = Join-Path $ScriptDir 'reports'
 if (-not (Test-Path -LiteralPath $ReportDir)) { New-Item -ItemType Directory -Path $ReportDir | Out-Null }
+
+# ---------- 本地设置：settings.json（不联网、不写注册表、跟着脚本走） ----------
+$script:SettingsFile = Join-Path $ScriptDir 'settings.json'
+$script:AutoOpen = $true
+
+$cfg = $null
+if (Test-Path -LiteralPath $script:SettingsFile) {
+    try { $cfg = (Get-Content -LiteralPath $script:SettingsFile -Raw -Encoding UTF8 | ConvertFrom-Json) } catch { $cfg = $null }
+}
+if ($cfg) {
+    if ($cfg.PSObject.Properties['ReportDir'] -and $cfg.ReportDir) {
+        if ([IO.Path]::IsPathRooted([string]$cfg.ReportDir)) { $ReportDir = [string]$cfg.ReportDir }
+        else { $ReportDir = Join-Path $ScriptDir ([string]$cfg.ReportDir) }
+    }
+    if ($cfg.PSObject.Properties['AutoOpen']) { $script:AutoOpen = [bool]$cfg.AutoOpen }
+    if ($cfg.PSObject.Properties['TimeoutMs'] -and [int]$cfg.TimeoutMs -gt 0) { $script:TimeoutMs = [int]$cfg.TimeoutMs }
+}
+if (-not (Test-Path -LiteralPath $ReportDir)) { New-Item -ItemType Directory -Path $ReportDir -Force | Out-Null }
+
+function Save-LocalSettings {
+    param([string]$Dir, [bool]$AutoOpen, [int]$TimeoutMs)
+    $obj = [ordered]@{
+        ReportDir = $Dir
+        AutoOpen  = $AutoOpen
+        TimeoutMs = $TimeoutMs
+    }
+    ($obj | ConvertTo-Json) | Set-Content -LiteralPath $script:SettingsFile -Encoding UTF8
+}
+
+# ---------- 「关于与开源信息」窗口：和安卓端的关于页同一套内容 ----------
+function Show-AboutWindow {
+    Add-Type -AssemblyName System.Windows.Forms
+    Add-Type -AssemblyName System.Drawing
+    $font = New-Object System.Drawing.Font('Microsoft YaHei UI', 9)
+    $form = New-Object System.Windows.Forms.Form
+    $form.Text = '关于与开源信息 · 网络连通性自检'
+    $form.Size = New-Object System.Drawing.Size(620, 640)
+    $form.StartPosition = 'CenterScreen'
+    $form.BackColor = [System.Drawing.Color]::FromArgb(244, 246, 248)
+    $form.Font = $font
+
+    $title = New-Object System.Windows.Forms.Label
+    $title.Text = '网络连通性自检　v' + $script:AppVersion
+    $title.Font = New-Object System.Drawing.Font('Microsoft YaHei UI', 15, [System.Drawing.FontStyle]::Bold)
+    $title.AutoSize = $true
+    $title.Location = New-Object System.Drawing.Point(24, 20)
+    $form.Controls.Add($title)
+
+    $sub = New-Object System.Windows.Forms.Label
+    $sub.Text = '纯 PowerShell 实现的网络连通性自检：DNS / TCP / TLS / HTTP 四段分别计时'
+    $sub.AutoSize = $true
+    $sub.ForeColor = [System.Drawing.Color]::FromArgb(107, 119, 133)
+    $sub.Location = New-Object System.Drawing.Point(26, 58)
+    $form.Controls.Add($sub)
+
+    $text = New-Object System.Windows.Forms.TextBox
+    $text.Multiline = $true
+    $text.ReadOnly = $true
+    $text.ScrollBars = 'Vertical'
+    $text.BorderStyle = 'FixedSingle'
+    $text.Location = New-Object System.Drawing.Point(24, 92)
+    $text.Size = New-Object System.Drawing.Size(556, 420)
+    $text.BackColor = [System.Drawing.Color]::White
+    $lines = @(
+        '指导作者　　　项目创作时为初中生。',
+        '　　　　　　　需求、判读规则的设计、验收测试全部由本人完成。',
+        '',
+        '开发　　　　　豆包工作任务 × DeepSeek-V4.1-Flash',
+        '',
+        '开源协议　　　Apache-2.0',
+        '',
+        '原项目地址　　' + $script:ProjectUrl,
+        '镜像（Gitee）　' + $script:MirrorUrl,
+        '',
+        '隐私　　　　　不安装后台服务，不写注册表，不上传任何数据。',
+        '　　　　　　　联网只用在本机自检本身；报告写在本机 reports 目录。',
+        '',
+        '二次开发 / 商用：三条硬要求',
+        '　① 保留「指导作者：项目创作时为初中生」的署名，不得删改。',
+        '　② 在你的程序里标注原项目地址，让使用者看得见。',
+        '　③ 改动过的版本请注明「本程序基于该地址修改，非原作者发布」。',
+        '',
+        '维护节奏：平时没有充足时间，一两个月上来看一两次，回复不会很快。',
+        '　　　　　代码全部公开，修不动的地方欢迎自己改、自己接着用。',
+        '　　　　　协议允许商用，不用付钱也不用问我，照上面三条做就行。',
+        '',
+        '如果这个工具帮到了你：给仓库点个 Star 就是最好的支持。'
+    )
+    $text.Text = ($lines -join "`r`n")
+    $form.Controls.Add($text)
+
+    $btn = New-Object System.Windows.Forms.Button
+    $btn.Text = '知道了'
+    $btn.Size = New-Object System.Drawing.Size(96, 32)
+    $btn.Location = New-Object System.Drawing.Point(484, 528)
+    $btn.BackColor = [System.Drawing.Color]::FromArgb(59, 130, 196)
+    $btn.ForeColor = [System.Drawing.Color]::White
+    $btn.FlatStyle = 'Flat'
+    $btn.Add_Click({ $form.Close() })
+    $form.Controls.Add($btn)
+
+    $open = New-Object System.Windows.Forms.Button
+    $open.Text = '打开项目页'
+    $open.Size = New-Object System.Drawing.Size(104, 32)
+    $open.Location = New-Object System.Drawing.Point(370, 528)
+    $open.FlatStyle = 'Flat'
+    $open.Add_Click({ Start-Process $script:ProjectUrl })
+    $form.Controls.Add($open)
+
+    $form.ShowDialog() | Out-Null
+}
+
+# ---------- 设置窗口：报告存哪、自检完要不要自动打开、超时 ----------
+function Show-SettingsWindow {
+    Add-Type -AssemblyName System.Windows.Forms
+    Add-Type -AssemblyName System.Drawing
+    $font = New-Object System.Drawing.Font('Microsoft YaHei UI', 9)
+    $form = New-Object System.Windows.Forms.Form
+    $form.Text = '设置 · 网络连通性自检'
+    $form.Size = New-Object System.Drawing.Size(600, 340)
+    $form.StartPosition = 'CenterScreen'
+    $form.BackColor = [System.Drawing.Color]::FromArgb(244, 246, 248)
+    $form.Font = $font
+
+    $t = New-Object System.Windows.Forms.Label
+    $t.Text = '设置'
+    $t.Font = New-Object System.Drawing.Font('Microsoft YaHei UI', 15, [System.Drawing.FontStyle]::Bold)
+    $t.AutoSize = $true
+    $t.Location = New-Object System.Drawing.Point(24, 18)
+    $form.Controls.Add($t)
+
+    $l1 = New-Object System.Windows.Forms.Label
+    $l1.Text = '报告保存位置'
+    $l1.AutoSize = $true
+    $l1.Location = New-Object System.Drawing.Point(26, 68)
+    $form.Controls.Add($l1)
+
+    $box = New-Object System.Windows.Forms.TextBox
+    $box.Location = New-Object System.Drawing.Point(26, 90)
+    $box.Size = New-Object System.Drawing.Size(440, 26)
+    $box.Text = $ReportDir
+    $form.Controls.Add($box)
+
+    $browse = New-Object System.Windows.Forms.Button
+    $browse.Text = '浏览…'
+    $browse.Size = New-Object System.Drawing.Size(84, 27)
+    $browse.Location = New-Object System.Drawing.Point(474, 89)
+    $browse.FlatStyle = 'Flat'
+    $browse.Add_Click({
+        $dlg = New-Object System.Windows.Forms.FolderBrowserDialog
+        $dlg.SelectedPath = $box.Text
+        if ($dlg.ShowDialog() -eq 'OK') { $box.Text = $dlg.SelectedPath }
+    })
+    $form.Controls.Add($browse)
+
+    $chk = New-Object System.Windows.Forms.CheckBox
+    $chk.Text = '自检结束后自动用浏览器打开报告'
+    $chk.AutoSize = $true
+    $chk.Checked = $script:AutoOpen
+    $chk.Location = New-Object System.Drawing.Point(26, 132)
+    $form.Controls.Add($chk)
+
+    $l2 = New-Object System.Windows.Forms.Label
+    $l2.Text = '单段超时（毫秒，默认 3000）'
+    $l2.AutoSize = $true
+    $l2.Location = New-Object System.Drawing.Point(26, 168)
+    $form.Controls.Add($l2)
+
+    $num = New-Object System.Windows.Forms.NumericUpDown
+    $num.Minimum = 500
+    $num.Maximum = 20000
+    $num.Increment = 500
+    $num.Value = $script:TimeoutMs
+    $num.Location = New-Object System.Drawing.Point(240, 166)
+    $num.Size = New-Object System.Drawing.Size(90, 26)
+    $form.Controls.Add($num)
+
+    $hint = New-Object System.Windows.Forms.Label
+    $hint.Text = '设置在 settings.json 里，跟着脚本走，不写注册表也不联网。'
+    $hint.AutoSize = $true
+    $hint.ForeColor = [System.Drawing.Color]::FromArgb(107, 119, 133)
+    $hint.Location = New-Object System.Drawing.Point(26, 208)
+    $form.Controls.Add($hint)
+
+    $save = New-Object System.Windows.Forms.Button
+    $save.Text = '保存'
+    $save.Size = New-Object System.Drawing.Size(96, 32)
+    $save.Location = New-Object System.Drawing.Point(382, 246)
+    $save.BackColor = [System.Drawing.Color]::FromArgb(18, 161, 80)
+    $save.ForeColor = [System.Drawing.Color]::White
+    $save.FlatStyle = 'Flat'
+    $save.Add_Click({
+        Save-LocalSettings -Dir $box.Text -AutoOpen $chk.Checked -TimeoutMs ([int]$num.Value)
+        [System.Windows.Forms.MessageBox]::Show('已保存。下次运行按新设置来。', '设置')
+        $form.Close()
+    })
+    $form.Controls.Add($save)
+
+    $cancel = New-Object System.Windows.Forms.Button
+    $cancel.Text = '取消'
+    $cancel.Size = New-Object System.Drawing.Size(96, 32)
+    $cancel.Location = New-Object System.Drawing.Point(486, 246)
+    $cancel.FlatStyle = 'Flat'
+    $cancel.Add_Click({ $form.Close() })
+    $form.Controls.Add($cancel)
+
+    $form.ShowDialog() | Out-Null
+}
+
+if ($About) {
+    Show-AboutWindow
+    exit 0
+}
+if ($Settings) {
+    Show-SettingsWindow
+    exit 0
+}
 
 # ---------- 测试目标清单（对齐瓦特工具箱的加速项） ----------
 $Targets = @(
@@ -235,8 +470,10 @@ function Get-Verdict {
 # ---------- 开始测试 ----------
 
 Write-Host ''
-Write-Host '  网络连通性自检   GitHub / Hugging Face / Docker' -ForegroundColor Cyan
+Write-Host ('  网络连通性自检 v' + $script:AppVersion + '   GitHub / Hugging Face / Docker') -ForegroundColor Cyan
 Write-Host '  ---------------------------------------------------------' -ForegroundColor DarkGray
+Write-Host ('  作者：项目创作时为初中生 · 开发：豆包工作任务 × DeepSeek-V4.1-Flash') -ForegroundColor DarkGray
+Write-Host ('  开源协议 Apache-2.0 · 原项目 ' + $script:ProjectUrl) -ForegroundColor DarkGray
 
 $script:RateInfo = ''
 $NetEnv = Get-NetEnv
@@ -570,6 +807,6 @@ try {
 Write-Host ("  报告已生成：" + $outFile) -ForegroundColor Cyan
 Write-Host ''
 
-if (-not $NoBrowser) {
+if (-not $NoBrowser -and $script:AutoOpen) {
     try { Start-Process $outFile } catch { Write-Host '  自动打开报告失败，请手动双击 reports 目录下的 html 文件。' -ForegroundColor Yellow }
 }
