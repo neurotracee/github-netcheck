@@ -1,5 +1,7 @@
 package com.neurotracee.netcheck.ui
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -29,8 +31,10 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -190,6 +194,48 @@ fun NetCheckScreen(
             versionName = BuildConfig.VERSION_NAME,
             onDismiss = { showAbout = false },
             onToast = { vm.message = it }
+        )
+    }
+
+    // 启动时静默查一次更新：查到新版才弹提示，给「打开下载页 / 复制链接 / 以后再说」三个出口
+    var updateInfo by remember { mutableStateOf<com.neurotracee.netcheck.data.UpdateChecker.Info?>(null) }
+    LaunchedEffect(Unit) {
+        if (!prefs.autoCheckUpdate) return@LaunchedEffect
+        val info = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            com.neurotracee.netcheck.data.UpdateChecker.check(prefs.updateSource).getOrNull()
+        }
+        if (info != null && com.neurotracee.netcheck.data.UpdateChecker.isNewer(info.tag, BuildConfig.VERSION_NAME)) {
+            updateInfo = info
+        }
+    }
+    updateInfo?.let { info ->
+        val msgNoBrowser = t("没有能打开浏览器的应用，已复制链接", "No browser found; link copied")
+        val msgCopied = t("下载链接已复制", "Download link copied")
+        AlertDialog(
+            onDismissRequest = { updateInfo = null },
+            title = { Text(t("发现新版本 ${info.tag}", "New version ${info.tag}")) },
+            text = {
+                Text(t("当前是 v${BuildConfig.VERSION_NAME}。不更新也一模一样用，只是新版顺手修了几个小毛病；下次打开还会再提醒一次。",
+                    "You're on v${BuildConfig.VERSION_NAME}. Skipping is fine — the app keeps working; you'll be reminded next launch."))
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    runCatching {
+                        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(info.url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                    }.onFailure { vm.message = msgNoBrowser }
+                    updateInfo = null
+                }) { Text(t("用浏览器打开下载", "Open download")) }
+            },
+            dismissButton = {
+                androidx.compose.foundation.layout.Row {
+                    TextButton(onClick = {
+                        clipboard.setText(AnnotatedString(info.url))
+                        vm.message = msgCopied
+                        updateInfo = null
+                    }) { Text(t("复制链接", "Copy link")) }
+                    TextButton(onClick = { updateInfo = null }) { Text(t("以后再说", "Later")) }
+                }
+            }
         )
     }
 }

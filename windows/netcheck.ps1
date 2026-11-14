@@ -4,7 +4,7 @@
 #  测四项：DNS 解析 / TCP 建连 / TLS 握手 / HTTPS 首字节
 #  输出：控制台结果 + reports 目录下的 HTML 可视化报告
 #
-#  版本：1.1.2.0
+#  版本：1.1.3.0
 #  开源协议：Apache License 2.0
 #  原项目地址：https://github.com/neurotracee/github-netcheck
 #  镜像（Gitee）：https://gitee.com/bio234/github-netcheck
@@ -25,7 +25,7 @@ param(
     [switch]$CheckUpdate  # 只查最新版本号，不测
 )
 
-$script:AppVersion = '1.1.2.0'
+$script:AppVersion = '1.1.3.0'
 $script:ProjectUrl = 'https://github.com/neurotracee/github-netcheck'
 $script:MirrorUrl  = 'https://gitee.com/bio234/github-netcheck'
 
@@ -103,7 +103,7 @@ function Show-AboutWindow {
     $font = New-Object System.Drawing.Font('Microsoft YaHei UI', 9)
     $form = New-Object System.Windows.Forms.Form
     $form.Text = '关于与开源信息 · GitHub 网络自检'
-    $form.Size = New-Object System.Drawing.Size(620, 640)
+    $form.Size = New-Object System.Drawing.Size(620, 820)
     $form.StartPosition = 'CenterScreen'
     $form.BackColor = [System.Drawing.Color]::FromArgb(244, 246, 248)
     $form.Font = $font
@@ -128,7 +128,7 @@ function Show-AboutWindow {
     $text.ScrollBars = 'Vertical'
     $text.BorderStyle = 'FixedSingle'
     $text.Location = New-Object System.Drawing.Point(24, 92)
-    $text.Size = New-Object System.Drawing.Size(556, 420)
+    $text.Size = New-Object System.Drawing.Size(556, 360)
     $text.BackColor = [System.Drawing.Color]::White
     $lines = @(
         '指导作者　　　项目创作时为初中生。',
@@ -162,6 +162,46 @@ function Show-AboutWindow {
     $text.SelectionStart = 0
     $text.SelectionLength = 0
     $form.Controls.Add($text)
+
+    # 赞赏：完全自愿，不打赏也一模一样用；有赞赏码图片就直接显示，没有就只留一句引导
+    $tipTitle = New-Object System.Windows.Forms.Label
+    $tipTitle.Text = '赞赏（完全自愿）'
+    $tipTitle.AutoSize = $true
+    $tipTitle.Font = New-Object System.Drawing.Font('Microsoft YaHei UI', 10, [System.Drawing.FontStyle]::Bold)
+    $tipTitle.Location = New-Object System.Drawing.Point(24, 466)
+    $form.Controls.Add($tipTitle)
+
+    $tipText = New-Object System.Windows.Forms.Label
+    $tipText.Text = '要是这个小工具帮你省了点时间，愿意的话可以请我喝杯奶茶——不打赏也一模一样用，功能一个都不少。'
+    $tipText.AutoSize = $true
+    $tipText.ForeColor = [System.Drawing.Color]::FromArgb(107, 119, 133)
+    $tipText.Location = New-Object System.Drawing.Point(26, 492)
+    $form.Controls.Add($tipText)
+
+    $tipPic = Join-Path $ScriptDir '赞赏码.png'
+    if (Test-Path -LiteralPath $tipPic) {
+        $img = New-Object System.Windows.Forms.PictureBox
+        $img.Size = New-Object System.Drawing.Size(180, 180)
+        $img.Location = New-Object System.Drawing.Point(26, 518)
+        $img.SizeMode = 'Zoom'
+        $img.BorderStyle = 'FixedSingle'
+        try { $img.Image = [System.Drawing.Image]::FromFile($tipPic) } catch { }
+        $form.Controls.Add($img)
+
+        $tipCap = New-Object System.Windows.Forms.Label
+        $tipCap.Text = '微信赞赏码 · 长按/截图后扫码即可'
+        $tipCap.AutoSize = $true
+        $tipCap.ForeColor = [System.Drawing.Color]::FromArgb(107, 119, 133)
+        $tipCap.Location = New-Object System.Drawing.Point(216, 524)
+        $form.Controls.Add($tipCap)
+    } else {
+        $tipCap = New-Object System.Windows.Forms.Label
+        $tipCap.Text = '赞赏码在仓库 README 的「赞赏」一节里。'
+        $tipCap.AutoSize = $true
+        $tipCap.ForeColor = [System.Drawing.Color]::FromArgb(107, 119, 133)
+        $tipCap.Location = New-Object System.Drawing.Point(26, 520)
+        $form.Controls.Add($tipCap)
+    }
 
     $btn = New-Object System.Windows.Forms.Button
     $btn.Text = '知道了'
@@ -612,6 +652,67 @@ function Resolve-UpdateSource {
     return 'gitee'
 }
 
+# 查到新版本时的提示窗：三个出口 —— 用浏览器打开下载 / 复制链接 / 以后再说
+function Show-UpdatePrompt {
+    param($Update)
+    Add-Type -AssemblyName System.Windows.Forms
+    Add-Type -AssemblyName System.Drawing
+    $font = New-Object System.Drawing.Font('Microsoft YaHei UI', 9)
+    $form = New-Object System.Windows.Forms.Form
+    $form.Text = '发现新版本 · GitHub 网络自检'
+    $form.Size = New-Object System.Drawing.Size(480, 236)
+    $form.StartPosition = 'CenterScreen'
+    $form.BackColor = [System.Drawing.Color]::FromArgb(244, 246, 248)
+    $form.Font = $font
+
+    $t1 = New-Object System.Windows.Forms.Label
+    $t1.Text = ('发现新版本 ' + $Update.Remote + '（当前 ' + $script:AppVersion + '）')
+    $t1.Font = New-Object System.Drawing.Font('Microsoft YaHei UI', 12, [System.Drawing.FontStyle]::Bold)
+    $t1.AutoSize = $true
+    $t1.Location = New-Object System.Drawing.Point(22, 22)
+    $form.Controls.Add($t1)
+
+    $t2 = New-Object System.Windows.Forms.Label
+    $t2.Text = '不更新也一模一样用，只是新版顺手修了几个小毛病，用起来更稳。' + "`r`n" +
+               '下次打开还会再提醒一次，到时候想换也来得及。'
+    $t2.AutoSize = $true
+    $t2.ForeColor = [System.Drawing.Color]::FromArgb(107, 119, 133)
+    $t2.Location = New-Object System.Drawing.Point(24, 58)
+    $form.Controls.Add($t2)
+
+    $url = $script:ProjectUrl + '/releases/latest'
+
+    $go = New-Object System.Windows.Forms.Button
+    $go.Text = '用浏览器打开下载'
+    $go.Size = New-Object System.Drawing.Size(140, 32)
+    $go.Location = New-Object System.Drawing.Point(24, 168)
+    $go.BackColor = [System.Drawing.Color]::FromArgb(18, 161, 80)
+    $go.ForeColor = [System.Drawing.Color]::White
+    $go.FlatStyle = 'Flat'
+    $go.Add_Click({ try { Start-Process $url } catch { }; $form.Close() })
+    $form.Controls.Add($go)
+
+    $copy = New-Object System.Windows.Forms.Button
+    $copy.Text = '复制链接'
+    $copy.Size = New-Object System.Drawing.Size(104, 32)
+    $copy.Location = New-Object System.Drawing.Point(176, 168)
+    $copy.FlatStyle = 'Flat'
+    $copy.Add_Click({
+        try { [System.Windows.Forms.Clipboard]::SetText($url); $copy.Text = '已复制' } catch { }
+    })
+    $form.Controls.Add($copy)
+
+    $later = New-Object System.Windows.Forms.Button
+    $later.Text = '以后再说'
+    $later.Size = New-Object System.Drawing.Size(104, 32)
+    $later.Location = New-Object System.Drawing.Point(292, 168)
+    $later.FlatStyle = 'Flat'
+    $later.Add_Click({ $form.Close() })
+    $form.Controls.Add($later)
+
+    $form.ShowDialog() | Out-Null
+}
+
 function Invoke-UpdateCheck {
     param([int]$TimeoutMs = 5000)
     $errs = @()
@@ -675,6 +776,7 @@ if ($script:AutoCheckUpdate) {
         if ($u.HasNew) {
             Write-Host ('  检查更新：' + $u.Text) -ForegroundColor Yellow
             Write-Host ('  下载页：' + $script:ProjectUrl + '/releases') -ForegroundColor DarkGray
+            Show-UpdatePrompt -Update $u
         } else {
             Write-Host ('  检查更新：' + $u.Text) -ForegroundColor DarkGray
         }

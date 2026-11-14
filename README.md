@@ -17,6 +17,8 @@
 
 一个纯本地、零依赖的网络连通性自检工具，专门盯着**中国大陆能不能连上 GitHub 系服务**：**不代理、不加速、不改 hosts，只测量**。
 
+> **创建时间**：本项目创建于 **2026 年 11 月 14 日**，同日完成 Windows 端脚本、安卓端 APK 与两平台仓库（GitHub `neurotracee/github-netcheck`、Gitee `bio234/github-netcheck`）。
+
 > **关于名字**：本项目原名「网络连通性自检」，容易被理解成泛泛的测网速工具。它的实际用途是排查 GitHub（含 Pages、raw、
 > API、对象存储、克隆下载）以及 Hugging Face、Docker 这些常被卡住的开发资源，所以从 1.1.0.3 起两端统一改名为 **GitHub 网络自检**；
 > 仓库名也从 `netcheck` 改成了 **`github-netcheck`**（GitHub 与 Gitee 两边一起改，旧链接会跳转到新地址），
@@ -35,19 +37,23 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 
 ## 下载（先点这里）
 
-**当前版本 v1.1.2.0**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
+**当前版本 v1.1.3.0**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
 
 | 你要的 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
 | 最新下载页 | https://github.com/neurotracee/github-netcheck/releases/latest | https://gitee.com/bio234/github-netcheck/releases/latest |
-| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.2.0/NetCheck-1.1.2.0.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.2.0/NetCheck-1.1.2.0.apk |
-| Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.2.0/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.2.0/NetCheck-Windows.zip |
+| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.3.0/NetCheck-1.1.3.0.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.3.0/NetCheck-1.1.3.0.apk |
+| Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.3.0/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.3.0/NetCheck-Windows.zip |
 | 仓库首页 | https://github.com/neurotracee/github-netcheck | https://gitee.com/bio234/github-netcheck |
 
 解压 Windows 包后双击 **一键网络自检.bat**；APK 直接安装（系统会提示「未知来源」，原因见下一节）。
 校验值（SHA-256）写在 [Release 说明](https://github.com/neurotracee/github-netcheck/releases/latest) 里，下载后可用 `certutil -hashfile <文件名> SHA256` 自己核一遍。
 
-**版本说明**：这是四段版本号（主.次.修订.补丁），小修小改只加最后一段，所以 1.1.1.0 → 1.1.2.0 属于功能级更新（加了「更新源默认 Gitee」的判定），不是大版本。
+> **Gitee 下载 APK 变成 .zip 后缀？不是文件坏了。** Gitee 的下载服务器按文件头识别类型，把 APK 判成了 `application/zip` 发给你，
+> 部分手机浏览器（例如 Edge 手机版）就顺手把文件名改成 `.zip`。把后缀改回 `.apk` 就能照常安装，文件内容一模一样。
+> 嫌麻烦就直接去 GitHub 下载页拿 APK（那边按 `application/vnd.android.package-archive` 发送，不会改后缀）。
+
+**版本说明**：这是四段版本号（主.次.修订.补丁），小修小改只加最后一段，所以 1.1.2.0 → 1.1.3.0 属于功能级更新（赞赏入口 + 启动查更新提示），不是大版本。
 
 ## 装之前先看三件事
 
@@ -294,23 +300,23 @@ hosts 把域名指向 127.0.0.1
 
 ## 版本号与更新检查（只发一端时，另一端不会被误报）
 
-版本号是四段 `主.次.修订.补丁`，例如 `1.1.2.0`：
+版本号是四段 `主.次.修订.补丁`，例如 `1.1.3.0`：
 
 - 只改文案、修小 bug → 只动**第四段**（`1.1.0.3` → `1.1.0.4`）；
-- 加了新功能 → 动**第三段**（`1.1.1.x` → `1.1.2.0`）；
+- 加了新功能 → 动**第三段**（`1.1.1.x` → `1.1.3.0`）；
 - 前两段基本不动，动了就是大版本，别轻易用。
 
 仓库根目录有一份 `version.json`，**按平台分开写版本号**：
 
 ```json
 {
-  "android": { "version": "1.1.2.0", "url": "https://github.com/neurotracee/github-netcheck/releases" },
-  "windows": { "version": "1.1.2.0", "url": "https://github.com/neurotracee/github-netcheck/releases" }
+  "android": { "version": "1.1.3.0", "url": "https://github.com/neurotracee/github-netcheck/releases" },
+  "windows": { "version": "1.1.3.0", "url": "https://github.com/neurotracee/github-netcheck/releases" }
 }
 ```
 
 两端的「检查更新」都先读这个文件，**只认自己那一段**：只发 Windows 更新、把 `windows.version` 改成 `1.1.0.4`，
-安卓端读到的仍是 `1.1.2.0`，就不会莫名弹出「有新版本」；反过来也一样。
+安卓端读到的仍是 `1.1.3.0`，就不会莫名弹出「有新版本」；反过来也一样。
 这修掉了以前「发一次 Release，两端都提示更新但只有一端真变了」的逻辑 bug。
 读不到 `version.json` 时才会退回读 Release（发布版本）的 tag，所以老环境也不会瞎。
 
@@ -518,6 +524,9 @@ limitations under the License.
 如果这个项目帮你省了时间，可以请我喝杯奶茶 🧋
 
 ![微信赞赏码](docs/img/wechat-donate.png)
+
+程序里也能直接看到这张码：Windows 端「关于与开源信息」窗口、安卓端「关于」页的「赞赏（完全自愿）」卡片，
+文案是同一句——**要是这个小工具帮你省了点时间，愿意的话可以请我喝杯奶茶；不打赏也一模一样用，功能一个都不少。**
 
 > **点 Star 比打赏更有用。**不想花钱完全没问题：到仓库点一颗 Star 就是最好的支持，别人搜得到，我才更有动力维护。
 >

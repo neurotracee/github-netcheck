@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -36,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -381,11 +383,32 @@ fun AboutSheet(versionName: String, onDismiss: () -> Unit, onToast: (String) -> 
             }
 
             Spacer(Modifier.height(14.dp))
-            Text(
-                t("赞赏：愿意的话可以请我喝杯奶茶，完全自愿，不打赏也一模一样用、功能不缺。赞赏码在仓库 README 里。",
-                    "Tips are completely optional. The QR code lives in the repo README."),
-                fontSize = 11.5.sp, color = p.sub, lineHeight = 18.sp
-            )
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(p.card)
+                    .border(1.dp, p.line, RoundedCornerShape(12.dp))
+                    .padding(14.dp)
+            ) {
+                Text(t("赞赏（完全自愿）", "Tip jar (completely optional)"),
+                    fontSize = 13.5.sp, fontWeight = FontWeight.SemiBold, color = p.ink)
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    t("要是这个小工具帮你省了点时间，愿意的话可以请我喝杯奶茶——不打赏也一模一样用，功能一个都不少。",
+                        "If this little tool saved you some time, you're welcome to buy me a milk tea. Nothing changes if you don't — every feature stays free."),
+                    fontSize = 11.5.sp, color = p.sub, lineHeight = 18.sp
+                )
+                Spacer(Modifier.height(10.dp))
+                Image(
+                    painter = painterResource(com.neurotracee.netcheck.R.drawable.wechat_donate),
+                    contentDescription = t("微信赞赏码", "WeChat tip QR code"),
+                    modifier = Modifier.size(176.dp).clip(RoundedCornerShape(8.dp))
+                )
+                Spacer(Modifier.height(6.dp))
+                Text(t("微信赞赏码 · 截图后在微信「扫一扫」里选相册即可", "WeChat tip QR — screenshot it, then pick it from your album in WeChat Scan."),
+                    fontSize = 11.sp, color = p.sub)
+            }
 
             Spacer(Modifier.height(16.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
