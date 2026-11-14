@@ -1,6 +1,6 @@
 @echo off
 chcp 936 >nul
-title GitHub - Network Check v1.1.0.3
+title GitHub - Network Check v1.1.1.0
 setlocal enabledelayedexpansion
 if not exist "%~dp0netcheck.ps1" (
   echo [错误] 这个文件夹里没有 netcheck.ps1，请把 bat 和 ps1 放在一起。
@@ -10,7 +10,7 @@ if not exist "%~dp0netcheck.ps1" (
 :menu
 cls
 echo.
-echo   GitHub 网络自检  v1.1.0.3
+echo   GitHub 网络自检  v1.1.1.0
 echo   -----------------------------------------------------------
 echo   作者：项目创作时为初中生（只负责提需求、定判读标准、验收与反馈）
 echo   开发：豆包工作任务的 Agent x DeepSeek-V4.1-Flash（Agent 属豆包，模型属 DeepSeek）
@@ -21,7 +21,7 @@ echo   -----------------------------------------------------------
 echo    [1] 开始自检（14 个点位，约 30 秒）
 echo    [2] 只测 GitHub 系（更快）
 echo    [3] 关于与开源信息
-echo    [4] 设置（报告位置 / 自动打开 / 超时）
+echo    [4] 设置（报告位置 / 先问我 / 自动打开 / 自动查更新 / 超时）
 echo    [5] 检查更新（只读远端版本号）
 echo    [0] 退出
 echo.

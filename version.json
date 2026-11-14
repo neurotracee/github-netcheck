@@ -1,0 +1,12 @@
+{
+  "_comment": "按平台分开的版本号。只改你要发的那个平台，另一端的更新检查不会误报。两端版本号一致时也可以只改一个数（见 README 的「发版规矩」）。",
+  "android": {
+    "version": "1.1.1.0",
+    "url": "https://github.com/neurotracee/github-netcheck/releases"
+  },
+  "windows": {
+    "version": "1.1.1.0",
+    "url": "https://github.com/neurotracee/github-netcheck/releases"
+  },
+  "updated": "2026-11-14"
+}

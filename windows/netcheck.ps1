@@ -4,7 +4,7 @@
 #  测四项：DNS 解析 / TCP 建连 / TLS 握手 / HTTPS 首字节
 #  输出：控制台结果 + reports 目录下的 HTML 可视化报告
 #
-#  版本：1.1.0.3
+#  版本：1.1.1.0
 #  开源协议：Apache License 2.0
 #  原项目地址：https://github.com/neurotracee/github-netcheck
 #  镜像（Gitee）：https://gitee.com/bio234/github-netcheck
@@ -25,7 +25,7 @@ param(
     [switch]$CheckUpdate  # 只查最新版本号，不测
 )
 
-$script:AppVersion = '1.1.0.3'
+$script:AppVersion = '1.1.1.0'
 $script:ProjectUrl = 'https://github.com/neurotracee/github-netcheck'
 $script:MirrorUrl  = 'https://gitee.com/bio234/github-netcheck'
 
@@ -58,7 +58,10 @@ if (-not (Test-Path -LiteralPath $ReportDir)) { New-Item -ItemType Directory -Pa
 
 # ---------- 本地设置：settings.json（不联网、不写注册表、跟着脚本走） ----------
 $script:SettingsFile = Join-Path $ScriptDir 'settings.json'
-$script:AutoOpen = $true
+$script:AutoOpen = $false
+$script:AutoCheckUpdate = $true
+$script:AskBeforeReport = $true
+$script:SaveReport = $true
 
 $cfg = $null
 if (Test-Path -LiteralPath $script:SettingsFile) {
@@ -70,16 +73,22 @@ if ($cfg) {
         else { $ReportDir = Join-Path $ScriptDir ([string]$cfg.ReportDir) }
     }
     if ($cfg.PSObject.Properties['AutoOpen']) { $script:AutoOpen = [bool]$cfg.AutoOpen }
+    if ($cfg.PSObject.Properties['AutoCheckUpdate']) { $script:AutoCheckUpdate = [bool]$cfg.AutoCheckUpdate }
+    if ($cfg.PSObject.Properties['AskBeforeReport']) { $script:AskBeforeReport = [bool]$cfg.AskBeforeReport }
+    if ($cfg.PSObject.Properties['SaveReport']) { $script:SaveReport = [bool]$cfg.SaveReport }
     if ($cfg.PSObject.Properties['TimeoutMs'] -and [int]$cfg.TimeoutMs -gt 0) { $script:TimeoutMs = [int]$cfg.TimeoutMs }
 }
 if (-not (Test-Path -LiteralPath $ReportDir)) { New-Item -ItemType Directory -Path $ReportDir -Force | Out-Null }
 
 function Save-LocalSettings {
-    param([string]$Dir, [bool]$AutoOpen, [int]$TimeoutMs)
+    param([string]$Dir, [bool]$AutoOpen, [int]$TimeoutMs, [bool]$AutoCheckUpdate = $true, [bool]$AskBeforeReport = $true, [bool]$SaveReport = $true)
     $obj = [ordered]@{
-        ReportDir = $Dir
-        AutoOpen  = $AutoOpen
-        TimeoutMs = $TimeoutMs
+        ReportDir       = $Dir
+        AutoOpen        = $AutoOpen
+        TimeoutMs       = $TimeoutMs
+        AutoCheckUpdate = $AutoCheckUpdate
+        AskBeforeReport = $AskBeforeReport
+        SaveReport      = $SaveReport
     }
     ($obj | ConvertTo-Json) | Set-Content -LiteralPath $script:SettingsFile -Encoding UTF8
 }
@@ -194,7 +203,7 @@ function Show-SettingsWindow {
     $font = New-Object System.Drawing.Font('Microsoft YaHei UI', 9)
     $form = New-Object System.Windows.Forms.Form
     $form.Text = '设置 · GitHub 网络自检'
-    $form.Size = New-Object System.Drawing.Size(600, 340)
+    $form.Size = New-Object System.Drawing.Size(600, 420)
     $form.StartPosition = 'CenterScreen'
     $form.BackColor = [System.Drawing.Color]::FromArgb(244, 246, 248)
     $form.Font = $font
@@ -230,17 +239,24 @@ function Show-SettingsWindow {
     })
     $form.Controls.Add($browse)
 
+    $chkAsk = New-Object System.Windows.Forms.CheckBox
+    $chkAsk.Text = '每次自检结束后先问我：要不要出报告、要不要打开'
+    $chkAsk.AutoSize = $true
+    $chkAsk.Checked = $script:AskBeforeReport
+    $chkAsk.Location = New-Object System.Drawing.Point(26, 132)
+    $form.Controls.Add($chkAsk)
+
     $chk = New-Object System.Windows.Forms.CheckBox
-    $chk.Text = '自检结束后自动用浏览器打开报告'
+    $chk.Text = '（不询问时）生成报告后自动用浏览器打开'
     $chk.AutoSize = $true
     $chk.Checked = $script:AutoOpen
-    $chk.Location = New-Object System.Drawing.Point(26, 132)
+    $chk.Location = New-Object System.Drawing.Point(44, 158)
     $form.Controls.Add($chk)
 
     $l2 = New-Object System.Windows.Forms.Label
     $l2.Text = '单段超时（毫秒，默认 3000）'
     $l2.AutoSize = $true
-    $l2.Location = New-Object System.Drawing.Point(26, 168)
+    $l2.Location = New-Object System.Drawing.Point(26, 194)
     $form.Controls.Add($l2)
 
     $num = New-Object System.Windows.Forms.NumericUpDown
@@ -248,7 +264,7 @@ function Show-SettingsWindow {
     $num.Maximum = 20000
     $num.Increment = 500
     $num.Value = $script:TimeoutMs
-    $num.Location = New-Object System.Drawing.Point(240, 166)
+    $num.Location = New-Object System.Drawing.Point(240, 192)
     $num.Size = New-Object System.Drawing.Size(90, 26)
     $form.Controls.Add($num)
 
@@ -256,18 +272,33 @@ function Show-SettingsWindow {
     $hint.Text = '设置在 settings.json 里，跟着脚本走，不写注册表也不联网。'
     $hint.AutoSize = $true
     $hint.ForeColor = [System.Drawing.Color]::FromArgb(107, 119, 133)
-    $hint.Location = New-Object System.Drawing.Point(26, 208)
+    $hint.Location = New-Object System.Drawing.Point(26, 236)
     $form.Controls.Add($hint)
+
+    # 自动检查更新：和安卓端一样，启动时静默查一次版本号，只在这里提示一行，不弹窗、不下载
+    $chkUpd = New-Object System.Windows.Forms.CheckBox
+    $chkUpd.Text = '启动时自动检查更新（只读一行版本号，不下载、不上传）'
+    $chkUpd.AutoSize = $true
+    $chkUpd.Checked = $script:AutoCheckUpdate
+    $chkUpd.Location = New-Object System.Drawing.Point(26, 266)
+    $form.Controls.Add($chkUpd)
+
+    $updHint = New-Object System.Windows.Forms.Label
+    $updHint.Text = '检查更新只连 Gitee 与 GitHub 两个仓库；连不上就跳过，不影响自检。'
+    $updHint.AutoSize = $true
+    $updHint.ForeColor = [System.Drawing.Color]::FromArgb(107, 119, 133)
+    $updHint.Location = New-Object System.Drawing.Point(44, 290)
+    $form.Controls.Add($updHint)
 
     $save = New-Object System.Windows.Forms.Button
     $save.Text = '保存'
     $save.Size = New-Object System.Drawing.Size(96, 32)
-    $save.Location = New-Object System.Drawing.Point(382, 246)
+    $save.Location = New-Object System.Drawing.Point(382, 326)
     $save.BackColor = [System.Drawing.Color]::FromArgb(18, 161, 80)
     $save.ForeColor = [System.Drawing.Color]::White
     $save.FlatStyle = 'Flat'
     $save.Add_Click({
-        Save-LocalSettings -Dir $box.Text -AutoOpen $chk.Checked -TimeoutMs ([int]$num.Value)
+        Save-LocalSettings -Dir $box.Text -AutoOpen $chk.Checked -TimeoutMs ([int]$num.Value) -AutoCheckUpdate $chkUpd.Checked -AskBeforeReport $chkAsk.Checked -SaveReport $script:SaveReport
         [System.Windows.Forms.MessageBox]::Show('已保存。下次运行按新设置来。', '设置')
         $form.Close()
     })
@@ -276,7 +307,7 @@ function Show-SettingsWindow {
     $cancel = New-Object System.Windows.Forms.Button
     $cancel.Text = '取消'
     $cancel.Size = New-Object System.Drawing.Size(96, 32)
-    $cancel.Location = New-Object System.Drawing.Point(486, 246)
+    $cancel.Location = New-Object System.Drawing.Point(486, 328)
     $cancel.FlatStyle = 'Flat'
     $cancel.Add_Click({ $form.Close() })
     $form.Controls.Add($cancel)
@@ -509,6 +540,18 @@ function Compare-VersionText {
 
 function Get-RemoteVersion {
     param([string]$Source = 'gitee', [int]$TimeoutMs = 5000)
+    # 先读仓库里的 version.json —— 它按平台分别写版本号，单端更新不会误报到另一端
+    if ($Source -eq 'github') {
+        $resp = Invoke-Https -HostName 'raw.githubusercontent.com' -Path '/neurotracee/github-netcheck/main/version.json' -TimeoutMs $TimeoutMs -Accept 'application/json'
+    } else {
+        $resp = Invoke-Https -HostName 'gitee.com' -Path '/bio234/github-netcheck/raw/main/version.json' -TimeoutMs $TimeoutMs -Accept 'application/json'
+    }
+    if ($resp.Ok -and $resp.Body) {
+        $m = [regex]::Match($resp.Body, '"windows"\s*:\s*\{[^}]*"version"\s*:\s*"([^"]+)"')
+        if (-not $m.Success) { $m = [regex]::Match($resp.Body, '"windows"\s*:\s*\{[^}]*\}') }
+        if ($m.Success -and $m.Groups.Count -ge 2 -and $m.Groups[1].Value) { return $m.Groups[1].Value }
+    }
+    # 兜底：version.json 拿不到时仍按 release tag 判断（老仓库没有这个文件也能用）
     if ($Source -eq 'github') {
         $resp = Invoke-Https -HostName 'api.github.com' -Path '/repos/neurotracee/github-netcheck/releases/latest' -TimeoutMs $TimeoutMs -Accept 'application/vnd.github+json'
     } else {
@@ -573,6 +616,21 @@ Write-Host ('  GitHub 网络自检 v' + $script:AppVersion + '   GitHub / Huggin
 Write-Host '  ---------------------------------------------------------' -ForegroundColor DarkGray
 Write-Host ('  作者：项目创作时为初中生 · 开发：豆包工作任务的 Agent × DeepSeek-V4.1-Flash') -ForegroundColor DarkGray
 Write-Host ('  开源协议 Apache-2.0 · 原项目 ' + $script:ProjectUrl) -ForegroundColor DarkGray
+
+# 启动时自动检查更新（可在设置里关掉）：只读一行公开版本号，连不上就静默跳过
+if ($script:AutoCheckUpdate) {
+    try {
+        $u = Invoke-UpdateCheck -TimeoutMs 3000
+        if ($u.HasNew) {
+            Write-Host ('  检查更新：' + $u.Text) -ForegroundColor Yellow
+            Write-Host ('  下载页：' + $script:ProjectUrl + '/releases') -ForegroundColor DarkGray
+        } else {
+            Write-Host ('  检查更新：' + $u.Text) -ForegroundColor DarkGray
+        }
+    } catch {
+        Write-Host '  检查更新：跳过（仓库暂时连不上）' -ForegroundColor DarkGray
+    }
+}
 
 $script:RateInfo = ''
 $NetEnv = Get-NetEnv
@@ -835,8 +893,8 @@ h2{font-size:16px;font-weight:600;margin-bottom:10px}
 <body>
 <div class="wrap">
   <header>
-    <div class="kicker">Net Check · 本机自检</div>
-    <h1>网络连通性报告</h1>
+    <div class="kicker">GitHub 网络自检 · v__VERSION__</div>
+    <h1>GitHub 网络自检报告</h1>
     <div class="meta">__DATE__ 　·　 __COUNT__ 个目标　·　 用时 __ELAPSED__ 秒　·　 全部测试在本机完成，不上传任何数据</div>
     <div class="pills">__ENV__</div>
   </header>
@@ -863,7 +921,11 @@ __ADVICE__
     测试方法：DNS 解析 → TCP 443 建连 → TLS 握手 → 发送 HTTP 请求测首字节时间，四段分别计时。<br>
     评级按 TCP 建连延迟：≤120ms 优秀，≤400ms 良好，≤1000ms 一般，&gt;1000ms 较慢，失败为不通。<br>
     <code>DoH 真实解析</code> 用阿里公共 DNS 加密查询对照，用来发现 hosts 改写或 DNS 污染。<br>
-    报告中若某域名 IP 显示为 127.0.0.1，说明它被 hosts 指向本机，实际流量走的是本地反代而不是直连。
+    报告中若某域名 IP 显示为 127.0.0.1，说明它被 hosts 指向本机，实际流量走的是本地反代而不是直连。<br>
+    <br>
+    GitHub 网络自检 <b>v__VERSION__</b>　·　指导作者：项目创作时为初中生　·　开发：豆包工作任务的 Agent × DeepSeek-V4.1-Flash<br>
+    原项目 <a href="__PROJECTURL__">github.com/neurotracee/github-netcheck</a>　·　
+    镜像 <a href="__MIRRORURL__">gitee.com/bio234/github-netcheck</a>　·　Apache-2.0
   </div>
 </div>
 </body>
@@ -876,6 +938,9 @@ function Set-Placeholder {
 }
 
 $html = Set-Placeholder $html '__DATE__'     $dateStr
+$html = Set-Placeholder $html '__VERSION__'  $script:AppVersion
+$html = Set-Placeholder $html '__PROJECTURL__' $script:ProjectUrl
+$html = Set-Placeholder $html '__MIRRORURL__'  $script:MirrorUrl
 $html = Set-Placeholder $html '__COUNT__'    ([string]$Total)
 $html = Set-Placeholder $html '__ELAPSED__'  ([string]$Elapsed)
 $html = Set-Placeholder $html '__ENV__'      $envHtml
@@ -889,6 +954,44 @@ $slowVal = [string]$FailList.Count
 $html = Set-Placeholder $html '__SLOW__' $slowVal
 $html = Set-Placeholder $html '__ROWS__'     $rowsHtml
 $html = Set-Placeholder $html '__ADVICE__'   $adviceHtml
+
+# ---------- 要不要出报告：默认先问一句，而不是闷头生成一堆 HTML ----------
+# 规则：AskBeforeReport 开着时每次询问（可在回答后选择「记住这次的选择」，之后不再问）；
+#     关掉时按 settings.json 里记住的 SaveReport / AutoOpen 执行。
+$wantSave = $false
+$wantOpen = $false
+if ($NoBrowser) {
+    # -NoBrowser 是给自动化/CI 用的：不弹问、不打开浏览器，只按记住的「要不要报告」来
+    $wantSave = $script:SaveReport
+    $wantOpen = $false
+}
+elseif ($script:AskBeforeReport) {
+    Write-Host ''
+    $ansSave = Read-Host '  自检跑完了。这次要生成 HTML 报告吗？(Y/n)'
+    if ($ansSave -eq '' -or $ansSave -match '^[Yy]') { $wantSave = $true }
+    if ($wantSave) {
+        $ansOpen = Read-Host '  要现在用浏览器打开吗？(Y/n)'
+        if ($ansOpen -eq '' -or $ansOpen -match '^[Yy]') { $wantOpen = $true }
+    }
+    $ansRemember = Read-Host '  记住这次的选择吗（下次不再问）？(y/N)'
+    if ($ansRemember -match '^[Yy]') {
+        Save-LocalSettings -Dir $ReportDir -AutoOpen $wantOpen -TimeoutMs $script:TimeoutMs `
+            -AutoCheckUpdate $script:AutoCheckUpdate -AskBeforeReport $false -SaveReport $wantSave
+        Write-Host ('  已记住：以后不再询问，' + $(if ($wantSave) { '会生成报告' } else { '不生成报告' }) +
+            $(if ($wantOpen) { '并自动打开' } else { '、不自动打开' }) + '。可在设置里改回来。') -ForegroundColor DarkGray
+    }
+}
+else {
+    $wantSave = $script:SaveReport
+    $wantOpen = $script:AutoOpen
+}
+
+if (-not $wantSave) {
+    Write-Host ''
+    Write-Host '  这次不生成报告（控制台结果已经打完）。想改回来：运行 -Settings 勾上「每次先问我」，或改 settings.json。' -ForegroundColor DarkGray
+    Write-Host ''
+    exit 0
+}
 
 $stamp = (Get-Date).ToString('yyyyMMdd-HHmmss')
 $outFile = Join-Path $ReportDir ("netcheck-" + $stamp + ".html")
@@ -906,6 +1009,6 @@ try {
 Write-Host ("  报告已生成：" + $outFile) -ForegroundColor Cyan
 Write-Host ''
 
-if (-not $NoBrowser -and $script:AutoOpen) {
+if ($wantOpen) {
     try { Start-Process $outFile } catch { Write-Host '  自动打开报告失败，请手动双击 reports 目录下的 html 文件。' -ForegroundColor Yellow }
 }

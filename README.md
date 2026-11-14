@@ -33,6 +33,22 @@ Hugging Face 下载慢 · Docker 拉取失败 · 国内网络环境 · Android A
 Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；安卓端是一个 APK，点一下就开始测。
 **两端共用同一套测试点位、同一套评级阈值、同一套报告样式**，手机测完和电脑测完的两份报告可以直接对着看。
 
+## 下载（先点这里）
+
+**当前版本 v1.1.1.0**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
+
+| 你要的 | GitHub | Gitee（国内镜像） |
+| --- | --- | --- |
+| 最新下载页 | https://github.com/neurotracee/github-netcheck/releases/latest | https://gitee.com/bio234/github-netcheck/releases/latest |
+| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.1.0/NetCheck-1.1.1.0.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.1.0/NetCheck-1.1.1.0.apk |
+| Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.1.0/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.1.0/NetCheck-Windows.zip |
+| 仓库首页 | https://github.com/neurotracee/github-netcheck | https://gitee.com/bio234/github-netcheck |
+
+解压 Windows 包后双击 **一键网络自检.bat**；APK 直接安装（系统会提示「未知来源」，原因见下一节）。
+校验值（SHA-256）写在 [Release 说明](https://github.com/neurotracee/github-netcheck/releases/latest) 里，下载后可用 `certutil -hashfile <文件名> SHA256` 自己核一遍。
+
+**版本说明**：这是四段版本号（主.次.修订.补丁），小修小改只加最后一段，所以 1.1.0.3 → 1.1.1.0 属于功能级更新（加了「先问我」和分平台版本号），不是大版本。
+
 ## 装之前先看三件事
 
 **① 为什么只在 Releases 下载，没上应用商店。**
@@ -70,6 +86,29 @@ apksigner verify -v --print-certs NetCheck-<版本号>.apk
 ![图标](assets/icon/netcheck-1024-plate.png)
 
 ---
+
+## 界面
+
+安卓端三屏，**真机截图**（OPPO Find X6 Pro / Android 14，装的正是本版 APK；这张屏上的 7 / 11 是「只测 GitHub 系」跑出来的，
+hosts 里那 2 条本地映射把 GitHub Pages 顶成了 127.0.0.1，所以它报「不通」——这正是工具该发现的东西）。
+设置页是照 PDF 隐私打码工具那套「齿轮 → 设置 → 关于」的结构做的。
+
+![安卓主界面：跑完一次的结果](docs/img/ui-android-main.png)
+![安卓设置页](docs/img/ui-android-settings.png)
+![安卓关于页](docs/img/ui-android-about.png)
+
+| 界面 | 说明 |
+| --- | --- |
+| 主界面 | 标题区 + 环境标签 + 两个按钮 + 四张汇总卡 + 逐条结果卡（点一条展开细节） |
+| 设置页 | 界面语言 / 外观 / 报告保存位置 / 更新检查方式 / 更新源（Gitee 或 GitHub）/ 版本与检查更新 / 关于入口 |
+| 关于页 | 指导作者、开发（豆包工作任务的 Agent × DeepSeek-V4.1-Flash）、协议、两个地址、隐私、三条硬要求、维护节奏 |
+
+Windows 端是控制台 + 两个 WinForms 窗口：菜单式 BAT 选 `1` 直接自检，选 `3` 弹关于窗、选 `4` 弹设置窗、选 `5` 只查更新。
+窗口内容与安卓的「关于 / 设置」两屏一一对应（同一份文案，见 `windows/netcheck.ps1` 的 `Show-AboutWindow` / `Show-SettingsWindow`）。
+
+下面是这台机器上真实跑出来的关于窗（不是示意图）：
+
+![Windows 关于窗](docs/img/ui-windows-about.png)
 
 ## 这个项目是谁做的
 
@@ -230,29 +269,6 @@ https://gitee.com/bio234/github-netcheck      # mirror / 镜像（国内访问�
 那个「TCP 0ms」不是作弊：本机反代把连接在本地就接住了，所以建连几乎不耗时——恰恰说明流量没真正走远。
 `codeload` 那条「能连上但握手失败」才是这类工具最该报出来的状态：TCP 通了，TLS 被掐，下载仓库 zip 就会失败。
 
-## 界面
-
-安卓端三屏，**真机截图**（OPPO Find X6 Pro / Android 14，装的正是本版 APK；这张屏上的 7 / 11 是「只测 GitHub 系」跑出来的，
-hosts 里那 2 条本地映射把 GitHub Pages 顶成了 127.0.0.1，所以它报「不通」——这正是工具该发现的东西）。
-设置页是照 PDF 隐私打码工具那套「齿轮 → 设置 → 关于」的结构做的。
-
-![安卓主界面：跑完一次的结果](docs/img/ui-android-main.png)
-![安卓设置页](docs/img/ui-android-settings.png)
-![安卓关于页](docs/img/ui-android-about.png)
-
-| 界面 | 说明 |
-| --- | --- |
-| 主界面 | 标题区 + 环境标签 + 两个按钮 + 四张汇总卡 + 逐条结果卡（点一条展开细节） |
-| 设置页 | 界面语言 / 外观 / 报告保存位置 / 更新检查方式 / 更新源（Gitee 或 GitHub）/ 版本与检查更新 / 关于入口 |
-| 关于页 | 指导作者、开发（豆包工作任务的 Agent × DeepSeek-V4.1-Flash）、协议、两个地址、隐私、三条硬要求、维护节奏 |
-
-Windows 端是控制台 + 两个 WinForms 窗口：菜单式 BAT 选 `1` 直接自检，选 `3` 弹关于窗、选 `4` 弹设置窗、选 `5` 只查更新。
-窗口内容与安卓的「关于 / 设置」两屏一一对应（同一份文案，见 `windows/netcheck.ps1` 的 `Show-AboutWindow` / `Show-SettingsWindow`）。
-
-下面是这台机器上真实跑出来的关于窗（不是示意图）：
-
-![Windows 关于窗](docs/img/ui-windows-about.png)
-
 ## 和瓦特工具箱是什么关系
 
 瓦特工具箱（Watt Toolkit，原名 Steam++）的加速思路是：
@@ -276,6 +292,29 @@ hosts 把域名指向 127.0.0.1
 - **系统代理模式**：本工具用原生 socket 直连，不走系统代理，所以测到的仍是真实直连状况——正好可以用来判断「如果不加速会有多惨」
 - **安卓端的 VPN 模式**（Clash 类工具）：VPN 在系统层接管流量，socket 无法绕过，这时测到的就是「走规则后的结果」。报告顶部会标「VPN 已启用」，看数值时请把这层算进去
 
+## 版本号与更新检查（只发一端时，另一端不会被误报）
+
+版本号是四段 `主.次.修订.补丁`，例如 `1.1.1.0`：
+
+- 只改文案、修小 bug → 只动**第四段**（`1.1.0.3` → `1.1.0.4`）；
+- 加了新功能 → 动**第三段**（`1.1.0.x` → `1.1.1.0`）；
+- 前两段基本不动，动了就是大版本，别轻易用。
+
+仓库根目录有一份 `version.json`，**按平台分开写版本号**：
+
+```json
+{
+  "android": { "version": "1.1.1.0", "url": "https://github.com/neurotracee/github-netcheck/releases" },
+  "windows": { "version": "1.1.1.0", "url": "https://github.com/neurotracee/github-netcheck/releases" }
+}
+```
+
+两端的「检查更新」都先读这个文件，**只认自己那一段**：只发 Windows 更新、把 `windows.version` 改成 `1.1.0.4`，
+安卓端读到的仍是 `1.1.1.0`，就不会莫名弹出「有新版本」；反过来也一样。
+这修掉了以前「发一次 Release，两端都提示更新但只有一端真变了」的逻辑 bug。
+读不到 `version.json` 时才会退回读 Release（发布版本）的 tag，所以老环境也不会瞎。
+
+
 ## 怎么用
 
 ### 方式一：Windows，双击就跑
@@ -287,14 +326,20 @@ hosts 把域名指向 127.0.0.1
    [1] 开始自检（14 个点位，约 30 秒）
    [2] 只测 GitHub 系（更快）
    [3] 关于与开源信息
-   [4] 设置（报告位置 / 自动打开 / 超时）
+   [4] 设置（报告位置 / 先问我 / 自动打开 / 自动查更新 / 超时）
+   [5] 检查更新（只读远端版本号）
    [0] 退出
    ```
 
    菜单顶部常驻署名、协议与两个项目地址——这个工具是谁做的、从哪儿来的，直接摆在最显眼的地方。
 3. 选 1（或 2），逐个测试 14 个目标，大约 15～40 秒（看网络差到什么程度）。
-4. 测完自动用默认浏览器打开报告，报告同时存到 `reports\latest.html`，历史记录按时间戳各存一份 HTML + CSV。
-   不想让它自动弹浏览器，就在「设置」里关掉。
+4. 测完**不会闷头生成一堆文件**，而是先问三句：
+   - 「这次要生成 HTML 报告吗？」（回车 = 是）
+   - 「要现在用浏览器打开吗？」（回车 = 是）
+   - 「记住这次的选择吗（下次不再问）？」（默认不记）
+
+   答「记住」就把这次的选择写进 `settings.json`，之后不再打扰；想改回来，进「设置」勾上「每次自检结束后先问我」即可。
+   报告存到 `reports\`（`latest.html` 是最新一份，历史按时间戳各存一份 HTML + CSV）。
 
 不需要安装 PowerShell 模块、不需要 Python、不需要联网安装任何东西——用的是 Windows 自带的 PowerShell 5.1。
 如果系统提示「无法加载文件，因为在此系统上禁止运行脚本」，用 bat 启动即可（bat 里已经带了 `-ExecutionPolicy Bypass`）。
@@ -329,17 +374,34 @@ powershell -ExecutionPolicy Bypass -File .\windows\netcheck.ps1
 # 只测 GitHub 系（快一些）
 powershell -ExecutionPolicy Bypass -File .\windows\netcheck.ps1 -Quick
 
-# 测完不自动打开浏览器
+# 测完不询问、不打开浏览器，只按记住的「要不要报告」执行（给自动化/CI 用）
 powershell -ExecutionPolicy Bypass -File .\windows\netcheck.ps1 -NoBrowser
 
 # 只弹「关于与开源信息」窗口
 powershell -ExecutionPolicy Bypass -File .\windows\netcheck.ps1 -About
 
-# 只弹设置窗口（报告存哪、要不要自动打开、单段超时）
+# 只弹设置窗口（报告存哪、要不要先问我、自动打开、自动查更新、单段超时）
 powershell -ExecutionPolicy Bypass -File .\windows\netcheck.ps1 -Settings
+
+# 只查一次最新版本号，不测网络
+powershell -ExecutionPolicy Bypass -File .\windows\netcheck.ps1 -CheckUpdate
 ```
 
-设置写在脚本同目录的 `settings.json`（不写注册表、不联网），删掉它就恢复默认。
+设置写在脚本同目录的 `settings.json`（不写注册表、不联网），删掉它就恢复默认：
+
+```json
+{
+  "ReportDir": "reports",
+  "AutoOpen": false,
+  "TimeoutMs": 3000,
+  "AutoCheckUpdate": true,
+  "AskBeforeReport": true,
+  "SaveReport": true
+}
+```
+
+`AskBeforeReport` 是「每次自检结束后先问我」；`AutoOpen` / `SaveReport` 只在关掉询问时生效；
+`AutoCheckUpdate` 是启动时静默查一次版本号（只读公开文件，连不上就跳过）。
 
 想换测试目标，用记事本打开 `windows/netcheck.ps1`，改开头 `$Targets` 那段，照着格式加一行就行：
 

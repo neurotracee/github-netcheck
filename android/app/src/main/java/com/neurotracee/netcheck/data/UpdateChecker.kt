@@ -6,22 +6,35 @@ import java.net.URL
 
 /**
  * 更新检查：只读一个公开的版本号，不传任何本机信息。
+ * 先读仓库里的 version.json（按平台分开写，安卓只认 android 那一段，
+ * 这样只发 Windows 更新时安卓不会被误报「有新版本」）；
+ * 拿不到再退回 release（发布版本）的 tag。
  * Gitee 是国内默认源，GitHub 是海外源；某个源连不上时自动换另一个再试一次。
  */
 object UpdateChecker {
 
     data class Info(val tag: String, val url: String)
 
+    private const val GITEE_VER = "https://gitee.com/bio234/github-netcheck/raw/main/version.json"
+    private const val GITHUB_VER = "https://raw.githubusercontent.com/neurotracee/github-netcheck/main/version.json"
     private const val GITEE_URL = "https://gitee.com/api/v5/repos/bio234/github-netcheck/releases/latest"
     private const val GITHUB_URL = "https://api.github.com/repos/neurotracee/github-netcheck/releases/latest"
 
     /** source: 0 Gitee · 1 GitHub。返回 Result，失败时带一句人话。 */
     fun check(source: Int, timeoutMs: Int = 8000): Result<Info> {
-        val order = if (source == 1) listOf(GITHUB_URL, GITEE_URL) else listOf(GITEE_URL, GITHUB_URL)
+        val order = if (source == 1) listOf(GITHUB_VER, GITEE_VER) else listOf(GITEE_VER, GITHUB_VER)
+        val fallback = if (source == 1) listOf(GITHUB_URL, GITEE_URL) else listOf(GITEE_URL, GITHUB_URL)
         var last: String = "拿不到更新信息"
         for (url in order) {
             try {
-                return Result.success(fetch(url, timeoutMs))
+                return Result.success(fetchVersionFile(url, timeoutMs))
+            } catch (t: Throwable) {
+                last = friendly(url, t)
+            }
+        }
+        for (url in fallback) {
+            try {
+                return Result.success(fetchRelease(url, timeoutMs))
             } catch (t: Throwable) {
                 last = friendly(url, t)
             }
@@ -29,7 +42,26 @@ object UpdateChecker {
         return Result.failure(IllegalStateException(last))
     }
 
-    private fun fetch(url: String, timeoutMs: Int): Info {
+    /** version.json 形如 {"android":{"version":"1.1.1.0","url":"..."},"windows":{...}} */
+    private fun fetchVersionFile(url: String, timeoutMs: Int): Info {
+        val obj = JSONObject(get(url, timeoutMs))
+        val self = obj.optJSONObject("android")
+            ?: throw IllegalStateException("version.json 里没有 android 段")
+        val ver = self.optString("version")
+        if (ver.isBlank()) throw IllegalStateException("没有版本号")
+        val page = self.optString("url")
+        return Info(ver.trim(), page.ifBlank { url })
+    }
+
+    private fun fetchRelease(url: String, timeoutMs: Int): Info {
+        val obj = JSONObject(get(url, timeoutMs))
+        val tag = obj.optString("tag_name")
+        val html = obj.optString("html_url")
+        if (tag.isBlank()) throw IllegalStateException("没有版本号")
+        return Info(tag.trim(), html.ifBlank { url })
+    }
+
+    private fun get(url: String, timeoutMs: Int): String {
         val conn = URL(url).openConnection() as HttpURLConnection
         conn.connectTimeout = timeoutMs
         conn.readTimeout = timeoutMs
@@ -37,12 +69,7 @@ object UpdateChecker {
         conn.setRequestProperty("Accept", "application/json")
         try {
             if (conn.responseCode !in 200..299) throw IllegalStateException("HTTP ${conn.responseCode}")
-            val text = conn.inputStream.bufferedReader().use { it.readText() }
-            val obj = JSONObject(text)
-            val tag = obj.optString("tag_name")
-            val html = obj.optString("html_url")
-            if (tag.isBlank()) throw IllegalStateException("没有版本号")
-            return Info(tag.trim(), html.ifBlank { url })
+            return conn.inputStream.bufferedReader().use { it.readText() }
         } finally {
             conn.disconnect()
         }
