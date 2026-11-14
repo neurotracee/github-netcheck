@@ -319,12 +319,14 @@ fun AboutSheet(versionName: String, onDismiss: () -> Unit, onToast: (String) -> 
             Text(t("隐私", "Privacy"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = p.ink)
             Spacer(Modifier.height(6.dp))
             Text(
-                t("没有存储权限，也没有后台常驻联网。唯一的网络权限用在两件事：自检本身，以及检查更新。"
-                        + "检查更新默认启动时静默查一次，也可以在设置里改成纯手动；联网时只读一个公开的版本号，"
-                        + "不传文件、不传任何本机信息。报告写在应用私有目录，导出时才交给你选定的位置或系统分享面板。",
-                    "No storage permission and no background networking. Network access is used only for the checks "
-                            + "themselves and for the update check, which reads one public version string and nothing else. "
-                            + "Reports live in app-private storage; they leave only when you export them."),
+                t("没有存储权限，也没有后台常驻联网。唯一的网络权限只用在三件事：① 启动时自动检查更新（可在上面关掉）；"
+                        + "② 手动点「检查更新」；③ 测那 14 个点位的延迟。"
+                        + "检查更新只连两个仓库——国内 Gitee 与国外 GitHub，由脚本按可用的那个自动择一，只读一行公开版本号；"
+                        + "不上传信息、不传文件、不带账号或设备标识。报告写在应用私有目录，导出时才交给你选定的位置或系统分享面板。",
+                    "No storage permission and no background networking. Network access is used only for three things: "
+                            + "the automatic update check at startup (can be turned off above), the manual \"check for updates\", "
+                            + "and measuring the 14 targets. Update checks hit only two repos — Gitee (China) and GitHub — "
+                            + "picking whichever answers, reading one public version string; nothing is uploaded."),
                 fontSize = 12.sp, color = p.sub, lineHeight = 19.sp
             )
 

@@ -4,7 +4,7 @@
 #  测四项：DNS 解析 / TCP 建连 / TLS 握手 / HTTPS 首字节
 #  输出：控制台结果 + reports 目录下的 HTML 可视化报告
 #
-#  版本：1.1.0.1
+#  版本：1.1.0.2
 #  开源协议：Apache License 2.0
 #  原项目地址：https://github.com/neurotracee/netcheck
 #  镜像（Gitee）：https://gitee.com/bio234/netcheck
@@ -25,7 +25,7 @@ param(
     [switch]$CheckUpdate  # 只查最新版本号，不测
 )
 
-$script:AppVersion = '1.1.0.1'
+$script:AppVersion = '1.1.0.2'
 $script:ProjectUrl = 'https://github.com/neurotracee/netcheck'
 $script:MirrorUrl  = 'https://gitee.com/bio234/netcheck'
 

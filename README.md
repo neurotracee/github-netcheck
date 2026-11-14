@@ -209,10 +209,11 @@ https://gitee.com/bio234/netcheck      # mirror / 镜像（国内访问更快）
 
 ## 界面
 
-安卓端三屏（⚠ **界面示意图**：按 APK 里 Compose 的实际布局、配色与文案绘制，用于说明信息层级；
-真实观感以装机后为准，作者的机器上没法跑模拟器截图）。设置页是照 PDF 隐私打码工具那套「齿轮 → 设置 → 关于」的结构做的。
+安卓端三屏，**真机截图**（OPPO Find X6 Pro / Android 14，装的正是本版 APK；这张屏上的 7 / 11 是「只测 GitHub 系」跑出来的，
+hosts 里那 2 条本地映射把 GitHub Pages 顶成了 127.0.0.1，所以它报「不通」——这正是工具该发现的东西）。
+设置页是照 PDF 隐私打码工具那套「齿轮 → 设置 → 关于」的结构做的。
 
-![安卓主界面](docs/img/ui-android-main.png)
+![安卓主界面：跑完一次的结果](docs/img/ui-android-main.png)
 ![安卓设置页](docs/img/ui-android-settings.png)
 ![安卓关于页](docs/img/ui-android-about.png)
 
