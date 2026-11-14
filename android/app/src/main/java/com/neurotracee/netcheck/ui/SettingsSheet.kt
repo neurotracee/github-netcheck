@@ -300,9 +300,17 @@ fun AboutSheet(versionName: String, onDismiss: () -> Unit, onToast: (String) -> 
             Box(Modifier.fillMaxWidth().height(1.dp).background(p.line))
             Spacer(Modifier.height(12.dp))
 
-            KvRow(p, t("指导作者", "Author"), t("项目创作时为初中生。\n需求、判读规则的设计、验收测试全部由本人完成。",
-                "A middle-school student when the project was made. Requirements, grading rules and acceptance tests are all his own work."))
-            KvRow(p, t("开发", "Built by"), "豆包工作任务 ×\nDeepSeek-V4.1-Flash")
+            KvRow(p, t("指导作者", "Author"), t("项目创作时为初中生。\n只负责提需求、定判读标准、验收与反馈问题；不写代码。",
+                "A middle-school student when the project was made. He only files requirements, sets the grading rules and accepts or rejects the result; he does not write code."))
+            KvRow(p, t("开发", "Built by"), "豆包工作任务的 Agent ×\nDeepSeek-V4.1-Flash")
+            Spacer(Modifier.height(8.dp))
+            Text(
+                t("说明：Agent 由豆包工作任务提供，模型是 DeepSeek 的 V4.1-Flash（由指导作者自己在客户端选定）。"
+                        + "两个端的全部代码、构建、签名、新建仓库与发布都由 Agent 完成，与腾讯没有任何关系。",
+                    "Note: the agent comes from Doubao Work, the model is DeepSeek V4.1-Flash chosen by the author. "
+                            + "All code, builds, signing and repository setup were done by the agent. No relation to Tencent."),
+                fontSize = 11.5.sp, color = p.sub, lineHeight = 18.sp
+            )
             KvRow(p, t("开源协议", "License"), "Apache-2.0")
             KvRow(p, t("原项目地址", "Primary"), "github.com/neurotracee/\nnetcheck", link = PROJECT_URL, onOpen = { openUrl(context, PROJECT_URL, onToast) })
             KvRow(p, t("镜像地址", "Mirror"), "gitee.com/bio234/\nnetcheck", link = MIRROR_URL, onOpen = { openUrl(context, MIRROR_URL, onToast) })

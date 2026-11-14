@@ -62,11 +62,14 @@ https://dns.alidns.com/resolve?name=<域名>&type=A
 ## 四、必须保留的署名（Apache-2.0 第 4 条 (c) 项，请勿删除）
 
 ```
-指导作者：项目创作时为初中生 —— 需求、点位设计、判读标准、验收测试全部由本人完成
-开发    ：腾讯 WorkBuddy × DeepSeek-V4.1-Flash
+指导作者：项目创作时为初中生 —— 只负责提需求、定判读标准、验收与反馈问题
+开发    ：豆包工作任务的 Agent × DeepSeek-V4.1-Flash（Agent 由豆包工作任务提供，模型为 DeepSeek V4.1-Flash）
 原项目  ：https://github.com/neurotracee/netcheck
 镜像    ：https://gitee.com/bio234/netcheck
 ```
+
+> 名词说明：**Agent 来自豆包工作任务，模型来自 DeepSeek（V4.1-Flash）**。两者都不是腾讯的产品，
+> 本项目与腾讯没有任何关系。全部代码、构建、建仓与发布由 Agent 完成，指导作者只负责提需求与验收。
 
 二次开发或商用必须保留以上署名，并在程序中标注原项目地址；改动过的版本须注明
 「本程序基于该地址修改，非原作者发布」。详见 [ADDITIONAL-TERMS.md](ADDITIONAL-TERMS.md)。

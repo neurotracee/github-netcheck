@@ -10,6 +10,10 @@
 
 > **本项目与 PDF 隐私打码工具同源同作者。** GitHub 仓库建得更早，Gitee 是同一名开发者维护的国内镜像
 > （https://gitee.com/bio234/netcheck），两边内容一致，不存在谁抄谁。
+>
+> 作者的另一项目：**PDF 隐私打码工具**（本地离线给 PDF 打码，不上传文件）——
+> GitHub https://github.com/neurotracee/pdf-privacy-masker ｜ Gitee https://gitee.com/bio234/pdf-privacy-masker 。
+> 那个项目用 AGPL-3.0，本项目用 Apache-2.0，协议不同，别混用。
 
 一个纯本地、零依赖的网络连通性自检工具：**不代理、不加速、不改 hosts，只测量**。
 
@@ -19,14 +23,37 @@
 Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；安卓端是一个 APK，点一下就开始测。
 **两端共用同一套测试点位、同一套评级阈值、同一套报告样式**，手机测完和电脑测完的两份报告可以直接对着看。
 
+## 装之前先看三件事
+
+**① 为什么只在 Releases 下载，没上应用商店。**
+作者是未成年人，华为 / 小米 / OPPO / vivo 四家应用市场的开发者上架要做互认证：手持身份证拍照 + 绑定**本人实名银行卡**。
+作者拿不到本人实名银行卡（未成年人办不了），家里对「上传身份证 + 银行卡」这套流程也不理解、警惕被骗的心思很重，
+所以这条路走不通，不是懒。因此 APK 直接放在 GitHub / Gitee 的 Releases 里，用作者自签证书签名，
+系统会提示「未知来源」——**这是没走应用商店的必然结果，不是应用本身有问题**。
+
+**② 安装时那句「信息可能会被第三方收集」是什么。**
+那是安卓系统（尤其国产 ROM 的安装器）对**任何非应用商店来源的 APK** 统一弹的风险提示，说给所有人听，
+不是针对本应用，也不代表本应用会收集什么。本应用申请的权限只有两项（`INTERNET` 与 `ACCESS_NETWORK_STATE`），
+没有存储、位置、通讯录、短信、相机权限，也没有任何统计 / 广告 / 崩溃上报 SDK（可对照
+[AndroidManifest.xml](android/app/src/main/AndroidManifest.xml) 与 [NOTICE.md](NOTICE.md) 自行核对）。
+签名证书指纹写在 Release 说明里，可以自己验。
+
+**③ 它到底连了什么网。**
+联网权限只有一项 `INTERNET`，只用在三件事：**启动时自动检查更新（可在设置里关掉）**、
+**手动点「检查更新」**、**测那 14 个点位的延迟**。
+检查更新只连**两个仓库**——国内 Gitee（https://gitee.com/bio234/netcheck）、国外 GitHub
+（https://github.com/neurotracee/netcheck），由脚本按可用的那个自动择一，读一行公开的版本号。
+**不上传任何信息、不传文件、不带账号、不带设备标识**；测延迟时也只发连接和一次响应头读取，不提交内容。
+
 ![图标](assets/icon/netcheck-1024-plate.png)
 
 ---
 
 ## 这个项目是谁做的
 
-- **指导作者：项目创作时为初中生。** 需求、测试点位的取舍、判读标准、验收测试全部由本人完成。
-- **开发：腾讯 WorkBuddy × DeepSeek-V4.1-Flash。** 在指导作者的指令与反复验收下实现代码。
+- **指导作者：项目创作时为初中生。** 只负责三件事：提出需求、确定测试点位的取舍与判读标准、验收并反馈问题。他不写代码。
+- **开发：豆包工作任务的 Agent × DeepSeek-V4.1-Flash。** 全部施工——两个端的代码、构建、签名、新建仓库与发布——都由 Agent 在他反复提需求与反馈下完成。
+- **名词说明（别混淆）**：**Agent 由豆包工作任务提供**，**模型是 DeepSeek 的（V4.1-Flash，由指导作者自己在客户端选定）**。所以这不是「豆包的模型」，也不是腾讯的产品，跟腾讯没有任何关系。
 - **开源协议：Apache License 2.0。** 详见 [LICENSE](LICENSE)，署名与出处要求见 [ADDITIONAL-TERMS.md](ADDITIONAL-TERMS.md) 与 [NOTICE.md](NOTICE.md)。
 - **维护方式**：个人业余时间维护，代码全部公开，欢迎任何人 fork 自行改进，不必询问。具体节奏与反馈渠道见文末「[维护节奏与反馈](#维护节奏与反馈)」。
 
@@ -43,7 +70,7 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 
 ```
 指导作者：项目创作时为初中生
-由 腾讯 WorkBuddy × DeepSeek-V4.1-Flash 开发
+由 豆包工作任务的 Agent × DeepSeek-V4.1-Flash 开发
 ```
 
 依据 Apache-2.0 第 4 条 (c) 项：必须保留源码中的版权、专利、商标与署名声明。
@@ -135,6 +162,72 @@ https://gitee.com/bio234/netcheck      # mirror / 镜像（国内访问更快）
 
 报告里的 **DoH 真实解析**：用阿里公共 DNS 加密查询拿到该域名的真实 IP，和本机解析结果对比。
 两者不一致，说明本机 DNS 被改写或被污染；如果本机 IP 显示 `127.0.0.1`，说明域名被 hosts 接管了。
+
+## 处理效果
+
+一次真实运行的产物长这样（2026-11-14 家庭宽带实测，完整 14 点位模式）：顶部是环境标签（系统代理、hosts 映射、
+本机 443 监听、DNS 服务器），中间四张汇总卡，下面每个点位一张卡——左侧竖条是评级颜色，右边是 DNS / TCP / TLS / HTTP
+四段各自的毫秒数，域名下面一行是解析到的 IP 与 DoH 对照结论。
+
+![真实报告截图](docs/img/effect-report.png)
+
+同一个数据还会在控制台打一份纯文本，跑完直接把报告甩进浏览器：
+
+```text
+  网络连通性自检 v1.1.0.1   GitHub / Hugging Face / Docker
+  ---------------------------------------------------------
+  作者：项目创作时为初中生 · 开发：豆包工作任务的 Agent × DeepSeek-V4.1-Flash
+  开源协议 Apache-2.0 · 原项目 https://github.com/neurotracee/netcheck
+  系统代理：未开启（直连模式）
+  hosts 记录：发现 45 条本地映射（可能来自瓦特工具箱等加速工具）
+  本机 443 端口：有程序在监听（本地反代很可能在运行）
+
+  [1/11] 百度（对照基准）  (www.baidu.com)   优秀   TCP 32ms / TLS 64ms / HTTP 150ms
+  [2/11] GitHub API 接口  (api.github.com)   优秀   TCP 0ms / TLS 10ms / HTTP 1297ms
+  [3/11] GitHub Raw 原始文件  (raw.githubusercontent.com)   优秀   TCP 0ms / TLS 12ms / HTTP 525ms
+  [4/11] GitHub Git 传输  (github.com)   优秀   TCP 0ms / TLS 9ms / HTTP 810ms
+  [5/11] GitHub 仓库打包  (codeload.github.com)   受限   TCP 103ms，但握手失败：读取响应超时（链路被掐断）
+  [6/11] GitHub 主站  (github.com)   优秀   TCP 0ms / TLS 1ms / HTTP 786ms
+  [7/11] GitHub 静态资源  (github.githubassets.com)   优秀   TCP 0ms / TLS 7ms / HTTP 1028ms
+  [8/11] GitHub 头像 CDN  (avatars.githubusercontent.com)   优秀   TCP 0ms / TLS 9ms / HTTP 471ms
+  [9/11] GitHub Gist  (gist.githubusercontent.com)   较慢   TCP 1141ms / TLS 280ms / HTTP 141ms
+  [10/11] GitHub Releases  (objects.githubusercontent.com)   优秀   TCP 0ms / TLS 10ms / HTTP 550ms
+  [11/11] GitHub Pages  (github.io)   优秀   TCP 0ms / TLS 9ms / HTTP 309ms
+
+  ---------------------------------------------------------
+  可连通 10 / 11    平均建连 117 ms    耗时 21 秒
+  API 配额 56 / 60
+  最快：GitHub 静态资源  0 ms
+  最慢：GitHub Gist  1141 ms
+  不通：GitHub 仓库打包
+
+  报告已生成：reports\netcheck-20261114-193319.html
+```
+
+那个「TCP 0ms」不是作弊：本机反代把连接在本地就接住了，所以建连几乎不耗时——恰恰说明流量没真正走远。
+`codeload` 那条「能连上但握手失败」才是这类工具最该报出来的状态：TCP 通了，TLS 被掐，下载仓库 zip 就会失败。
+
+## 界面
+
+安卓端三屏（⚠ **界面示意图**：按 APK 里 Compose 的实际布局、配色与文案绘制，用于说明信息层级；
+真实观感以装机后为准，作者的机器上没法跑模拟器截图）。设置页是照 PDF 隐私打码工具那套「齿轮 → 设置 → 关于」的结构做的。
+
+![安卓主界面](docs/img/ui-android-main.png)
+![安卓设置页](docs/img/ui-android-settings.png)
+![安卓关于页](docs/img/ui-android-about.png)
+
+| 界面 | 说明 |
+| --- | --- |
+| 主界面 | 标题区 + 环境标签 + 两个按钮 + 四张汇总卡 + 逐条结果卡（点一条展开细节） |
+| 设置页 | 界面语言 / 外观 / 报告保存位置 / 更新检查方式 / 更新源（Gitee 或 GitHub）/ 版本与检查更新 / 关于入口 |
+| 关于页 | 指导作者、开发（豆包工作任务的 Agent × DeepSeek-V4.1-Flash）、协议、两个地址、隐私、三条硬要求、维护节奏 |
+
+Windows 端是控制台 + 两个 WinForms 窗口：菜单式 BAT 选 `1` 直接自检，选 `3` 弹关于窗、选 `4` 弹设置窗、选 `5` 只查更新。
+窗口内容与安卓的「关于 / 设置」两屏一一对应（同一份文案，见 `windows/netcheck.ps1` 的 `Show-AboutWindow` / `Show-SettingsWindow`）。
+
+下面是这台机器上真实跑出来的关于窗（不是示意图）：
+
+![Windows 关于窗](docs/img/ui-windows-about.png)
 
 ## 和瓦特工具箱是什么关系
 

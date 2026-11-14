@@ -4,12 +4,12 @@
 #  测四项：DNS 解析 / TCP 建连 / TLS 握手 / HTTPS 首字节
 #  输出：控制台结果 + reports 目录下的 HTML 可视化报告
 #
-#  版本：1.1.0.0
+#  版本：1.1.0.1
 #  开源协议：Apache License 2.0
 #  原项目地址：https://github.com/neurotracee/netcheck
 #  镜像（Gitee）：https://gitee.com/bio234/netcheck
 #  指导作者：项目创作时为初中生；需求、判读规则与验收测试由本人完成
-#  开发：豆包工作任务 × DeepSeek-V4.1-Flash
+#  开发：豆包工作任务的 Agent × DeepSeek-V4.1-Flash
 #
 #  二次开发 / 商用三条硬要求：
 #   ① 保留上面「指导作者：项目创作时为初中生」的署名，不得删改
@@ -21,10 +21,11 @@ param(
     [switch]$NoBrowser,   # 加这个参数则不自动打开报告
     [switch]$Quick,       # 加这个参数只测 GitHub 系（少测几个，快一点）
     [switch]$About,       # 只弹「关于与开源信息」窗口，不测
-    [switch]$Settings     # 只弹设置窗口（报告目录 / 自动打开 / 超时），不测
+    [switch]$Settings,    # 只弹设置窗口（报告目录 / 自动打开 / 超时），不测
+    [switch]$CheckUpdate  # 只查最新版本号，不测
 )
 
-$script:AppVersion = '1.1.0.0'
+$script:AppVersion = '1.1.0.1'
 $script:ProjectUrl = 'https://github.com/neurotracee/netcheck'
 $script:MirrorUrl  = 'https://gitee.com/bio234/netcheck'
 
@@ -119,9 +120,11 @@ function Show-AboutWindow {
     $text.BackColor = [System.Drawing.Color]::White
     $lines = @(
         '指导作者　　　项目创作时为初中生。',
-        '　　　　　　　需求、判读规则的设计、验收测试全部由本人完成。',
+        '　　　　　　　只负责提需求、定判读标准、验收与反馈问题；不写代码。',
         '',
-        '开发　　　　　豆包工作任务 × DeepSeek-V4.1-Flash',
+        '开发　　　　　豆包工作任务的 Agent × DeepSeek-V4.1-Flash',
+        '　　　　　　　（Agent 由豆包工作任务提供，模型是 DeepSeek 的 V4.1-Flash）',
+        '　　　　　　　全部代码、构建、建仓与发布都由 Agent 完成，与腾讯无关。',
         '',
         '开源协议　　　Apache-2.0',
         '',
@@ -130,6 +133,7 @@ function Show-AboutWindow {
         '',
         '隐私　　　　　不安装后台服务，不写注册表，不上传任何数据。',
         '　　　　　　　联网只用在本机自检本身；报告写在本机 reports 目录。',
+        '　　　　　　　下面「检查更新」只读一行公开的版本号，不发送本机信息。',
         '',
         '二次开发 / 商用：三条硬要求',
         '　① 保留「指导作者：项目创作时为初中生」的署名，不得删改。',
@@ -143,6 +147,8 @@ function Show-AboutWindow {
         '如果这个工具帮到了你：给仓库点个 Star 就是最好的支持。'
     )
     $text.Text = ($lines -join "`r`n")
+    $text.SelectionStart = 0
+    $text.SelectionLength = 0
     $form.Controls.Add($text)
 
     $btn = New-Object System.Windows.Forms.Button
@@ -162,6 +168,21 @@ function Show-AboutWindow {
     $open.FlatStyle = 'Flat'
     $open.Add_Click({ Start-Process $script:ProjectUrl })
     $form.Controls.Add($open)
+
+    $chkUpd = New-Object System.Windows.Forms.Button
+    $chkUpd.Text = '检查更新'
+    $chkUpd.Location = New-Object System.Drawing.Point(254, 528)
+    $chkUpd.Size = New-Object System.Drawing.Size(104, 32)
+    $chkUpd.FlatStyle = 'Flat'
+    $chkUpd.Add_Click({
+        $chkUpd.Enabled = $false
+        $chkUpd.Text = '检查中…'
+        $u = Invoke-UpdateCheck
+        $text.AppendText("`r`n" + '—— 检查更新：' + $u.Text)
+        $chkUpd.Text = '检查更新'
+        $chkUpd.Enabled = $true
+    })
+    $form.Controls.Add($chkUpd)
 
     $form.ShowDialog() | Out-Null
 }
@@ -263,14 +284,7 @@ function Show-SettingsWindow {
     $form.ShowDialog() | Out-Null
 }
 
-if ($About) {
-    Show-AboutWindow
-    exit 0
-}
-if ($Settings) {
-    Show-SettingsWindow
-    exit 0
-}
+
 
 # ---------- 测试目标清单（对齐瓦特工具箱的加速项） ----------
 $Targets = @(
@@ -467,12 +481,97 @@ function Get-Verdict {
     return @{ Level = 'o'; Label = '较慢'; Text = '很慢' }
 }
 
+# ---------- 检查更新：只读两个平台上一个公开的版本号，不传本机任何信息 ----------
+function ConvertTo-VersionParts {
+    param([string]$Text)
+    $clean = ($Text -replace '^[vV]', '').Trim()
+    $nums = @()
+    foreach ($p in ($clean -split '[.\-+]')) {
+        $n = 0
+        if ([int]::TryParse($p, [ref]$n)) { $nums += $n }
+    }
+    $out = @(0, 0, 0, 0)
+    for ($k = 0; $k -lt [Math]::Min(4, $nums.Count); $k++) { $out[$k] = $nums[$k] }
+    return $out
+}
+
+# 远端比本机新返回 1，相同返回 0，更旧返回 -1
+function Compare-VersionText {
+    param([string]$Remote, [string]$Local)
+    $r = ConvertTo-VersionParts $Remote
+    $l = ConvertTo-VersionParts $Local
+    for ($k = 0; $k -lt 4; $k++) {
+        if ($r[$k] -gt $l[$k]) { return 1 }
+        if ($r[$k] -lt $l[$k]) { return -1 }
+    }
+    return 0
+}
+
+function Get-RemoteVersion {
+    param([string]$Source = 'gitee', [int]$TimeoutMs = 5000)
+    if ($Source -eq 'github') {
+        $resp = Invoke-Https -HostName 'api.github.com' -Path '/repos/neurotracee/netcheck/releases/latest' -TimeoutMs $TimeoutMs -Accept 'application/vnd.github+json'
+    } else {
+        $resp = Invoke-Https -HostName 'gitee.com' -Path '/api/v5/repos/bio234/netcheck/releases/latest' -TimeoutMs $TimeoutMs -Accept 'application/json'
+    }
+    if (-not $resp.Ok) { return $null }
+    $m = [regex]::Match($resp.Body, '"tag_name"\s*:\s*"([^"]+)"')
+    if (-not $m.Success) { return $null }
+    return $m.Groups[1].Value
+}
+
+function Invoke-UpdateCheck {
+    param([int]$TimeoutMs = 5000)
+    $errs = @()
+    foreach ($s in @('gitee', 'github')) {
+        $srcName = 'Gitee'
+        if ($s -eq 'github') { $srcName = 'GitHub' }
+        $tag = Get-RemoteVersion -Source $s -TimeoutMs $TimeoutMs
+        if ($tag) {
+            $cmp = Compare-VersionText -Remote $tag -Local $script:AppVersion
+            if ($cmp -gt 0) {
+                return @{ Ok = $true; HasNew = $true; Source = $srcName; Remote = $tag;
+                          Text = ('发现新版本 ' + $tag + '（当前 ' + $script:AppVersion + '，来源 ' + $srcName + '）') }
+            }
+            return @{ Ok = $true; HasNew = $false; Source = $srcName; Remote = $tag;
+                      Text = ('已是最新版本（当前 ' + $script:AppVersion + '，远端 ' + $tag + '，来源 ' + $srcName + '）') }
+        }
+        $errs += ($srcName + ' 连不上')
+    }
+    return @{ Ok = $false; HasNew = $false; Source = ''; Remote = '';
+              Text = ('检查不到更新：' + ($errs -join '，') + '（不影响自检）') }
+}
+
+# ---------- 参数分派（放在所有函数定义之后，保证 -About / -Settings / -CheckUpdate 都能用到函数） ----------
+if ($About) {
+    Show-AboutWindow
+    exit 0
+}
+if ($Settings) {
+    Show-SettingsWindow
+    exit 0
+}
+if ($CheckUpdate) {
+    Write-Host ''
+    Write-Host ('  网络连通性自检 v' + $script:AppVersion + ' · 检查更新') -ForegroundColor Cyan
+    $u = Invoke-UpdateCheck
+    $color = 'Cyan'
+    if ($u.HasNew) { $color = 'Yellow' }
+    Write-Host ('  ' + $u.Text) -ForegroundColor $color
+    if ($u.HasNew) {
+        Write-Host ('  下载页：' + $script:ProjectUrl + '/releases') -ForegroundColor DarkGray
+        Write-Host ('  镜像下载：' + $script:MirrorUrl + '/releases') -ForegroundColor DarkGray
+    }
+    Write-Host ''
+    exit 0
+}
+
 # ---------- 开始测试 ----------
 
 Write-Host ''
 Write-Host ('  网络连通性自检 v' + $script:AppVersion + '   GitHub / Hugging Face / Docker') -ForegroundColor Cyan
 Write-Host '  ---------------------------------------------------------' -ForegroundColor DarkGray
-Write-Host ('  作者：项目创作时为初中生 · 开发：豆包工作任务 × DeepSeek-V4.1-Flash') -ForegroundColor DarkGray
+Write-Host ('  作者：项目创作时为初中生 · 开发：豆包工作任务的 Agent × DeepSeek-V4.1-Flash') -ForegroundColor DarkGray
 Write-Host ('  开源协议 Apache-2.0 · 原项目 ' + $script:ProjectUrl) -ForegroundColor DarkGray
 
 $script:RateInfo = ''

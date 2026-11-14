@@ -22,7 +22,7 @@
 
 ```
 指导作者：项目创作时为初中生
-由 腾讯 WorkBuddy × DeepSeek-V4.1-Flash 开发
+由 豆包工作任务的 Agent × DeepSeek-V4.1-Flash 开发
 ```
 
 依据：Apache-2.0 第 4 条 (c) 项 —— 分发衍生作品时，必须保留源码中所有版权、专利、商标与署名声明。
@@ -114,7 +114,7 @@ This project is licensed under the **Apache License 2.0**. Attribution requireme
 
 1. **Preserve attribution** (§4(c)): keep
    `Advisor: was a junior high school student when this project was created` and
-   `Developed by Tencent WorkBuddy × DeepSeek-V4.1-Flash`.
+   `Developed by Doubao Work Agent × DeepSeek-V4.1-Flash`.
 2. **Display the original project URL** (§4(d), because this repository ships a NOTICE file):
    `https://github.com/neurotracee/netcheck` (mirror: `https://gitee.com/bio234/netcheck`),
    somewhere the end user can actually see it — an About screen, a footer, a report footer,
