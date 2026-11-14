@@ -80,11 +80,12 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: PowerShell 语法解析
-        shell: powershell
+        shell: pwsh
         run: |
+          $tokens = $null
           $errors = $null
           [System.Management.Automation.Language.Parser]::ParseFile(
-            "$PWD\windows\netcheck.ps1", [ref]$null, [ref]$errors
+            "$PWD\windows\netcheck.ps1", [ref]$tokens, [ref]$errors
           ) | Out-Null
           if ($errors.Count -gt 0) {
             $errors | ForEach-Object { Write-Error $_.Message }
@@ -93,7 +94,7 @@ jobs:
           Write-Host "OK：netcheck.ps1 语法正确"
 
       - name: 不许往上报数据
-        shell: powershell
+        shell: pwsh
         run: |
           $bad = Select-String -Path .\windows\netcheck.ps1 -Pattern "Invoke-WebRequest|Invoke-RestMethod|UploadString|Start-BitsTransfer"
           if ($bad) {
