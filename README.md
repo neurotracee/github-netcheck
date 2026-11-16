@@ -37,13 +37,13 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 
 ## 下载（先点这里）
 
-**当前版本 v1.1.3.3**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
+**当前版本 v1.1.3.4**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
 
 | 你要的 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
 | 最新下载页 | https://github.com/neurotracee/github-netcheck/releases/latest | https://gitee.com/bio234/github-netcheck/releases/latest |
-| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.3.3/NetCheck-1.1.3.3.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.3.3/NetCheck-1.1.3.3.apk |
-| Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.3.3/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.3.3/NetCheck-Windows.zip |
+| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.3.4/NetCheck-1.1.3.4.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.3.4/NetCheck-1.1.3.4.apk |
+| Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.3.4/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.3.4/NetCheck-Windows.zip |
 | 仓库首页 | https://github.com/neurotracee/github-netcheck | https://gitee.com/bio234/github-netcheck |
 
 解压 Windows 包后双击 **一键网络自检.bat**；APK 直接安装（系统会提示「未知来源」，原因见下一节）。

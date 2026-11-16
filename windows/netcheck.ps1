@@ -4,7 +4,7 @@
 #  测四项：DNS 解析 / TCP 建连 / TLS 握手 / HTTPS 首字节
 #  输出：控制台结果 + reports 目录下的 HTML 可视化报告
 #
-#  版本：1.1.3.3
+#  版本：1.1.3.4
 #  开源协议：Apache License 2.0
 #  原项目地址：https://github.com/neurotracee/github-netcheck
 #  镜像（Gitee）：https://gitee.com/bio234/github-netcheck
@@ -25,7 +25,7 @@ param(
     [switch]$CheckUpdate  # 只查最新版本号，不测
 )
 
-$script:AppVersion = '1.1.3.3'
+$script:AppVersion = '1.1.3.4'
 $script:ProjectUrl = 'https://github.com/neurotracee/github-netcheck'
 $script:MirrorUrl  = 'https://gitee.com/bio234/github-netcheck'
 
@@ -223,9 +223,9 @@ function Show-AboutWindow {
     }
 
     $starTip = New-Object System.Windows.Forms.Label
-    $starTip.Text = '觉得好用？去仓库右上角点个 Star（收藏），就是对作者最大的支持。'
+    $starTip.Text = '觉得好用？GitHub 和 Gitee 两个仓库都点个 Star（标星 / 收藏），就是对作者最大的支持。'
     $starTip.AutoSize = $false
-    $starTip.Size = New-Object System.Drawing.Size(360, 44)
+    $starTip.Size = New-Object System.Drawing.Size(380, 44)
     $starTip.ForeColor = [System.Drawing.Color]::FromArgb(107, 119, 133)
     $starTip.Location = New-Object System.Drawing.Point(206, 556)
     $form.Controls.Add($starTip)
@@ -245,21 +245,21 @@ function Show-AboutWindow {
     })
     $form.Controls.Add($chkUpd)
 
-    $starBtn = New-Object System.Windows.Forms.Button
-    $starBtn.Text = '点个 Star'
-    $starBtn.Size = New-Object System.Drawing.Size(104, 32)
-    $starBtn.Location = New-Object System.Drawing.Point(138, 752)
-    $starBtn.FlatStyle = 'Flat'
-    $starBtn.Add_Click({ Start-Process $script:ProjectUrl })
-    $form.Controls.Add($starBtn)
+    $starGh = New-Object System.Windows.Forms.Button
+    $starGh.Text = 'Star · GitHub'
+    $starGh.Size = New-Object System.Drawing.Size(112, 32)
+    $starGh.Location = New-Object System.Drawing.Point(138, 752)
+    $starGh.FlatStyle = 'Flat'
+    $starGh.Add_Click({ Start-Process $script:ProjectUrl })
+    $form.Controls.Add($starGh)
 
-    $open = New-Object System.Windows.Forms.Button
-    $open.Text = '打开项目页'
-    $open.Size = New-Object System.Drawing.Size(104, 32)
-    $open.Location = New-Object System.Drawing.Point(252, 752)
-    $open.FlatStyle = 'Flat'
-    $open.Add_Click({ Start-Process $script:ProjectUrl })
-    $form.Controls.Add($open)
+    $starGitee = New-Object System.Windows.Forms.Button
+    $starGitee.Text = 'Star · Gitee'
+    $starGitee.Size = New-Object System.Drawing.Size(112, 32)
+    $starGitee.Location = New-Object System.Drawing.Point(258, 752)
+    $starGitee.FlatStyle = 'Flat'
+    $starGitee.Add_Click({ Start-Process $script:MirrorUrl })
+    $form.Controls.Add($starGitee)
 
     $btn = New-Object System.Windows.Forms.Button
     $btn.Text = '知道了'
@@ -661,16 +661,21 @@ function Get-RemoteVersion {
         if (-not $m.Success) { $m = [regex]::Match($resp.Body, '"windows"\s*:\s*\{[^}]*\}') }
         if ($m.Success -and $m.Groups.Count -ge 2 -and $m.Groups[1].Value) { return $m.Groups[1].Value }
     }
-    # 兜底：version.json 拿不到时仍按 release tag 判断（老仓库没有这个文件也能用）
+    # 兜底：version.json 拿不到时才看 Release。只认本平台的 .zip 附件，
+    # 某一版只给安卓发过包时，对 Windows 等于没有更新，不再拿 tag 兜底误报。
     if ($Source -eq 'github') {
         $resp = Invoke-Https -HostName 'api.github.com' -Path '/repos/neurotracee/github-netcheck/releases/latest' -TimeoutMs $TimeoutMs -Accept 'application/vnd.github+json'
     } else {
         $resp = Invoke-Https -HostName 'gitee.com' -Path '/api/v5/repos/bio234/github-netcheck/releases/latest' -TimeoutMs $TimeoutMs -Accept 'application/json'
     }
     if (-not $resp.Ok) { return $null }
-    $m = [regex]::Match($resp.Body, '"tag_name"\s*:\s*"([^"]+)"')
-    if (-not $m.Success) { return $null }
-    return $m.Groups[1].Value
+    $asset = [regex]::Match($resp.Body, '"name"\s*:\s*"([^"]*\.zip)"')
+    if (-not $asset.Success) { return $null }
+    $ver = [regex]::Match($asset.Groups[1].Value, '(\d+\.\d+\.\d+\.\d+)')
+    if ($ver.Success) { return $ver.Groups[1].Value }
+    $tag = [regex]::Match($resp.Body, '"tag_name"\s*:\s*"([^"]+)"')
+    if ($tag.Success) { return $tag.Groups[1].Value }
+    return $null
 }
 
 # 更新源顺序：默认 Gitee。

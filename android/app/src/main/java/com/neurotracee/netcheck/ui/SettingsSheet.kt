@@ -402,15 +402,35 @@ fun AboutSheet(versionName: String, onDismiss: () -> Unit, onToast: (String) -> 
                     .clip(RoundedCornerShape(12.dp))
                     .background(p.card)
                     .border(1.dp, p.line, RoundedCornerShape(12.dp))
-                    .clickable { openUrl(context, PROJECT_URL, onToast) }
                     .padding(14.dp)
             ) {
                 Column {
-                    Text(t("给仓库点个 Star", "Star the repo"), fontSize = 13.5.sp, fontWeight = FontWeight.SemiBold, color = p.ink)
+                    Text(t("给两个仓库都点个 Star（标星）", "Star both repos"), fontSize = 13.5.sp, fontWeight = FontWeight.SemiBold, color = p.ink)
                     Spacer(Modifier.height(4.dp))
-                    Text(t("不想花钱也没关系，点一颗 Star 就是最好的支持 —— 别人搜得到，我才更有动力维护。",
-                        "No money needed. A star is the best support: it makes the project findable."),
+                    Text(t("不想花钱也没关系，GitHub 和 Gitee 两个仓库各点一颗 Star（收藏）就是最好的支持 —— 别人搜得到，我才更有动力维护。",
+                        "No money needed. A star on either GitHub or Gitee is the best support: it makes the project findable."),
                         fontSize = 11.5.sp, color = p.sub, lineHeight = 18.sp)
+                    Spacer(Modifier.height(10.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                        Box(
+                            Modifier
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(p.fair)
+                                .clickable { openUrl(context, PROJECT_URL, onToast) }
+                                .padding(horizontal = 14.dp, vertical = 8.dp)
+                        ) {
+                            Text(t("GitHub 仓库", "GitHub"), fontSize = 12.sp, color = Color.White, fontWeight = FontWeight.Medium)
+                        }
+                        Box(
+                            Modifier
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(p.fair)
+                                .clickable { openUrl(context, MIRROR_URL, onToast) }
+                                .padding(horizontal = 14.dp, vertical = 8.dp)
+                        ) {
+                            Text(t("Gitee 镜像", "Gitee"), fontSize = 12.sp, color = Color.White, fontWeight = FontWeight.Medium)
+                        }
+                    }
                 }
             }
 
