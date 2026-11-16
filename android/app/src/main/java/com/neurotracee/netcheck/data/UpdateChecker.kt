@@ -21,6 +21,26 @@ object UpdateChecker {
     private const val GITEE_URL = "https://gitee.com/api/v5/repos/bio234/github-netcheck/releases/latest"
     private const val GITHUB_URL = "https://api.github.com/repos/neurotracee/github-netcheck/releases/latest"
 
+    /** 下载直链只认这几个域名，镜像站 / 被接管的接口返回陌生地址时只给发布页 */
+    private val ALLOWED_HOSTS = listOf(
+        "github.com",
+        "objects.githubusercontent.com",
+        "release-assets.githubusercontent.com",
+        "codeload.github.com",
+        "gitee.com"
+    )
+
+    fun allowedDownload(url: String?): Boolean {
+        if (url.isNullOrBlank()) return false
+        if (!url.startsWith("https://", ignoreCase = true)) return false
+        val host = try {
+            URL(url).host?.lowercase() ?: return false
+        } catch (e: Exception) {
+            return false
+        }
+        return ALLOWED_HOSTS.any { host == it || host.endsWith(".$it") }
+    }
+
     /** source: -1 自动 · 0 Gitee · 1 GitHub。返回 Result，失败时带一句人话。 */
     fun check(source: Int, timeoutMs: Int = 8000): Result<Info> {
         val resolved = resolveSource(source)
@@ -61,13 +81,15 @@ object UpdateChecker {
         val tag = obj.optString("tag_name")
         val html = obj.optString("html_url")
         if (tag.isBlank()) throw IllegalStateException("没有版本号")
-        // 只认本平台的安装包，只给另一端发过包时 apk 为空 → 退化为发布页
+        // 只认本平台的安装包；直链不在白名单内 → 只给发布页
         var apk = ""
         obj.optJSONArray("assets")?.let { arr ->
             for (i in 0 until arr.length()) {
-                val name = arr.optJSONObject(i)?.optString("name").orEmpty()
+                val asset = arr.optJSONObject(i) ?: continue
+                val name = asset.optString("name").orEmpty()
                 if (name.lowercase().endsWith(".apk")) {
-                    apk = arr.optJSONObject(i)?.optString("browser_download_url").orEmpty()
+                    val raw = asset.optString("browser_download_url").orEmpty()
+                    if (allowedDownload(raw)) apk = raw
                     break
                 }
             }

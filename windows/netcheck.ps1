@@ -25,7 +25,7 @@ param(
     [switch]$CheckUpdate  # 只查最新版本号，不测
 )
 
-$script:AppVersion = '1.1.3.4'
+$script:AppVersion = '1.1.4.0'
 $script:ProjectUrl = 'https://github.com/neurotracee/github-netcheck'
 $script:MirrorUrl  = 'https://gitee.com/bio234/github-netcheck'
 

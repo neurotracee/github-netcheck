@@ -197,7 +197,7 @@ fun NetCheckScreen(
         )
     }
 
-    // 启动时静默查一次更新：查到新版才弹提示，给「打开下载页 / 复制链接 / 以后再说」三个出口
+    // 启动时静默查一次更新：查到新版才弹提示，应用内下载安装，浏览器 / 复制链接作为退路
     var updateInfo by remember { mutableStateOf<com.neurotracee.netcheck.data.UpdateChecker.Info?>(null) }
     LaunchedEffect(Unit) {
         if (!prefs.autoCheckUpdate) return@LaunchedEffect
@@ -209,52 +209,7 @@ fun NetCheckScreen(
         }
     }
     updateInfo?.let { info ->
-        val msgNoBrowser = t("没有能打开浏览器的应用，已复制链接", "No browser found; link copied")
-        val msgCopied = t("下载链接已复制", "Download link copied")
-        val downloadUrl = info.apk.ifBlank { info.url }
-        val zipHint = downloadUrl.contains("gitee.com")
-        AlertDialog(
-            onDismissRequest = { updateInfo = null },
-            title = { Text(t("发现新版本 ${info.tag}", "New version ${info.tag}")) },
-            text = {
-                Column {
-                    Text(t("当前是 v${BuildConfig.VERSION_NAME}。不更新也一模一样用，只是新版顺手修了几个小毛病；下次打开还会再提醒一次。",
-                        "You're on v${BuildConfig.VERSION_NAME}. Skipping is fine — the app keeps working; you'll be reminded next launch."))
-                    Spacer(Modifier.height(8.dp))
-                    Text(
-                        t("安卓 16（含 OPPO / vivo / 小米 / 荣耀等机型的侧载校验）：安装时若提示「开发者身份未验证」，勾选「已知悉应用风险」再点「仍然安装」，个别机型还要输一次锁屏密码。",
-                            "Android may ask you to confirm installing from an unknown source: tick “I understand the risk”, then “Install anyway”."),
-                        fontSize = 11.sp, color = p.sub, lineHeight = 16.sp
-                    )
-                    if (zipHint) {
-                        Spacer(Modifier.height(6.dp))
-                        Text(
-                            t("Gitee 浏览器下载会把 .apk 存成 .zip（服务器按文件类型发的），下完把后缀改回 .apk 就能装；嫌麻烦去 GitHub 页下载。",
-                                "Gitee's download may save the APK as .zip; rename it back to .apk. GitHub doesn't have this issue."),
-                            fontSize = 11.sp, color = p.sub, lineHeight = 16.sp
-                        )
-                    }
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    runCatching {
-                        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(downloadUrl)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-                    }.onFailure { vm.message = msgNoBrowser }
-                    updateInfo = null
-                }) { Text(t("下载新版本", "Download")) }
-            },
-            dismissButton = {
-                androidx.compose.foundation.layout.Row {
-                    TextButton(onClick = {
-                        clipboard.setText(AnnotatedString(downloadUrl))
-                        vm.message = msgCopied
-                        updateInfo = null
-                    }) { Text(t("复制链接", "Copy link")) }
-                    TextButton(onClick = { updateInfo = null }) { Text(t("以后再说", "Later")) }
-                }
-            }
-        )
+        UpdateDialog(info = info, onClose = { updateInfo = null }, onToast = { vm.message = it })
     }
 }
 

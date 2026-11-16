@@ -4,6 +4,8 @@
     <!-- 只做连通性测量，两个权限都只服务于测量本身，不做任何统计埋点 -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- 安装应用：只用于更新时把下载好的新版本交给系统安装器；系统会再问一次是否安装，不点不会装 -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <application
         android:allowBackup="true"
@@ -35,6 +37,17 @@
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
+        </provider>
+
+        <!-- 更新时把缓存目录里的安装包交给系统安装器；只暴露 cache/update/ 这一层 -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.neurotracee.netcheck.updatefile"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/update_paths" />
         </provider>
     </application>
 

@@ -1,5 +1,6 @@
 package com.neurotracee.netcheck.ui
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
 
@@ -11,3 +12,7 @@ val LocalLang = compositionLocalOf { Lang.ZH }
 /** 在 Composable 里按当前语言取一句话。 */
 @Composable
 fun t(zh: String, en: String): String = if (LocalLang.current == Lang.EN) en else zh
+
+/** 非 Composable 上下文（点击回调、后台线程、工具函数）里按设置项取一句话。 */
+fun tr(ctx: Context, zh: String, en: String): String =
+    if (com.neurotracee.netcheck.data.Prefs(ctx).langMode == 1) en else zh

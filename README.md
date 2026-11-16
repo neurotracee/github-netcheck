@@ -37,13 +37,13 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 
 ## 下载（先点这里）
 
-**当前版本 v1.1.3.4**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
+**当前版本 v1.1.4.0**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
 
 | 你要的 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
 | 最新下载页 | https://github.com/neurotracee/github-netcheck/releases/latest | https://gitee.com/bio234/github-netcheck/releases/latest |
-| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.3.4/NetCheck-1.1.3.4.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.3.4/NetCheck-1.1.3.4.apk |
-| Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.3.4/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.3.4/NetCheck-Windows.zip |
+| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.4.0/NetCheck-1.1.4.0.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.4.0/NetCheck-1.1.4.0.apk |
+| Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.4.0/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.4.0/NetCheck-Windows.zip |
 | 仓库首页 | https://github.com/neurotracee/github-netcheck | https://gitee.com/bio234/github-netcheck |
 
 解压 Windows 包后双击 **一键网络自检.bat**；APK 直接安装（系统会提示「未知来源」，原因见下一节）。
@@ -52,6 +52,19 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 > **Gitee 下载 APK 变成 .zip 后缀？不是文件坏了。** Gitee 的下载服务器按文件头识别类型，把 APK 判成了 `application/zip` 发给你，
 > 部分手机浏览器（例如 Edge 手机版）就顺手把文件名改成 `.zip`。把后缀改回 `.apk` 就能照常安装，文件内容一模一样。
 > 嫌麻烦就直接去 GitHub 下载页拿 APK（那边按 `application/vnd.android.package-archive` 发送，不会改后缀）。
+
+### 旧版本附件放在哪里（Gitee 容量有限）
+
+Gitee 的附件总容量只有 1GB，装不下所有历史包，所以安装包在两端的留存分三档，**Windows 与安卓同样对待**：
+
+| 版本档位 | GitHub | Gitee（国内镜像） |
+| --- | --- | --- |
+| **最新版**（当前 v1.1.4.0，APK + Windows zip） | 保留附件 | **保留附件** |
+| **上一版**（v1.1.3.4，APK + Windows zip） | 保留附件 | 保留附件（方便覆盖升级过渡） |
+| **更早的旧版本** | 保留全部附件 | **附件已撤下**，只留发布说明 |
+
+也就是说：**最新版和上一版的 Windows 包、安卓包在 Gitee 都能下**；只有更早的旧版本才需要到 GitHub 发布页找。
+旧版本下载地址：https://github.com/neurotracee/github-netcheck/releases （Gitee 对应旧发布页里也会注明「旧版请到 GitHub 下载」并给出链接）。
 
 **版本说明**：这是四段版本号（主.次.修订.补丁），小修小改只加最后一段。所以 1.1.2.0 → 1.1.3.2 属于功能级更新（赞赏入口 + 启动查更新提示），
 而 1.1.3.2 → 1.1.3.2 是**纯文案更新**：把「图标里含 GitHub 的 Octocat、本项目无授权无背书、仅限非商业使用、请勿复用图标」这段声明
@@ -67,7 +80,8 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 
 **② 安装时那句「信息可能会被第三方收集」是什么。**
 那是安卓系统（尤其国产 ROM 的安装器）对**任何非应用商店来源的 APK** 统一弹的风险提示，说给所有人听，
-不是针对本应用，也不代表本应用会收集什么。本应用申请的权限只有两项（`INTERNET` 与 `ACCESS_NETWORK_STATE`），
+不是针对本应用，也不代表本应用会收集什么。本应用申请的权限只有三项（`INTERNET`、`ACCESS_NETWORK_STATE`、
+`REQUEST_INSTALL_PACKAGES`——最后一项只用于更新时把下好的安装包交给系统安装器，系统会再问一次是否安装），
 没有存储、位置、通讯录、短信、相机权限，也没有任何统计 / 广告 / 崩溃上报 SDK（可对照
 [AndroidManifest.xml](android/app/src/main/AndroidManifest.xml) 与 [NOTICE.md](NOTICE.md) 自行核对）。
 签名证书指纹写在 Release 说明里，可以自己验。
@@ -347,7 +361,8 @@ hosts 把域名指向 127.0.0.1
 - **查什么**：只 GET 一份公开的 `version.json`，UA 里只带自己的版本号，不上传任何本地内容。
 - **怎么算「有新版本」**：版本号统一按四段补零比较（`1.1.3` 与 `1.1.3.0` 视为同一版）；只认自己平台那一段，
   **某一版只给另一端发过包时，对本平台等于没有更新**——这就是不会误报的根本原因。
-- **发现之后**：弹一次提示，给「下载新版本 / 复制链接 / 以后再说」三个出口；点「以后再说」下次启动还会再提醒
+- **发现之后**：弹一次提示，默认在**应用内直接下载并安装**（下完核对包名与版本号，再交给系统安装器，不经过浏览器）；
+  另留「用浏览器下载 / 复制链接」作为退路。点「以后再说」下次启动还会再提醒
   （故意不做「跳过此版本」的永久记忆，否则容易再也想不起来更新）。
 - **下载地址只认自家域名**：`github.com`、`objects.githubusercontent.com`、`release-assets.githubusercontent.com`、
   `codeload.github.com`、`gitee.com`，而且必须是 https；不在这份名单里就只给发布页，不给直链。
@@ -395,7 +410,8 @@ hosts 把域名指向 127.0.0.1
 **报告保存位置**：默认走系统分享面板（发微信、发邮件、存到「文件」都行）；在设置里选了一个文件夹之后，
 导出就直接写进那个文件夹，不再弹分享面板。
 
-权限两个，都只服务于测量本身：`INTERNET`（发起 socket 连接）、`ACCESS_NETWORK_STATE`（读当前网络类型、代理、私有 DNS、DNS 服务器）。
+权限三个，都只服务于测量与更新本身：`INTERNET`（发起 socket 连接）、`ACCESS_NETWORK_STATE`（读当前网络类型、代理、私有 DNS、DNS 服务器）、
+`REQUEST_INSTALL_PACKAGES`（更新时把下好的 APK 交给系统安装器，系统会再确认一次）。
 没有存储权限——报告写在应用私有目录，导出时由你指定落地位置（SAF 授权，只给那一个目录）。
 不做任何统计埋点，不上传任何数据；联网只有两处：自检本身，以及更新检查（只读一个公开版本号，
 默认启动时静默查一次，可在设置里改成纯手动）。
@@ -604,4 +620,6 @@ Attribution and project-URL requirements are described in [ADDITIONAL-TERMS.md](
 
 **Privacy:** no upload, no telemetry, no proxy, no hosts modification. The only outbound connections are the 14 test targets plus one DNS-over-HTTPS lookup to Alibaba Public DNS used as a ground-truth comparison.
 
-**Permissions (Android):** `INTERNET` and `ACCESS_NETWORK_STATE` only — both needed to make sockets and to read the current network's proxy / private-DNS / DNS-server state. No storage permission, no contacts, no telemetry.
+**Permissions (Android):** `INTERNET`, `ACCESS_NETWORK_STATE` and `REQUEST_INSTALL_PACKAGES` (the last one only hands a downloaded APK to the system installer on update) — no storage, no contacts, no telemetry.
+
+**Release assets on the mirror.** Gitee's attachment quota is limited to 1 GB, so the mirror keeps only the latest release and the previous release (both APK and Windows zip). Older installers were removed from Gitee and remain on GitHub: https://github.com/neurotracee/github-netcheck/releases . The latest Windows package is always available on Gitee too — only older versions moved to GitHub.

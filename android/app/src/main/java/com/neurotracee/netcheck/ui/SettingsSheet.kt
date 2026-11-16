@@ -74,6 +74,7 @@ fun SettingsSheet(
     var saveDirName by remember { mutableStateOf(prefs.saveTreeUri?.let { "已设置" } ?: "未设置（每次走分享面板）") }
     var checking by remember { mutableStateOf(false) }
     var checkResult by remember { mutableStateOf<String?>(null) }
+    var updateInfo by remember { mutableStateOf<UpdateChecker.Info?>(null) }
 
     val picker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri: Uri? ->
         if (uri != null) {
@@ -229,10 +230,11 @@ fun SettingsSheet(
                                 val r = UpdateChecker.check(src)
                                 Handler(Looper.getMainLooper()).post {
                                     checking = false
-                                    checkResult = r.fold(
+                            checkResult = r.fold(
                                         onSuccess = { info ->
                                             if (UpdateChecker.isNewer(info.tag, versionName)) {
-                                                "发现新版本 ${info.tag} · 去发布页下载"
+                                                updateInfo = info
+                                                "发现新版本 ${info.tag} · 可在弹窗内直接下载安装"
                                             } else {
                                                 "已是最新版本（远端 ${info.tag}）"
                                             }
@@ -270,6 +272,10 @@ fun SettingsSheet(
                 fontSize = 11.sp, color = p.sub
             )
         }
+    }
+
+    updateInfo?.let { info ->
+        UpdateDialog(info = info, onClose = { updateInfo = null }, onToast = onToast)
     }
 }
 
