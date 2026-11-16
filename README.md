@@ -181,6 +181,21 @@ https://gitee.com/bio234/github-netcheck      # mirror / 镜像（国内访问�
 
 需要闭源商用？**Apache-2.0 允许**，但上面三条署名与出处要求仍然有效。
 
+### ④ 图标（重要，这一段优先于上面任何与图标相关的表述）
+
+**图标里有一只 GitHub 的猫。** 本项目的图标（`assets/icon/` 下的 png 与 ico，以及 Windows 端和安卓端的应用图标）中，
+猫头剪影来自 GitHub 的吉祥物 **Octocat**。**Octocat® 是 GitHub, Inc. 的注册商标**（GitHub, Inc. 现为 Microsoft 旗下公司），
+该形象另在美国版权局做过作品登记。这些权利**不属于本项目作者**，本项目**未获得 GitHub, Inc. 或 Microsoft 的任何授权、认可或背书**。
+
+项目名里的「GitHub」只用于说明本工具**检查的对象**（与 GitHub 各服务的连通性），属于指示性使用，不代表与 GitHub 官方有任何关联。
+
+| 边界 | 说明 |
+| --- | --- |
+| **本项目自身的定位** | **仅限个人、非商业使用**。作者不售卖、不上架应用商店、不接受商业授权，也不从本项目取得任何收入（赞赏仅为读者自愿的小额支持，与授权无关）。**禁止将本项目用于任何商业用途。** |
+| **强烈建议不要使用这个图标** | fork、二次开发、改名发布，或打算用于任何其他项目，**请自行替换成不含任何第三方商标元素的图标**。不要直接沿用，也不要改动后继续使用。只在自己机器上用不受此限。 |
+| **权利人可要求移除** | 若 GitHub, Inc. 或 Microsoft 认为本图标使用不妥，向仓库 Issue 提出后，本项目会立即更换图标并清理相关说明。 |
+| **声明不是护身符** | 以上文字只用来表明作者立场与使用边界，**不构成授权，不能替代权利人的许可，也不能免除使用者自身的法律责任**。需要商用或大范围公开传播，请先取得权利人书面许可。 |
+
 ---
 
 ## 测的是什么
@@ -564,6 +579,26 @@ Both share the **same target list, same grading thresholds, same report layout**
 
 **License:** Apache License 2.0 — commercial use, modification and closed-source redistribution are all permitted.
 Attribution and project-URL requirements are described in [ADDITIONAL-TERMS.md](ADDITIONAL-TERMS.md) (Apache-2.0 §4 and §6) and are part of the terms.
+
+> **Icon and trademark notice (this section prevails over anything above that mentions the icon).**
+> The project icon (the PNG/ICO files under `assets/icon/` and the app icons used by the Windows and Android builds)
+> contains a silhouette of **Octocat**, GitHub's mascot. **Octocat® is a registered trademark of GitHub, Inc.**
+> (GitHub, Inc. is a subsidiary of Microsoft), and the design is also registered with the U.S. Copyright Office.
+> Those rights are **not owned by this project's author**, and this project has **no authorization, approval or
+> endorsement from GitHub, Inc. or Microsoft**. The word "GitHub" in the project name is used only to describe
+> **what this tool measures** (connectivity to GitHub services) — a nominative use — and implies no affiliation.
+>
+> - **This project itself is for personal, non-commercial use only.** The author does not sell it, does not publish
+>   it on app stores, grants no commercial licence, and earns nothing from it (the donation QR code is voluntary
+>   pocket money from readers and grants no rights). **Commercial use of this project is prohibited.**
+> - **You are strongly advised not to reuse this icon.** If you fork, modify, rename, redistribute, or use it in any
+>   other project, **replace the icon with one that contains no third-party trademark elements**. Do not keep it as-is
+>   and do not reuse a modified version. Using it on your own machine is not affected.
+> - **The rights holder may ask for removal.** If GitHub, Inc. or Microsoft objects, the icon will be replaced and
+>   the related documentation cleaned up as soon as the request is received via a repository issue.
+> - **This notice is not a licence.** It states the author's position and the intended usage boundary only. It cannot
+>   substitute for the rights holder's permission, and it does not exempt any user from liability. For commercial
+>   use or wide public distribution, obtain written permission from the rights holder first.
 
 **Privacy:** no upload, no telemetry, no proxy, no hosts modification. The only outbound connections are the 14 test targets plus one DNS-over-HTTPS lookup to Alibaba Public DNS used as a ground-truth comparison.
 

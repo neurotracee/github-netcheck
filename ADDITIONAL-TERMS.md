@@ -80,7 +80,11 @@ https://gitee.com/bio234/github-netcheck      （国内镜像，两处写任一�
 
 - 上面第一节的三条（署名 + 地址 + 修改说明）；
 - 分发时附带 `LICENSE` 与 `NOTICE.md`（第 4 条 (a)(d)）；
-- 不要暗示原作者为你的版本背书（第 6 条：不得使用作者的商号、商标、产品名做背书）。
+- 不要暗示原作者为你的版本背书（第 6 条：不得使用作者的商号、商标、产品名做背书）；
+- **图标不要带走**（见 [NOTICE.md](NOTICE.md) 第六节）：项目图标含 GitHub 的 Octocat 形象，
+  **Octocat® 是 GitHub, Inc. 的注册商标**，不在 Apache-2.0 §6 的授权范围内，也不在本项目作者的处分权限内。
+  商用或再发布请自行换成不含任何第三方商标元素的图标；同时本项目作者声明本项目**仅限非商业使用**，
+  商业场景请勿照搬本项目名称与图标。
 
 **不需要**做的事：
 
@@ -124,7 +128,10 @@ This project is licensed under the **Apache License 2.0**. Attribution requireme
 4. **Ship the license and notice** (§4(a)(d)): distribute `LICENSE` and `NOTICE.md` with any
    binary or script you redistribute.
 5. **No endorsement, no trademark use** (§6): the names "GitHub 网络自检" / "NetCheck" and the
-   application icon are **not** licensed. Rename your fork.
+   application icon are **not** licensed. Rename your fork and **replace the icon**.
+   The icon contains a silhouette of **Octocat**, a **registered trademark of GitHub, Inc.**; the author
+   holds no rights in it and grants none. This project itself is stated to be **for personal,
+   non-commercial use only**.
 6. **Commercial use and closed-source redistribution are permitted.** Apache-2.0 has no
    copyleft obligation — unlike the author's other project (PDF Privacy Masker, AGPL-3.0),
    you do not have to publish your modified source.
