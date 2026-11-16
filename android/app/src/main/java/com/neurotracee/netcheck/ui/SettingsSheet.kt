@@ -354,6 +354,38 @@ fun AboutSheet(versionName: String, onDismiss: () -> Unit, onToast: (String) -> 
                 )
             }
 
+            Spacer(Modifier.height(14.dp))
+            WarnBox(p) {
+                Text(t("图标与商标（重要）", "Icon & trademark (important)"),
+                    fontSize = 13.5.sp, fontWeight = FontWeight.SemiBold, color = p.warnText)
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    t("图标里的猫头来自 GitHub 的吉祥物 Octocat；Octocat® 是 GitHub, Inc. 的注册商标"
+                            + "（GitHub, Inc. 现为 Microsoft 旗下公司），相关权利不属于本项目作者。\n"
+                            + "本项目未获得 GitHub, Inc. 或 Microsoft 的任何授权、认可或背书，"
+                            + "与 GitHub 官方没有任何关系（名字里的 GitHub 只说明检查的对象）。\n"
+                            + "本项目仅限个人、非商业使用，禁止任何商业用途。\n"
+                            + "强烈建议不要使用这个图标：fork、二次开发或二次发布，"
+                            + "请换成不含任何第三方商标元素的图标；不要直接沿用，也不要改动后继续使用。\n"
+                            + "若 GitHub, Inc. 或 Microsoft 认为使用不妥并提出，本项目会立即更换图标并清理相关说明。\n"
+                            + "以上仅说明作者立场与使用边界，不是授权，不能替代权利人的许可，"
+                            + "也不能免除使用者自身的法律责任。",
+                        "The cat in the icon is GitHub's mascot Octocat; Octocat® is a registered trademark of "
+                                + "GitHub, Inc. (a Microsoft subsidiary). Those rights are not owned by this "
+                                + "project's author.\n"
+                                + "This project has no authorization, approval or endorsement from GitHub, Inc. "
+                                + "or Microsoft, and is not affiliated with GitHub in any way.\n"
+                                + "This project is for personal, non-commercial use only; commercial use is "
+                                + "prohibited.\n"
+                                + "Please do not reuse this icon: forks, derivatives and redistributions must use "
+                                + "an icon without any third-party trademark.\n"
+                                + "The icon will be replaced if the rights holder objects.\n"
+                                + "This text states the author's position only; it is not a licence and does not "
+                                + "exempt any user from liability."),
+                    fontSize = 12.sp, color = p.warnText, lineHeight = 20.sp
+                )
+            }
+
             Spacer(Modifier.height(12.dp))
             Text(
                 t("维护节奏：平时没有充足时间，大概一两个月上来看一两次，回复不会很快。代码全部公开，"

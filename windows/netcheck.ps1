@@ -152,6 +152,19 @@ function Show-AboutWindow {
         '　② 在你的程序里标注原项目地址，让使用者看得见。',
         '　③ 改动过的版本请注明「本程序基于该地址修改，非原作者发布」。',
         '',
+        '图标与商标（重要，阅读上面三条之前请先看这里）',
+        '　图标里的猫头来自 GitHub 的吉祥物 Octocat；Octocat® 是 GitHub, Inc.',
+        '　的注册商标（GitHub, Inc. 现为 Microsoft 旗下公司），相关权利不属于',
+        '　本项目作者。本项目未获得 GitHub, Inc. 或 Microsoft 的任何授权、认可',
+        '　或背书，与 GitHub 官方没有任何关系（名字里的 GitHub 只说明检查的对象）。',
+        '　本项目仅限个人、非商业使用，禁止任何商业用途。',
+        '　强烈建议不要使用这个图标：fork、二次开发或二次发布，请换成不含任何',
+        '　第三方商标元素的图标；不要直接沿用，也不要改动后继续使用。',
+        '　若 GitHub, Inc. 或 Microsoft 认为使用不妥并提出，本项目会立即更换图标',
+        '　并清理相关说明（可通过仓库 Issue 联系）。',
+        '　以上文字仅说明作者立场与使用边界，不是授权，不能替代权利人的许可，',
+        '　也不能免除使用者自身的法律责任。',
+        '',
         '维护节奏：平时没有充足时间，一两个月上来看一两次，回复不会很快。',
         '　　　　　代码全部公开，修不动的地方欢迎自己改、自己接着用。',
         '　　　　　协议允许商用，不用付钱也不用问我，照上面三条做就行。',
@@ -769,6 +782,9 @@ Write-Host ('  GitHub 网络自检 v' + $script:AppVersion + '   GitHub / Huggin
 Write-Host '  ---------------------------------------------------------' -ForegroundColor DarkGray
 Write-Host ('  作者：项目创作时为初中生 · 开发：豆包工作任务的 Agent × DeepSeek-V4.1-Flash') -ForegroundColor DarkGray
 Write-Host ('  开源协议 Apache-2.0 · 原项目 ' + $script:ProjectUrl) -ForegroundColor DarkGray
+Write-Host '  图标含 GitHub 吉祥物 Octocat（GitHub, Inc. 注册商标）：本项目无授权、' -ForegroundColor DarkGray
+Write-Host '  无背书，仅限个人非商业使用；请勿复用本图标。详见菜单 [关于与开源信息]。' -ForegroundColor DarkGray
+Write-Host '  以上仅为作者立场，不构成授权，不能替代权利人许可。' -ForegroundColor DarkGray
 
 # 启动时自动检查更新（可在设置里关掉）：只读一行公开版本号，连不上就静默跳过
 if ($script:AutoCheckUpdate) {
@@ -1079,7 +1095,9 @@ __ADVICE__
     <br>
     GitHub 网络自检 <b>v__VERSION__</b>　·　指导作者：项目创作时为初中生　·　开发：豆包工作任务的 Agent × DeepSeek-V4.1-Flash<br>
     原项目 <a href="__PROJECTURL__">github.com/neurotracee/github-netcheck</a>　·　
-    镜像 <a href="__MIRRORURL__">gitee.com/bio234/github-netcheck</a>　·　Apache-2.0
+    镜像 <a href="__MIRRORURL__">gitee.com/bio234/github-netcheck</a>　·　Apache-2.0<br>
+    <span style="color:#8a94a2">图标含 GitHub 吉祥物 Octocat（GitHub, Inc. 注册商标）；本项目无授权、无背书，仅限个人非商业使用，请勿复用本图标。
+    若权利人认为使用不妥并提出，本项目会立即更换图标。本声明不构成授权。</span>
   </div>
 </div>
 </body>

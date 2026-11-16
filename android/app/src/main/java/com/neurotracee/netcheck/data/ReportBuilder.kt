@@ -287,7 +287,9 @@ __ADVICE__
     <br>
     版本 __VERSION__　·　Apache License 2.0　·　测试全程在本机完成，不上传任何数据<br>
     GitHub 网络自检 <b>v__VERSION__</b>　·　指导作者：项目创作时为初中生　·　开发：豆包工作任务的 Agent × DeepSeek-V4.1-Flash<br>
-    原项目地址：https://github.com/neurotracee/github-netcheck　（镜像：https://gitee.com/bio234/github-netcheck）
+    原项目地址：https://github.com/neurotracee/github-netcheck　（镜像：https://gitee.com/bio234/github-netcheck）<br>
+    <span style="color:#8a94a2">图标含 GitHub 吉祥物 Octocat（GitHub, Inc. 注册商标）；本项目无授权、无背书，仅限个人非商业使用，请勿复用本图标。
+    若权利人认为使用不妥并提出，本项目会立即更换图标。本声明不构成授权。</span>
   </div>
 </div>
 </body>
