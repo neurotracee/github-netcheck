@@ -37,13 +37,13 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 
 ## 下载（先点这里）
 
-**当前版本 v1.1.3.1**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
+**当前版本 v1.1.3.2**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
 
 | 你要的 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
 | 最新下载页 | https://github.com/neurotracee/github-netcheck/releases/latest | https://gitee.com/bio234/github-netcheck/releases/latest |
-| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.3.1/NetCheck-1.1.3.1.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.3.1/NetCheck-1.1.3.1.apk |
-| Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.3.1/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.3.1/NetCheck-Windows.zip |
+| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.3.2/NetCheck-1.1.3.2.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.3.2/NetCheck-1.1.3.2.apk |
+| Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.3.2/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.3.2/NetCheck-Windows.zip |
 | 仓库首页 | https://github.com/neurotracee/github-netcheck | https://gitee.com/bio234/github-netcheck |
 
 解压 Windows 包后双击 **一键网络自检.bat**；APK 直接安装（系统会提示「未知来源」，原因见下一节）。
@@ -53,7 +53,9 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 > 部分手机浏览器（例如 Edge 手机版）就顺手把文件名改成 `.zip`。把后缀改回 `.apk` 就能照常安装，文件内容一模一样。
 > 嫌麻烦就直接去 GitHub 下载页拿 APK（那边按 `application/vnd.android.package-archive` 发送，不会改后缀）。
 
-**版本说明**：这是四段版本号（主.次.修订.补丁），小修小改只加最后一段，所以 1.1.2.0 → 1.1.3.1 属于功能级更新（赞赏入口 + 启动查更新提示），不是大版本。
+**版本说明**：这是四段版本号（主.次.修订.补丁），小修小改只加最后一段。所以 1.1.2.0 → 1.1.3.1 属于功能级更新（赞赏入口 + 启动查更新提示），
+而 1.1.3.1 → 1.1.3.2 是**纯文案更新**：把「图标里含 GitHub 的 Octocat、本项目无授权无背书、仅限非商业使用、请勿复用图标」这段声明
+写进了两端程序内部（关于页、控制台、报告页脚），功能一行没动。
 
 ## 装之前先看三件事
 
