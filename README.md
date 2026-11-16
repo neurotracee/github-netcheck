@@ -37,13 +37,13 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 
 ## 下载（先点这里）
 
-**当前版本 v1.1.3.2**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
+**当前版本 v1.1.3.3**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
 
 | 你要的 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
 | 最新下载页 | https://github.com/neurotracee/github-netcheck/releases/latest | https://gitee.com/bio234/github-netcheck/releases/latest |
-| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.3.2/NetCheck-1.1.3.2.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.3.2/NetCheck-1.1.3.2.apk |
-| Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.3.2/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.3.2/NetCheck-Windows.zip |
+| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.3.3/NetCheck-1.1.3.3.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.3.3/NetCheck-1.1.3.3.apk |
+| Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.3.3/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.3.3/NetCheck-Windows.zip |
 | 仓库首页 | https://github.com/neurotracee/github-netcheck | https://gitee.com/bio234/github-netcheck |
 
 解压 Windows 包后双击 **一键网络自检.bat**；APK 直接安装（系统会提示「未知来源」，原因见下一节）。
@@ -53,8 +53,8 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 > 部分手机浏览器（例如 Edge 手机版）就顺手把文件名改成 `.zip`。把后缀改回 `.apk` 就能照常安装，文件内容一模一样。
 > 嫌麻烦就直接去 GitHub 下载页拿 APK（那边按 `application/vnd.android.package-archive` 发送，不会改后缀）。
 
-**版本说明**：这是四段版本号（主.次.修订.补丁），小修小改只加最后一段。所以 1.1.2.0 → 1.1.3.1 属于功能级更新（赞赏入口 + 启动查更新提示），
-而 1.1.3.1 → 1.1.3.2 是**纯文案更新**：把「图标里含 GitHub 的 Octocat、本项目无授权无背书、仅限非商业使用、请勿复用图标」这段声明
+**版本说明**：这是四段版本号（主.次.修订.补丁），小修小改只加最后一段。所以 1.1.2.0 → 1.1.3.2 属于功能级更新（赞赏入口 + 启动查更新提示），
+而 1.1.3.2 → 1.1.3.2 是**纯文案更新**：把「图标里含 GitHub 的 Octocat、本项目无授权无背书、仅限非商业使用、请勿复用图标」这段声明
 写进了两端程序内部（关于页、控制台、报告页脚），功能一行没动。
 
 ## 装之前先看三件事
@@ -317,23 +317,23 @@ hosts 把域名指向 127.0.0.1
 
 ## 版本号与更新检查（只发一端时，另一端不会被误报）
 
-版本号是四段 `主.次.修订.补丁`，例如 `1.1.3.1`：
+版本号是四段 `主.次.修订.补丁`，例如 `1.1.3.2`：
 
 - 只改文案、修小 bug → 只动**第四段**（`1.1.0.3` → `1.1.0.4`）；
-- 加了新功能 → 动**第三段**（`1.1.1.x` → `1.1.3.1`）；
+- 加了新功能 → 动**第三段**（`1.1.1.x` → `1.1.3.2`）；
 - 前两段基本不动，动了就是大版本，别轻易用。
 
 仓库根目录有一份 `version.json`，**按平台分开写版本号**：
 
 ```json
 {
-  "android": { "version": "1.1.3.1", "url": "https://github.com/neurotracee/github-netcheck/releases" },
-  "windows": { "version": "1.1.3.1", "url": "https://github.com/neurotracee/github-netcheck/releases" }
+  "android": { "version": "1.1.3.2", "url": "https://github.com/neurotracee/github-netcheck/releases" },
+  "windows": { "version": "1.1.3.2", "url": "https://github.com/neurotracee/github-netcheck/releases" }
 }
 ```
 
 两端的「检查更新」都先读这个文件，**只认自己那一段**：只发 Windows 更新、把 `windows.version` 改成 `1.1.0.4`，
-安卓端读到的仍是 `1.1.3.1`，就不会莫名弹出「有新版本」；反过来也一样。
+安卓端读到的仍是 `1.1.3.2`，就不会莫名弹出「有新版本」；反过来也一样。
 这修掉了以前「发一次 Release，两端都提示更新但只有一端真变了」的逻辑 bug。
 读不到 `version.json` 时才会退回读 Release（发布版本）的 tag，所以老环境也不会瞎。
 

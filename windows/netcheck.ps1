@@ -4,7 +4,7 @@
 #  测四项：DNS 解析 / TCP 建连 / TLS 握手 / HTTPS 首字节
 #  输出：控制台结果 + reports 目录下的 HTML 可视化报告
 #
-#  版本：1.1.3.2
+#  版本：1.1.3.3
 #  开源协议：Apache License 2.0
 #  原项目地址：https://github.com/neurotracee/github-netcheck
 #  镜像（Gitee）：https://gitee.com/bio234/github-netcheck
@@ -25,7 +25,7 @@ param(
     [switch]$CheckUpdate  # 只查最新版本号，不测
 )
 
-$script:AppVersion = '1.1.3.2'
+$script:AppVersion = '1.1.3.3'
 $script:ProjectUrl = 'https://github.com/neurotracee/github-netcheck'
 $script:MirrorUrl  = 'https://gitee.com/bio234/github-netcheck'
 
@@ -103,7 +103,7 @@ function Show-AboutWindow {
     $font = New-Object System.Drawing.Font('Microsoft YaHei UI', 9)
     $form = New-Object System.Windows.Forms.Form
     $form.Text = '关于与开源信息 · GitHub 网络自检'
-    $form.Size = New-Object System.Drawing.Size(620, 820)
+    $form.Size = New-Object System.Drawing.Size(620, 830)
     $form.StartPosition = 'CenterScreen'
     $form.BackColor = [System.Drawing.Color]::FromArgb(244, 246, 248)
     $form.Font = $font
@@ -192,20 +192,26 @@ function Show-AboutWindow {
     $form.Controls.Add($tipText)
 
     $tipPic = Join-Path $ScriptDir '赞赏码.png'
+    $imgOk = $false
     if (Test-Path -LiteralPath $tipPic) {
-        $img = New-Object System.Windows.Forms.PictureBox
-        $img.Size = New-Object System.Drawing.Size(180, 180)
-        $img.Location = New-Object System.Drawing.Point(26, 518)
-        $img.SizeMode = 'Zoom'
-        $img.BorderStyle = 'FixedSingle'
-        try { $img.Image = [System.Drawing.Image]::FromFile($tipPic) } catch { }
-        $form.Controls.Add($img)
+        try {
+            $img = New-Object System.Windows.Forms.PictureBox
+            $img.Size = New-Object System.Drawing.Size(160, 160)
+            $img.Location = New-Object System.Drawing.Point(26, 518)
+            $img.SizeMode = 'Zoom'
+            $img.BorderStyle = 'FixedSingle'
+            $img.Image = [System.Drawing.Image]::FromFile($tipPic)
+            $form.Controls.Add($img)
+            $imgOk = $true
+        } catch { }
+    }
 
+    if ($imgOk) {
         $tipCap = New-Object System.Windows.Forms.Label
-        $tipCap.Text = '微信赞赏码 · 长按/截图后扫码即可'
+        $tipCap.Text = '微信赞赏码 · 截图后在微信「扫一扫」选相册即可'
         $tipCap.AutoSize = $true
         $tipCap.ForeColor = [System.Drawing.Color]::FromArgb(107, 119, 133)
-        $tipCap.Location = New-Object System.Drawing.Point(216, 524)
+        $tipCap.Location = New-Object System.Drawing.Point(206, 524)
         $form.Controls.Add($tipCap)
     } else {
         $tipCap = New-Object System.Windows.Forms.Label
@@ -216,27 +222,17 @@ function Show-AboutWindow {
         $form.Controls.Add($tipCap)
     }
 
-    $btn = New-Object System.Windows.Forms.Button
-    $btn.Text = '知道了'
-    $btn.Size = New-Object System.Drawing.Size(96, 32)
-    $btn.Location = New-Object System.Drawing.Point(484, 528)
-    $btn.BackColor = [System.Drawing.Color]::FromArgb(59, 130, 196)
-    $btn.ForeColor = [System.Drawing.Color]::White
-    $btn.FlatStyle = 'Flat'
-    $btn.Add_Click({ $form.Close() })
-    $form.Controls.Add($btn)
-
-    $open = New-Object System.Windows.Forms.Button
-    $open.Text = '打开项目页'
-    $open.Size = New-Object System.Drawing.Size(104, 32)
-    $open.Location = New-Object System.Drawing.Point(370, 528)
-    $open.FlatStyle = 'Flat'
-    $open.Add_Click({ Start-Process $script:ProjectUrl })
-    $form.Controls.Add($open)
+    $starTip = New-Object System.Windows.Forms.Label
+    $starTip.Text = '觉得好用？去仓库右上角点个 Star（收藏），就是对作者最大的支持。'
+    $starTip.AutoSize = $false
+    $starTip.Size = New-Object System.Drawing.Size(360, 44)
+    $starTip.ForeColor = [System.Drawing.Color]::FromArgb(107, 119, 133)
+    $starTip.Location = New-Object System.Drawing.Point(206, 556)
+    $form.Controls.Add($starTip)
 
     $chkUpd = New-Object System.Windows.Forms.Button
     $chkUpd.Text = '检查更新'
-    $chkUpd.Location = New-Object System.Drawing.Point(254, 528)
+    $chkUpd.Location = New-Object System.Drawing.Point(24, 752)
     $chkUpd.Size = New-Object System.Drawing.Size(104, 32)
     $chkUpd.FlatStyle = 'Flat'
     $chkUpd.Add_Click({
@@ -248,6 +244,32 @@ function Show-AboutWindow {
         $chkUpd.Enabled = $true
     })
     $form.Controls.Add($chkUpd)
+
+    $starBtn = New-Object System.Windows.Forms.Button
+    $starBtn.Text = '点个 Star'
+    $starBtn.Size = New-Object System.Drawing.Size(104, 32)
+    $starBtn.Location = New-Object System.Drawing.Point(138, 752)
+    $starBtn.FlatStyle = 'Flat'
+    $starBtn.Add_Click({ Start-Process $script:ProjectUrl })
+    $form.Controls.Add($starBtn)
+
+    $open = New-Object System.Windows.Forms.Button
+    $open.Text = '打开项目页'
+    $open.Size = New-Object System.Drawing.Size(104, 32)
+    $open.Location = New-Object System.Drawing.Point(252, 752)
+    $open.FlatStyle = 'Flat'
+    $open.Add_Click({ Start-Process $script:ProjectUrl })
+    $form.Controls.Add($open)
+
+    $btn = New-Object System.Windows.Forms.Button
+    $btn.Text = '知道了'
+    $btn.Size = New-Object System.Drawing.Size(96, 32)
+    $btn.Location = New-Object System.Drawing.Point(484, 752)
+    $btn.BackColor = [System.Drawing.Color]::FromArgb(59, 130, 196)
+    $btn.ForeColor = [System.Drawing.Color]::White
+    $btn.FlatStyle = 'Flat'
+    $btn.Add_Click({ $form.Close() })
+    $form.Controls.Add($btn)
 
     $form.ShowDialog() | Out-Null
 }
