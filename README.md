@@ -12,7 +12,10 @@
 > （https://gitee.com/bio234/github-netcheck），两边内容一致，不存在谁抄谁。
 >
 > 作者的另一项目：**PDF 隐私打码工具**（本地离线给 PDF 打码，不上传文件）——
-> GitHub https://github.com/neurotracee/pdf-privacy-masker ｜ Gitee https://gitee.com/bio234/pdf-privacy-masker 。
+> GitHub：https://github.com/neurotracee/pdf-privacy-masker
+>
+> Gitee：https://gitee.com/bio234/pdf-privacy-masker
+>
 > 那个项目用 AGPL-3.0，本项目用 Apache-2.0，协议不同，别混用。
 
 一个纯本地、零依赖的网络连通性自检工具，专门盯着**中国大陆能不能连上 GitHub 系服务**：**不代理、不加速、不改 hosts，只测量**。
@@ -115,12 +118,12 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 
 ## 下载（先点这里）
 
-**当前版本：安卓 v1.1.5.3 ・ Windows v1.1.5.2**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
+**当前版本：安卓 v1.1.5.4 ・ Windows v1.1.5.2**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
 
 | 你要的 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
 | 最新下载页 | https://github.com/neurotracee/github-netcheck/releases/latest | https://gitee.com/bio234/github-netcheck/releases/latest |
-| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.3/NetCheck-1.1.5.3.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.5.3/NetCheck-1.1.5.3.apk |
+| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.4/NetCheck-1.1.5.4.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.5.4/NetCheck-1.1.5.4.apk |
 | Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.2/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.5.2/NetCheck-Windows.zip |
 | 仓库首页 | https://github.com/neurotracee/github-netcheck | https://gitee.com/bio234/github-netcheck |
 
@@ -137,8 +140,8 @@ Gitee 的附件总容量只有 1GB，装不下所有历史包，所以安装包�
 
 | 版本档位 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
-| **最新版**（安卓 v1.1.5.3 的 APK、Windows v1.1.5.2 的 zip） | 保留附件 | **保留附件** |
-| **上一版**（v1.1.5.1 的安卓 APK、v1.1.5.0 的 Windows zip） | 保留附件 | 保留附件（方便覆盖升级过渡） |
+| **最新版**（安卓 v1.1.5.4 的 APK、Windows v1.1.5.2 的 zip） | 保留附件 | **保留附件** |
+| **上一版**（v1.1.5.3 的安卓 APK、v1.1.5.1 的 Windows zip） | 保留附件 | 保留附件（方便覆盖升级过渡） |
 | **更早的旧版本** | 保留全部附件 | **附件已撤下**，只留发布说明 |
 
 也就是说：**最新版和上一版的 Windows 包、安卓包在 Gitee 都能下**；只有更早的旧版本才需要到 GitHub 发布页找。

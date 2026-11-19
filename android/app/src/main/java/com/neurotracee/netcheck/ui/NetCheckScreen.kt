@@ -82,6 +82,11 @@ fun NetCheckScreen(
     var showSettings by remember { mutableStateOf(false) }
     var showAbout by remember { mutableStateOf(false) }
 
+    // 点击回调、后台消息这类非 Composable 上下文里也要按当前语言出字，
+    // 所以这里先取一次语言，再用普通函数拼字符串（t() 只能在 Composable 里调用）。
+    val isEn = LocalLang.current == com.neurotracee.netcheck.ui.Lang.EN
+    fun s(zh: String, en: String) = if (isEn) en else zh
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -97,9 +102,10 @@ fun NetCheckScreen(
                 Header(
                     p = p,
                     run = vm.run,
-                    idleHint = if (LocalLang.current == com.neurotracee.netcheck.ui.Lang.EN)
+                    idleHint = t(
+                        "${Targets.all.size} 个目标 · 逐项测 DNS / TCP / TLS / HTTP 四段耗时",
                         "${Targets.all.size} targets · DNS / TCP / TLS / HTTP timed separately"
-                    else "${Targets.all.size} 个目标 · 逐项测 DNS / TCP / TLS / HTTP 四段耗时",
+                    ),
                     onSettings = { showSettings = true }
                 )
             }
@@ -128,10 +134,10 @@ fun NetCheckScreen(
                                     vm.store().saveToTree(android.net.Uri.parse(it), file.name, "text/html", file.readBytes())
                                 }
                                 if (saved != null) {
-                                    vm.message = "报告已存到你选的文件夹：${file.name}"
+                                    vm.message = s("报告已存到你选的文件夹：${file.name}", "Report saved to the folder you picked: ${file.name}")
                                 } else {
                                     context.startActivity(
-                                        vm.store().shareIntent(file, "text/html", "GitHub 网络自检报告")
+                                        vm.store().shareIntent(file, "text/html", s("GitHub 网络自检报告", "GitHub Network Check report"))
                                     )
                                 }
                             }
@@ -144,10 +150,10 @@ fun NetCheckScreen(
                                     vm.store().saveToTree(android.net.Uri.parse(it), file.name, "text/csv", file.readBytes())
                                 }
                                 if (saved != null) {
-                                    vm.message = "CSV 已存到你选的文件夹：${file.name}"
+                                    vm.message = s("CSV 已存到你选的文件夹：${file.name}", "CSV saved to the folder you picked: ${file.name}")
                                 } else {
                                     context.startActivity(
-                                        vm.store().shareIntent(file, "text/csv", "GitHub 网络自检数据")
+                                        vm.store().shareIntent(file, "text/csv", s("GitHub 网络自检数据", "GitHub Network Check data"))
                                     )
                                 }
                             }
@@ -216,7 +222,10 @@ fun NetCheckScreen(
 @Composable
 private fun Header(p: Palette, run: RunResult?, idleHint: String, onSettings: () -> Unit) {
     val meta = if (run != null) {
-        "${ReportBuilder.timeStamp(run.startedAtMillis)}　·　${run.total} 个目标　·　用时 ${run.elapsedSec} 秒"
+        t(
+            "${ReportBuilder.timeStamp(run.startedAtMillis)}　·　${run.total} 个目标　·　用时 ${run.elapsedSec} 秒",
+            "${ReportBuilder.timeStamp(run.startedAtMillis)}　·　${run.total} targets　·　${run.elapsedSec}s"
+        )
     } else {
         idleHint
     }
@@ -224,14 +233,14 @@ private fun Header(p: Palette, run: RunResult?, idleHint: String, onSettings: ()
         Row(verticalAlignment = Alignment.Top) {
             Column(Modifier.weight(1f)) {
                 Text(
-                    "GITHUB NET CHECK · 本机自检",
+                    t("GITHUB NET CHECK · 本机自检", "GITHUB NET CHECK · ON-DEVICE"),
                     fontSize = 10.5.sp,
                     letterSpacing = 2.sp,
                     color = p.sub,
                     fontWeight = FontWeight.Medium
                 )
                 Spacer(Modifier.height(6.dp))
-                Text("GitHub 网络自检", fontSize = 24.sp, fontWeight = FontWeight.SemiBold, color = p.ink)
+                Text(t("GitHub 网络自检", "GitHub Network Check"), fontSize = 24.sp, fontWeight = FontWeight.SemiBold, color = p.ink)
             }
             Box(
                 Modifier
@@ -247,18 +256,25 @@ private fun Header(p: Palette, run: RunResult?, idleHint: String, onSettings: ()
         Spacer(Modifier.height(4.dp))
         Text(meta, fontSize = 12.sp, color = p.sub)
         Spacer(Modifier.height(2.dp))
-        Text("全部测试在本机完成，不上传任何数据", fontSize = 12.sp, color = p.sub)
+        Text(t("全部测试在本机完成，不上传任何数据", "Everything runs on this device. No data is uploaded."), fontSize = 12.sp, color = p.sub)
     }
 }
 
 @Composable
 private fun EnvPills(p: Palette, env: NetEnv, rateInfo: String) {
     val items = mutableListOf<Pair<String, Boolean>>()
-    if (env.networkName.isNotEmpty()) items += ("当前网络 ${env.networkName}" to env.vpnActive)
-    if (env.proxyEnabled) items += ("系统代理 ${env.proxyServer}" to true) else items += ("系统代理未开启" to false)
-    if (env.vpnActive) items += ("VPN 已启用" to true)
-    if (env.privateDns.isNotEmpty() && env.privateDns != "关闭") items += ("私有 DNS ${env.privateDns}" to true)
-    val hostsLabel = if (env.hostsHits > 0) "hosts ${env.hostsHits} 条本地映射" else "hosts 无本地映射"
+    if (env.networkName.isNotEmpty()) items += (t("当前网络 ${env.networkName}", "Network ${env.networkName}") to env.vpnActive)
+    if (env.proxyEnabled) items += (t("系统代理 ${env.proxyServer}", "Proxy ${env.proxyServer}") to true)
+    else items += (t("系统代理未开启", "Proxy off") to false)
+    if (env.vpnActive) items += (t("VPN 已启用", "VPN on") to true)
+    if (env.privateDns.isNotEmpty() && env.privateDns != "关闭") {
+        items += (t("私有 DNS ${env.privateDns}", "Private DNS ${env.privateDns}") to true)
+    }
+    val hostsLabel = if (env.hostsHits > 0) {
+        t("hosts ${env.hostsHits} 条本地映射", "hosts: ${env.hostsHits} local mappings")
+    } else {
+        t("hosts 无本地映射", "hosts: none")
+    }
     items += (hostsLabel to (env.hostsHits > 0))
     if (env.dnsServers.isNotEmpty()) items += ("DNS ${env.dnsServers.joinToString(", ")}" to false)
     if (rateInfo.isNotEmpty()) items += (rateInfo to false)
@@ -297,7 +313,7 @@ private fun StartButtons(p: Palette, onRun: () -> Unit, onQuick: () -> Unit) {
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = p.good, contentColor = Color.White)
         ) {
-            Text("开始自检", fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+            Text(t("开始自检", "Start check"), fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
         }
         OutlinedButton(
             onClick = onQuick,
@@ -306,7 +322,7 @@ private fun StartButtons(p: Palette, onRun: () -> Unit, onQuick: () -> Unit) {
             colors = ButtonDefaults.outlinedButtonColors(contentColor = p.sub),
             border = androidx.compose.foundation.BorderStroke(1.dp, p.line)
         ) {
-            Text("只测 GitHub 系（更快）", fontSize = 13.sp)
+            Text(t("只测 GitHub 系（更快）", "GitHub-only (faster)"), fontSize = 13.sp)
         }
     }
 }
@@ -327,7 +343,7 @@ private fun ResultActions(
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = p.good, contentColor = Color.White)
             ) {
-                Text("重新自检", fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
+                Text(t("重新自检", "Run again"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
             }
             OutlinedButton(
                 onClick = onQuick,
@@ -336,7 +352,7 @@ private fun ResultActions(
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = p.sub),
                 border = androidx.compose.foundation.BorderStroke(1.dp, p.line)
             ) {
-                Text("只测 GitHub 系", fontSize = 13.sp)
+                Text(t("只测 GitHub 系", "GitHub-only"), fontSize = 13.sp)
             }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -347,7 +363,7 @@ private fun ResultActions(
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = p.ink),
                 border = androidx.compose.foundation.BorderStroke(1.dp, p.line)
             ) {
-                Text("导出报告", fontSize = 13.sp)
+                Text(t("导出报告", "Export report"), fontSize = 13.sp)
             }
             OutlinedButton(
                 onClick = onExportCsv,
@@ -356,7 +372,7 @@ private fun ResultActions(
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = p.ink),
                 border = androidx.compose.foundation.BorderStroke(1.dp, p.line)
             ) {
-                Text("分享 CSV", fontSize = 13.sp)
+                Text(t("分享 CSV", "Share CSV"), fontSize = 13.sp)
             }
         }
     }
@@ -374,14 +390,14 @@ private fun RunningCard(p: Palette, current: Int, total: Int, name: String, onCa
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                if (total > 0) "正在测试 $current / $total" else "准备中",
+                if (total > 0) t("正在测试 $current / $total", "Testing $current / $total") else t("准备中", "Preparing"),
                 fontSize = 13.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = p.ink,
                 modifier = Modifier.weight(1f)
             )
             TextButton(onClick = onCancel) {
-                Text("停止", fontSize = 12.sp, color = p.sub)
+                Text(t("停止", "Stop"), fontSize = 12.sp, color = p.sub)
             }
         }
         Text(name, fontSize = 12.sp, color = p.sub, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -415,12 +431,12 @@ private fun MessageBanner(p: Palette, text: String, onDismiss: () -> Unit) {
 private fun SummaryGrid(p: Palette, run: RunResult) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            SummaryCard(p, "可连通", "${run.okCount}", "/ ${run.total}", Modifier.weight(1f))
-            SummaryCard(p, "平均建连延迟", "${run.avgTcp}", "ms", Modifier.weight(1f))
+            SummaryCard(p, t("可连通", "Reachable"), "${run.okCount}", "/ ${run.total}", Modifier.weight(1f))
+            SummaryCard(p, t("平均建连延迟", "Avg connect"), "${run.avgTcp}", "ms", Modifier.weight(1f))
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            SummaryCard(p, "最快", run.fastest?.tcpMs?.toString() ?: "-", "ms", Modifier.weight(1f))
-            SummaryCard(p, "异常目标", "${run.failCount}", "项", Modifier.weight(1f))
+            SummaryCard(p, t("最快", "Fastest"), run.fastest?.tcpMs?.toString() ?: "-", "ms", Modifier.weight(1f))
+            SummaryCard(p, t("异常目标", "Issues"), "${run.failCount}", t("项", "items"), Modifier.weight(1f))
         }
         Text(
             ReportBuilder.headline(run),
@@ -518,7 +534,7 @@ private fun ResultRow(r: TargetResult, expanded: Boolean, onClick: () -> Unit) {
             if (r.dohIp.isNotEmpty()) {
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    if (r.dohIp == r.ip) "DoH 一致" else "DoH 真实解析 ${r.dohIp}",
+                    if (r.dohIp == r.ip) t("DoH 一致", "DoH: same") else t("DoH 真实解析 ${r.dohIp}", "DoH resolves to ${r.dohIp}"),
                     fontSize = 10.5.sp,
                     color = if (r.dohIp == r.ip) p.good else p.warnText,
                     maxLines = 1,
@@ -563,15 +579,15 @@ private fun ResultRow(r: TargetResult, expanded: Boolean, onClick: () -> Unit) {
                     .background(p.line)
             )
             Spacer(Modifier.height(8.dp))
-            DetailLine(p, "评级依据", "${Verdict.text(r.level)}　·　${r.label}")
-            DetailLine(p, "HTTP 状态", if (r.status > 0) r.status.toString() else "—")
-            DetailLine(p, "本机解析", r.ip)
-            DetailLine(p, "DoH 对照", r.dohIp.ifEmpty { "未取到" })
-            DetailLine(p, "DNS 耗时", if (r.dnsOk) "${r.dnsMs} ms" else "解析失败")
-            DetailLine(p, "TCP 建连", if (r.tcpOk) "${r.tcpMs} ms" else "未建立")
-            DetailLine(p, "TLS 握手", if (r.ok) "${r.tlsMs} ms" else "未完成")
-            DetailLine(p, "HTTP 首字节", if (r.ok) "${r.ttfbMs} ms" else "未收到")
-            DetailLine(p, "用途说明", r.desc)
+            DetailLine(p, t("评级依据", "Basis"), "${Verdict.text(r.level)}　·　${r.label}")
+            DetailLine(p, t("HTTP 状态", "HTTP status"), if (r.status > 0) r.status.toString() else "—")
+            DetailLine(p, t("本机解析", "Local DNS"), r.ip)
+            DetailLine(p, t("DoH 对照", "DoH result"), r.dohIp.ifEmpty { t("未取到", "n/a") })
+            DetailLine(p, t("DNS 耗时", "DNS time"), if (r.dnsOk) "${r.dnsMs} ms" else t("解析失败", "failed"))
+            DetailLine(p, t("TCP 建连", "TCP connect"), if (r.tcpOk) "${r.tcpMs} ms" else t("未建立", "not opened"))
+            DetailLine(p, t("TLS 握手", "TLS handshake"), if (r.ok) "${r.tlsMs} ms" else t("未完成", "incomplete"))
+            DetailLine(p, t("HTTP 首字节", "HTTP first byte"), if (r.ok) "${r.ttfbMs} ms" else t("未收到", "none"))
+            DetailLine(p, t("用途说明", "What it does"), r.desc)
         }
     }
 }
@@ -609,21 +625,21 @@ private fun DetailLine(p: Palette, label: String, value: String) {
 private fun Footer(p: Palette, onCopy: (String) -> Unit) {
     Column(Modifier.padding(top = 8.dp)) {
         Text(
-            "测试方法：DNS 解析 → TCP 443 建连 → TLS 握手 → 发送 HTTP 请求测首字节，四段分别计时。",
+            t("测试方法：DNS 解析 → TCP 443 建连 → TLS 握手 → 发送 HTTP 请求测首字节，四段分别计时。", "Method: DNS lookup → TCP connect to 443 → TLS handshake → HTTP request for first byte, each timed separately."),
             fontSize = 11.sp,
             color = p.sub,
             lineHeight = 18.sp
         )
         Spacer(Modifier.height(3.dp))
         Text(
-            "评级按 TCP 建连延迟：≤120ms 优秀，≤400ms 良好，≤1000ms 一般，>1000ms 较慢，失败为不通。",
+            t("评级按 TCP 建连延迟：≤120ms 优秀，≤400ms 良好，≤1000ms 一般，>1000ms 较慢，失败为不通。", "Graded by TCP connect time: ≤120ms excellent, ≤400ms good, ≤1000ms fair, >1000ms slow, failure means unreachable."),
             fontSize = 11.sp,
             color = p.sub,
             lineHeight = 18.sp
         )
         Spacer(Modifier.height(3.dp))
         Text(
-            "DoH 对照用阿里公共 DNS 的加密查询，用来发现 hosts 改写或 DNS 污染。",
+            t("DoH 对照用阿里公共 DNS 的加密查询，用来发现 hosts 改写或 DNS 污染。", "The DoH column queries Ali public DNS over HTTPS, to expose hosts rewrites or DNS poisoning."),
             fontSize = 11.sp,
             color = p.sub,
             lineHeight = 18.sp
@@ -631,21 +647,21 @@ private fun Footer(p: Palette, onCopy: (String) -> Unit) {
         Spacer(Modifier.height(10.dp))
         Box(Modifier.fillMaxWidth().height(1.dp).background(p.line))
         Spacer(Modifier.height(10.dp))
-        Text("版本 ${BuildConfig.VERSION_NAME}　·　Apache License 2.0", fontSize = 11.sp, color = p.sub)
+        Text(t("版本 ${BuildConfig.VERSION_NAME}　·　Apache License 2.0", "Version ${BuildConfig.VERSION_NAME}　·　Apache License 2.0"), fontSize = 11.sp, color = p.sub)
         Spacer(Modifier.height(3.dp))
         Text(
-            "原项目地址：$PROJECT_URL",
+            t("原项目地址：$PROJECT_URL", "Project: $PROJECT_URL"),
             fontSize = 11.sp,
             color = p.fair,
             modifier = Modifier.padding(vertical = 2.dp).clickable { onCopy(PROJECT_URL) }
         )
         Text(
-            "镜像（Gitee）：$MIRROR_URL",
+            t("镜像（Gitee）：$MIRROR_URL", "Mirror (Gitee): $MIRROR_URL"),
             fontSize = 11.sp,
             color = p.fair,
             modifier = Modifier.padding(vertical = 2.dp).clickable { onCopy(MIRROR_URL) }
         )
         Spacer(Modifier.height(3.dp))
-        Text("点地址可复制到剪贴板", fontSize = 10.5.sp, color = p.sub)
+        Text(t("点地址可复制到剪贴板", "Tap an address to copy it"), fontSize = 10.5.sp, color = p.sub)
     }
 }
