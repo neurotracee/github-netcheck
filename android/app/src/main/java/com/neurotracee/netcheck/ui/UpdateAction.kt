@@ -236,6 +236,21 @@ internal fun UpdateActionBlock(
             TextButton(onClick = onCopyLink) {
                 Text(t("复制链接", "Copy link"), fontSize = 12.sp)
             }
+            // 安装器抽风时的退路：把已下好的包另存到「下载」，用文件管理器自己点一下装
+            val saved = apk
+            if (!downloading && saved != null && saved.exists()) {
+                TextButton(onClick = {
+                    val name = UpdateApk.saveToDownloads(ctx, saved)
+                    Toast.makeText(
+                        ctx,
+                        if (name != null) tr(ctx, "已存到「下载」：$name，用文件管理器点它就能装", "Saved to Downloads: $name — open it from your file manager")
+                        else tr(ctx, "这台手机的「下载」目录不让写，改用浏览器下载", "This phone blocks writing to Downloads; use the browser instead"),
+                        Toast.LENGTH_LONG
+                    ).show()
+                }) {
+                    Text(t("另存到下载", "Save to Downloads"), fontSize = 12.sp)
+                }
+            }
             // 主源下不动时给一次「换另一个仓库下」的机会，不用让人只靠浏览器
             if (!downloading && error.isNotBlank() && info.altApk.isNotBlank() && !usingAlt) {
                 TextButton(onClick = { begin(true) }) {

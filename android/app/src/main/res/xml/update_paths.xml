@@ -4,5 +4,10 @@
   别处一概不给。装完 / 取消后文件会被清掉。
 -->
 <paths>
-    <cache-path name="update" path="update/" />
+    <!-- 安装包现在放 filesDir/update：cache 目录会被系统或清理工具当成垃圾随时清掉，
+         用户在「允许安装未知来源」的页面上停留一会儿，回来文件就没了，系统安装器只能报「安装包已损坏」。
+         filesDir 不会被当成缓存清理，装完由应用自己删。 -->
+    <files-path name="update" path="update/" />
+    <!-- 兼容上一版留在 cache/update 里的文件 -->
+    <cache-path name="update_cache" path="update/" />
 </paths>

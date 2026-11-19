@@ -49,6 +49,16 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/update_paths" />
         </provider>
+
+        <!-- 安装会话的结果回调：系统通过它回传「装成功 / 失败的具体原因」，
+             失败时能把系统原话提示出来，而不是让用户对着「安装包已损坏」猜 -->
+        <receiver
+            android:name=".data.InstallResultReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.neurotracee.netcheck.INSTALL_RESULT" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

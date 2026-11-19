@@ -1,11 +1,17 @@
 package com.neurotracee.netcheck.data
 
+import android.content.ClipData
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageInstaller
+import android.app.PendingIntent
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.os.Handler
 import android.os.Looper
+import android.provider.MediaStore
 import android.provider.Settings
 import androidx.core.content.FileProvider
 import kotlinx.coroutines.Dispatchers
@@ -26,13 +32,17 @@ import java.net.URL
  * 顺带能当场校验下载到的确实是本应用的安装包（包名 + 版本号对得上），
  * 万一 CDN 抽风返回错误页或源码 zip，立刻按失败处理，不让用户去装看不懂的文件。
  *
- * 隐私：只下载用户点击的那个安装包地址，不发任何本地内容；文件写在应用自己的缓存目录，
- * 装完或取消后清除。
+ * 隐私：只下载用户点击的那个安装包地址，不发任何本地内容；文件写在应用自己的文件目录
+ * （filesDir/update，不用 cache——ROM 会把 cache 当垃圾清掉，用户在权限页停留时就可能被删，
+ * 回来装就成了「安装包已损坏」），装完或下次更新时清除。
  */
 object UpdateApk {
 
     /** 与 AndroidManifest 里 FileProvider 的 authorities 保持一致 */
     const val AUTHORITY = "com.neurotracee.netcheck.updatefile"
+
+    /** 安装会话结果广播的 action，只在本应用内部用 */
+    const val ACTION_INSTALL_RESULT = "com.neurotracee.netcheck.INSTALL_RESULT"
 
     private const val DIR = "update"
     private const val MAX_REDIRECTS = 5
@@ -56,18 +66,29 @@ object UpdateApk {
 
     data class Fetched(val outcome: Outcome, val apk: File? = null)
 
-    fun dir(ctx: Context): File = File(ctx.cacheDir, DIR).apply { if (!exists()) mkdirs() }
+    /** 安装包存放目录。放 filesDir 而不是 cacheDir：见 install 里的说明 */
+    fun dir(ctx: Context): File = File(ctx.filesDir, DIR).apply { if (!exists()) mkdirs() }
 
-    /** 清掉上次留下的安装包，避免缓存目录越堆越大 */
+    /** 清掉上次留下的安装包，避免目录越堆越大；keep 是正在用/正在装的那个 */
     fun clean(ctx: Context, keep: File? = null) {
         dir(ctx).listFiles()?.forEach { f ->
             if (keep == null || f.canonicalPath != keep.canonicalPath) f.delete()
         }
+        // 旧版本把文件放在 cache/update 里，顺手一起清
+        File(ctx.cacheDir, DIR).listFiles()?.forEach { it.delete() }
     }
 
     /** 非 Composable 里按语言取一句话（设置项里存的是 0 中文 · 1 English） */
     private fun tr(ctx: Context, zh: String, en: String): String =
         if (Prefs(ctx).langMode == 1) en else zh
+
+    /** 同一套取词，给安装结果广播用 */
+    internal fun trPublic(ctx: Context, zh: String, en: String): String = tr(ctx, zh, en)
+
+    /** 安装结束（成功或失败）后清掉留下的包；安装器读过了，留着只是占地方 */
+    fun cleanAfterInstall(ctx: Context) {
+        dir(ctx).deleteRecursively()
+    }
 
     /**
      * 下载 + 校验 + 拉起安装。整个过程在 IO 线程，进度回调切回主线程。
@@ -242,9 +263,31 @@ object UpdateApk {
 
     /** 拉起系统安装界面；没权限时只返回 NeedPermission，让界面去引导 */
     fun install(ctx: Context, apk: File): Outcome {
+        // 安装包放在文件目录（不是 cache）就是为了熬过用户去系统设置开权限那段时间；
+        // 回来先复核文件还在、还没被截断，别把残缺文件丢给安装器
+        if (!apk.exists() || apk.length() < MIN_BYTES) {
+            return Outcome.Failed(
+                tr(ctx, "安装包不在了或只剩一半（多半是被系统清了缓存），请点「立即更新」重新下载",
+                    "The file is missing or truncated (the system probably cleared it) — tap “Update now” to fetch it again")
+            )
+        }
+        // 复核 zip 结构：读得出版本信息说明中央目录完整，被截断的包在这一步就失败
+        val info = packageInfo(ctx, apk)
+        if (info == null || info.first != ctx.packageName) {
+            apk.delete()
+            return Outcome.Failed(
+                tr(ctx, "安装包结构不完整，已删除，请重新下载", "The file was incomplete and has been deleted — please download again")
+            )
+        }
         if (!canInstall(ctx)) {
             return Outcome.NeedPermission
         }
+
+        // 首选官方安装会话（PackageInstaller Session）：
+        // ACTION_VIEW 那条老路在个别 ROM 的「安全安装」流程里会把文件重新拷一遍，
+        // 拷的过程中出岔子就报「安装包已损坏」，且不给具体原因。Session 由系统自己把字节接过去，
+        // 失败原因还能通过广播回传。不可用时再退回 ACTION_VIEW。
+        installViaSession(ctx, apk)?.let { return it }
         val uri: Uri = try {
             FileProvider.getUriForFile(ctx, AUTHORITY, apk)
         } catch (e: Exception) {
@@ -257,6 +300,8 @@ object UpdateApk {
             setDataAndType(uri, "application/vnd.android.package-archive")
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            // 部分 ROM 的安装器只认 ClipData 里带的 URI 才给读权限，光在 data 上挂 flag 它不认
+            clipData = ClipData.newRawUri("apk", uri)
         }
         return try {
             ctx.startActivity(intent)
@@ -266,6 +311,71 @@ object UpdateApk {
                 tr(ctx, "没能打开安装界面（" + e.javaClass.simpleName + "）",
                     "Could not open the installer (" + e.javaClass.simpleName + ")")
             )
+        }
+    }
+
+    /**
+     * 把已下载的安装包另存到系统「下载」目录，留给文件管理器手动安装。
+     * 系统安装器抽风、或 ROM 拦得太狠时的退路：用户自己点那个文件就能装。
+     * 只有 Android 10 起能用（MediaStore.Downloads）；更老的系统返回 null，界面退回浏览器那条路。
+     */
+    fun saveToDownloads(ctx: Context, apk: File): String? {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return null
+        if (!apk.exists() || apk.length() < MIN_BYTES) return null
+        return try {
+            val values = ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, apk.name)
+                put(MediaStore.MediaColumns.MIME_TYPE, "application/vnd.android.package-archive")
+                put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+                put(MediaStore.MediaColumns.IS_PENDING, 1)
+            }
+            val resolver = ctx.contentResolver
+            val target = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values) ?: return null
+            resolver.openOutputStream(target)?.use { out ->
+                apk.inputStream().use { input -> input.copyTo(out) }
+            } ?: return null
+            val done = ContentValues().apply { put(MediaStore.MediaColumns.IS_PENDING, 0) }
+            resolver.update(target, done, null, null)
+            apk.name
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    /**
+     * 走 PackageInstaller 的安装会话。返回 null 表示这条路在这台机器上用不了，调用方退回 ACTION_VIEW。
+     *
+     * 步骤：建 session → 把 apk 字节写进 session → commit（带上结果广播）。
+     * 系统随后弹自己的确认界面，用户在系统界面点「安装」才真的装；本应用不持有任何静默安装能力。
+     */
+    private fun installViaSession(ctx: Context, apk: File): Outcome? {
+        return try {
+            val installer = ctx.packageManager.packageInstaller
+            val params = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL).apply {
+                setAppPackageName(ctx.packageName)
+            }
+            val sessionId = installer.createSession(params)
+            installer.openSession(sessionId).use { session ->
+                session.openWrite("netcheck.apk", 0, apk.length()).use { out ->
+                    apk.inputStream().use { input -> input.copyTo(out) }
+                    session.fsync(out)
+                }
+                val result = Intent(ctx, InstallResultReceiver::class.java)
+                    .putExtra(PackageInstaller.EXTRA_SESSION_ID, sessionId)
+                    .setAction(ACTION_INSTALL_RESULT)
+                val flags = if (Build.VERSION.SDK_INT >= 31) {
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+                } else {
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                }
+                val pi = PendingIntent.getBroadcast(ctx, sessionId, result, flags)
+                session.commit(pi.intentSender)
+            }
+            Outcome.Started
+        } catch (e: Exception) {
+            // 建会话失败（个别 ROM 禁了 session 或参数不对）：清掉半成品，交给 ACTION_VIEW 那条路
+            try { cleanAfterInstall(ctx) } catch (ignored: Exception) { }
+            null
         }
     }
 
