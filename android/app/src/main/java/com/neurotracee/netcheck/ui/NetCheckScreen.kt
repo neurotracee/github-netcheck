@@ -262,13 +262,26 @@ private fun Header(p: Palette, run: RunResult?, idleHint: String, onSettings: ()
 
 @Composable
 private fun EnvPills(p: Palette, env: NetEnv, rateInfo: String) {
+    // 网络类型与私有 DNS 的状态词是代码里写死的中文常量（不是系统给的），
+    // 英文界面下要在这里翻一遍，否则会出现「Network 移动数据」这种半中半英
+    val isEn = LocalLang.current == com.neurotracee.netcheck.ui.Lang.EN
+    fun enName(raw: String) = when (raw) {
+        "移动数据" -> "Mobile data"
+        "以太网" -> "Ethernet"
+        "关闭" -> "Off"
+        "自动" -> "Auto"
+        else -> raw
+    }
+
     val items = mutableListOf<Pair<String, Boolean>>()
-    if (env.networkName.isNotEmpty()) items += (t("当前网络 ${env.networkName}", "Network ${env.networkName}") to env.vpnActive)
+    if (env.networkName.isNotEmpty()) {
+        items += (t("当前网络 ${env.networkName}", "Network ${enName(env.networkName)}") to env.vpnActive)
+    }
     if (env.proxyEnabled) items += (t("系统代理 ${env.proxyServer}", "Proxy ${env.proxyServer}") to true)
     else items += (t("系统代理未开启", "Proxy off") to false)
     if (env.vpnActive) items += (t("VPN 已启用", "VPN on") to true)
     if (env.privateDns.isNotEmpty() && env.privateDns != "关闭") {
-        items += (t("私有 DNS ${env.privateDns}", "Private DNS ${env.privateDns}") to true)
+        items += (t("私有 DNS ${env.privateDns}", "Private DNS ${enName(env.privateDns)}") to true)
     }
     val hostsLabel = if (env.hostsHits > 0) {
         t("hosts ${env.hostsHits} 条本地映射", "hosts: ${env.hostsHits} local mappings")

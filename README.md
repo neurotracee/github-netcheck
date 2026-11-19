@@ -91,7 +91,7 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 | Windows · 控制台（选 1 的结果） | 14 个点位逐条给出 DNS / TCP / TLS / HTTP 四段耗时，末尾汇总「可连通 X/14、平均建连、耗时、最快 / 最慢 / 不通」 |
 | Windows · 关于窗 | 选项 3 弹出：同一份「关于与开源信息」文案，外加赞赏码与两个仓库的 Star 直达按钮 |
 
-> 手机图拍摄于 v1.1.5.5（11 月 19 日，深色主题）；英文三张同版本，主界面与关于页是浅色主题、设置页是深色，分开拍的，凑不成同一套深浅。
+> 手机图拍摄于 v1.1.5.5（11 月 19 日）：中文三张与英文三张都是深色主题，各自成套。
 > 关于窗那张是 v1.1.5.2 重拍的；控制台菜单页是 v1.1.5.2 刚截的（双击 .bat 的原样）。
 > 套壳脚本：手机 `docs/tools/frame_ui.py`（机身壳，批量用 `frame_batch.py`），Windows `docs/tools/frame_window.py`（窗口壳）；换新截图重跑一遍就行，不用手工修图。
 
@@ -106,12 +106,12 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
   <b>Android</b> — one run, all verdicts at a glance. 14 endpoints, each reported with DNS / TCP / TLS / HTTP timings; tap a row for details.
 </p>
 <p align="center">
-  <img src="docs/img/ui-android-main-en-light-device.png" width="230" alt="Android main screen (English)">
+  <img src="docs/img/ui-android-main-en-dark-device.png" width="230" alt="Android main screen (English)">
   <img src="docs/img/ui-android-settings-en-dark-device.png" width="230" alt="Android settings (English)">
-  <img src="docs/img/ui-android-about-en-light-device.png" width="230" alt="Android about (English)">
+  <img src="docs/img/ui-android-about-en-dark-device.png" width="230" alt="Android about (English)">
 </p>
 <p align="center">
-  <sub>↑ English UI: main · settings · about. Main and About are shot in the light theme, Settings in the dark one — they are separate takes, so the theme differs.</sub>
+  <sub>↑ English UI: main · settings · about, all shot in the dark theme.</sub>
 </p>
 
 <p align="center">
@@ -138,12 +138,12 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 
 ## 下载（先点这里）
 
-**当前版本：安卓 v1.1.5.5 ・ Windows v1.1.5.2**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
+**当前版本：安卓 v1.1.5.6 ・ Windows v1.1.5.2**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
 
 | 你要的 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
 | 最新下载页 | https://github.com/neurotracee/github-netcheck/releases/latest | https://gitee.com/bio234/github-netcheck/releases/latest |
-| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.5/NetCheck-1.1.5.5.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.5.5/NetCheck-1.1.5.5.apk |
+| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.6/NetCheck-1.1.5.6.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.5.6/NetCheck-1.1.5.6.apk |
 | Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.2/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.5.2/NetCheck-Windows.zip |
 | 仓库首页 | https://github.com/neurotracee/github-netcheck | https://gitee.com/bio234/github-netcheck |
 
@@ -160,8 +160,8 @@ Gitee 的附件总容量只有 1GB，装不下所有历史包，所以安装包�
 
 | 版本档位 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
-| **最新版**（安卓 v1.1.5.5 的 APK、Windows v1.1.5.2 的 zip） | 保留附件 | **保留附件** |
-| **上一版**（v1.1.5.4 的安卓 APK、v1.1.5.1 的 Windows zip） | 保留附件 | 保留附件（方便覆盖升级过渡） |
+| **最新版**（安卓 v1.1.5.6 的 APK、Windows v1.1.5.2 的 zip） | 保留附件 | **保留附件** |
+| **上一版**（v1.1.5.5 的安卓 APK、v1.1.5.1 的 Windows zip） | 保留附件 | 保留附件（方便覆盖升级过渡） |
 | **更早的旧版本** | 保留全部附件 | **附件已撤下**，只留发布说明 |
 
 也就是说：**最新版和上一版的 Windows 包、安卓包在 Gitee 都能下**；只有更早的旧版本才需要到 GitHub 发布页找。

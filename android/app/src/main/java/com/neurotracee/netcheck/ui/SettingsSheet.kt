@@ -71,7 +71,8 @@ fun SettingsSheet(
     var langMode by remember { mutableStateOf(prefs.langMode) }
     var autoUpdate by remember { mutableStateOf(prefs.autoCheckUpdate) }
     var source by remember { mutableStateOf(prefs.updateSource) }
-    var saveDirName by remember { mutableStateOf(prefs.saveTreeUri?.let { "已设置" } ?: "未设置（每次走分享面板）") }
+    // 只存「有没有设过」这个事实，文案在显示时按当前语言取，切语言后不会留着旧说法
+    var saveDirSet by remember { mutableStateOf(prefs.saveTreeUri != null) }
     var checking by remember { mutableStateOf(false) }
     var checkResult by remember { mutableStateOf<String?>(null) }
     var updateInfo by remember { mutableStateOf<UpdateChecker.Info?>(null) }
@@ -84,8 +85,8 @@ fun SettingsSheet(
                 )
             }
             prefs.saveTreeUri = uri.toString()
-            saveDirName = "已设置"
-            onToast("报告以后会存到你选的文件夹")
+            saveDirSet = true
+            onToast(tr(context, "报告以后会存到你选的文件夹", "Reports will be saved to the folder you picked"))
         }
     }
 
@@ -156,7 +157,7 @@ fun SettingsSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(Modifier.weight(1f)) {
-                    Text(saveDirName, fontSize = 13.5.sp, color = p.ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(t("已设置", "Set").takeIf { saveDirSet } ?: t("未设置（每次走分享面板）", "Not set (uses the share sheet)"), fontSize = 13.5.sp, color = p.ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Text(
                         t("导出报告时不再弹分享面板，直接写进这个文件夹", "Reports are written straight into this folder"),
                         fontSize = 11.sp, color = p.sub
@@ -173,8 +174,8 @@ fun SettingsSheet(
                         fontSize = 13.sp, color = p.sub,
                         modifier = Modifier.clickable {
                             prefs.saveTreeUri = null
-                            saveDirName = "未设置（每次走分享面板）"
-                            onToast("已改回每次走分享面板")
+                            saveDirSet = false
+                            onToast(tr(context, "已改回每次走分享面板", "Back to the share sheet"))
                         }.padding(6.dp)
                     )
                 }
@@ -234,12 +235,12 @@ fun SettingsSheet(
                                         onSuccess = { info ->
                                             if (UpdateChecker.isNewer(info.tag, versionName)) {
                                                 updateInfo = info
-                                                "发现新版本 ${info.tag} · 可在弹窗内直接下载安装"
+                                                tr(context, "发现新版本 ${info.tag} · 可在弹窗内直接下载安装", "New version ${info.tag} — it can be installed straight from the dialog")
                                             } else {
-                                                "已是最新版本（远端 ${info.tag}）"
+                                                tr(context, "已是最新版本（远端 ${info.tag}）", "Already up to date (remote ${info.tag})")
                                             }
                                         },
-                                        onFailure = { e -> "检查失败：${e.message}" }
+                                        onFailure = { e -> tr(context, "检查失败：${e.message}", "Check failed: ${e.message}") }
                                     )
                                 }
                             }.start()
@@ -489,7 +490,7 @@ fun AboutSheet(versionName: String, onDismiss: () -> Unit, onToast: (String) -> 
 private fun openUrl(context: android.content.Context, url: String, onToast: (String) -> Unit) {
     runCatching {
         context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-    }.onFailure { onToast("没有能打开浏览器的应用") }
+    }.onFailure { onToast(tr(context, "没有能打开浏览器的应用", "No app can open a browser")) }
 }
 
 @Composable
