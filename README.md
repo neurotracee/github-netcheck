@@ -37,12 +37,12 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 
 ## 下载（先点这里）
 
-**当前版本：安卓 v1.1.5.1 ・ Windows v1.1.5.0**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
+**当前版本：安卓 v1.1.5.2 ・ Windows v1.1.5.0**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
 
 | 你要的 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
 | 最新下载页 | https://github.com/neurotracee/github-netcheck/releases/latest | https://gitee.com/bio234/github-netcheck/releases/latest |
-| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.1/NetCheck-1.1.5.1.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.5.1/NetCheck-1.1.5.1.apk |
+| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.2/NetCheck-1.1.5.2.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.5.2/NetCheck-1.1.5.2.apk |
 | Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.0/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.5.0/NetCheck-Windows.zip |
 | 仓库首页 | https://github.com/neurotracee/github-netcheck | https://gitee.com/bio234/github-netcheck |
 
@@ -59,8 +59,8 @@ Gitee 的附件总容量只有 1GB，装不下所有历史包，所以安装包�
 
 | 版本档位 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
-| **最新版**（安卓 v1.1.5.1 的 APK、Windows v1.1.5.0 的 zip） | 保留附件 | **保留附件** |
-| **上一版**（v1.1.5.0，APK + Windows zip） | 保留附件 | 保留附件（方便覆盖升级过渡） |
+| **最新版**（安卓 v1.1.5.2 的 APK、Windows v1.1.5.0 的 zip） | 保留附件 | **保留附件** |
+| **上一版**（v1.1.5.1 的 APK、v1.1.5.0 的 Windows zip） | 保留附件 | 保留附件（方便覆盖升级过渡） |
 | **更早的旧版本** | 保留全部附件 | **附件已撤下**，只留发布说明 |
 
 也就是说：**最新版和上一版的 Windows 包、安卓包在 Gitee 都能下**；只有更早的旧版本才需要到 GitHub 发布页找。
@@ -118,10 +118,13 @@ apksigner verify -v --print-certs NetCheck-<版本号>.apk
 安卓端三屏，**真机截图**（OPPO Find X6 Pro / Android 14，装的正是本版 APK；这张屏上的 7 / 11 是「只测 GitHub 系」跑出来的，
 hosts 里那 2 条本地映射把 GitHub Pages 顶成了 127.0.0.1，所以它报「不通」——这正是工具该发现的东西）。
 设置页是照 PDF 隐私打码工具那套「齿轮 → 设置 → 关于」的结构做的。
+下面的图都套了机身壳，脚本在 `docs/tools/frame_ui.py`，换了新截图重跑一遍即可。
 
-![安卓主界面：跑完一次的结果](docs/img/ui-android-main.png)
-![安卓设置页](docs/img/ui-android-settings.png)
-![安卓关于页](docs/img/ui-android-about.png)
+<p align="center">
+  <img src="docs/img/ui-android-main-device.png" width="300" alt="安卓主界面：跑完一次的结果">
+  <img src="docs/img/ui-android-settings-device.png" width="300" alt="安卓设置页">
+  <img src="docs/img/ui-android-about-device.png" width="300" alt="安卓关于页">
+</p>
 
 | 界面 | 说明 |
 | --- | --- |
@@ -129,10 +132,12 @@ hosts 里那 2 条本地映射把 GitHub Pages 顶成了 127.0.0.1，所以它�
 | 设置页 | 界面语言 / 外观 / 报告保存位置 / 更新检查方式 / 更新源（自动默认 Gitee / 只用 Gitee / 只用 GitHub）/ 版本与检查更新 / 关于入口 |
 | 关于页 | 指导作者、开发（豆包工作任务的 Agent × DeepSeek-V4.1-Flash）、协议、两个地址、隐私、三条硬要求、维护节奏 |
 
+> 三张图拍摄于 v1.1.0.x（11 月 14 日），界面结构一直没变；目标数量后来加到 14 个、版本号也走到 1.1.5.x，以你现在装的那版为准。
+
 Windows 端是控制台 + 两个 WinForms 窗口：菜单式 BAT 选 `1` 直接自检，选 `3` 弹关于窗、选 `4` 弹设置窗、选 `5` 只查更新。
 窗口内容与安卓的「关于 / 设置」两屏一一对应（同一份文案，见 `windows/netcheck.ps1` 的 `Show-AboutWindow` / `Show-SettingsWindow`）。
 
-下面是这台机器上真实跑出来的关于窗（不是示意图）：
+下面是这台机器上真实跑出来的关于窗（不是示意图，窗口边框是系统原生的，所以不用套壳）：
 
 ![Windows 关于窗](docs/img/ui-windows-about.png)
 

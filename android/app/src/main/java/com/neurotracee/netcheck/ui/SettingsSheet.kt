@@ -326,8 +326,8 @@ fun AboutSheet(versionName: String, onDismiss: () -> Unit, onToast: (String) -> 
                 fontSize = 11.5.sp, color = p.sub, lineHeight = 18.sp
             )
             KvRow(p, t("开源协议", "License"), "Apache-2.0")
-            KvRow(p, t("原项目地址", "Primary"), "github.com/neurotracee/\nnetcheck", link = PROJECT_URL, onOpen = { openUrl(context, PROJECT_URL, onToast) })
-            KvRow(p, t("镜像地址", "Mirror"), "gitee.com/bio234/\nnetcheck", link = MIRROR_URL, onOpen = { openUrl(context, MIRROR_URL, onToast) })
+            KvRow(p, t("原项目地址", "Primary"), "github.com/neurotracee/\ngithub-netcheck", link = PROJECT_URL, onOpen = { openUrl(context, PROJECT_URL, onToast) })
+            KvRow(p, t("镜像地址", "Mirror"), "gitee.com/bio234/\ngithub-netcheck", link = MIRROR_URL, onOpen = { openUrl(context, MIRROR_URL, onToast) })
 
             Spacer(Modifier.height(14.dp))
             Text(t("隐私", "Privacy"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = p.ink)
