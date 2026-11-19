@@ -37,13 +37,13 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 
 ## 下载（先点这里）
 
-**当前版本 v1.1.4.1**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
+**当前版本 v1.1.5.0**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
 
 | 你要的 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
 | 最新下载页 | https://github.com/neurotracee/github-netcheck/releases/latest | https://gitee.com/bio234/github-netcheck/releases/latest |
-| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.4.1/NetCheck-1.1.4.1.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.4.1/NetCheck-1.1.4.1.apk |
-| Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.4.1/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.4.1/NetCheck-Windows.zip |
+| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.0/NetCheck-1.1.5.0.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.5.0/NetCheck-1.1.5.0.apk |
+| Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.0/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.5.0/NetCheck-Windows.zip |
 | 仓库首页 | https://github.com/neurotracee/github-netcheck | https://gitee.com/bio234/github-netcheck |
 
 解压 Windows 包后双击 **一键网络自检.bat**；APK 直接安装（系统会提示「未知来源」，原因见下一节）。
@@ -59,8 +59,8 @@ Gitee 的附件总容量只有 1GB，装不下所有历史包，所以安装包�
 
 | 版本档位 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
-| **最新版**（当前 v1.1.4.1，APK + Windows zip） | 保留附件 | **保留附件** |
-| **上一版**（v1.1.4.0，APK + Windows zip） | 保留附件 | 保留附件（方便覆盖升级过渡） |
+| **最新版**（当前 v1.1.5.0，APK + Windows zip） | 保留附件 | **保留附件** |
+| **上一版**（v1.1.4.1，APK + Windows zip） | 保留附件 | 保留附件（方便覆盖升级过渡） |
 | **更早的旧版本** | 保留全部附件 | **附件已撤下**，只留发布说明 |
 
 也就是说：**最新版和上一版的 Windows 包、安卓包在 Gitee 都能下**；只有更早的旧版本才需要到 GitHub 发布页找。
@@ -362,9 +362,15 @@ hosts 把域名指向 127.0.0.1
 **检查更新的规矩（两端一致）**：
 
 - **什么时候查**：只在启动时查一次，没有定时轮询，也没有后台常驻进程；关掉「自动检查更新」就完全不联网。
-- **查什么**：只 GET 一份公开的 `version.json`，UA 里只带自己的版本号，不上传任何本地内容。
+- **查什么**：只 GET 两份公开内容——`version.json`（版本号），以及**仅在真有新版本时才多读一次**的发布列表（用来显示更新说明）。
+  UA 里只带自己的版本号，不上传任何本地内容。
 - **怎么算「有新版本」**：版本号统一按四段补零比较（`1.1.3` 与 `1.1.3.0` 视为同一版）；只认自己平台那一段，
   **某一版只给另一端发过包时，对本平台等于没有更新**——这就是不会误报的根本原因。
+- **弹窗里能直接读到这一版改了什么**：不再是干巴巴一句「发现新版本」，而是把发布页正文里的摘要和
+  按 Windows / 安卓 分条的条目直接显示出来，说明太长方框内可上下滚动。
+  **落后好几个版本时**（例如停在 1.1.2.0，仓库已有 1.1.4.0、1.1.5.0）：变成一页一版的说明浏览器，
+  最多列最近 4 版，左右翻看更早 / 更新的说明；**但下载目标永远是那一版最新的**，
+  绿框里也写明了「翻页只换说明，不改变要装的版本」。
 - **发现之后**：弹一次提示，默认在**应用内直接下载并安装**（下完核对包名与版本号，再交给系统安装器，不经过浏览器）；
   另留「用浏览器下载 / 复制链接」作为退路。点「以后再说」下次启动还会再提醒
   （故意不做「跳过此版本」的永久记忆，否则容易再也想不起来更新）。

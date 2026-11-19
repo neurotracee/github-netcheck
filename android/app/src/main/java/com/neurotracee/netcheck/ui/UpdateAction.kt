@@ -279,6 +279,19 @@ internal fun UpdateDialog(
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(Modifier.height(9.dp))
+                UpdateNotesBlock(
+                    info = info,
+                    accent = accent,
+                    onOpenPage = {
+                        val page = info.url.ifBlank { downloadUrl }
+                        if (!openUrlInBrowser(ctx, page)) {
+                            copyLinkToClipboard(ctx, page)
+                            onToast(tr(ctx, "没有能打开浏览器的应用，已复制链接", "No browser found; link copied"))
+                        }
+                    }
+                )
+
+                Spacer(Modifier.height(8.dp))
                 Text(
                     t("当前是 v${BuildConfig.VERSION_NAME}。不更新也一模一样用，只是新版顺手修了几个小毛病；下次打开还会再提醒一次。",
                         "You're on v${BuildConfig.VERSION_NAME}. Skipping is fine — the app keeps working; you'll be reminded next launch."),

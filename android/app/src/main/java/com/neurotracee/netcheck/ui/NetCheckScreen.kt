@@ -202,7 +202,7 @@ fun NetCheckScreen(
     LaunchedEffect(Unit) {
         if (!prefs.autoCheckUpdate) return@LaunchedEffect
         val info = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
-            com.neurotracee.netcheck.data.UpdateChecker.check(prefs.updateSource).getOrNull()
+            com.neurotracee.netcheck.data.UpdateChecker.check(prefs.updateSource, BuildConfig.VERSION_NAME).getOrNull()
         }
         if (info != null && com.neurotracee.netcheck.data.UpdateChecker.isNewer(info.tag, BuildConfig.VERSION_NAME)) {
             updateInfo = info

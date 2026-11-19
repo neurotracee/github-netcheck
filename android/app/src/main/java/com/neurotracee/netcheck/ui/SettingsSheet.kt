@@ -227,7 +227,7 @@ fun SettingsSheet(
                             checkResult = null
                             val src = source
                             Thread {
-                                val r = UpdateChecker.check(src)
+                                val r = UpdateChecker.check(src, versionName)
                                 Handler(Looper.getMainLooper()).post {
                                     checking = false
                             checkResult = r.fold(

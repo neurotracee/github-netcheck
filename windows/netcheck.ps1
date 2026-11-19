@@ -25,7 +25,7 @@ param(
     [switch]$CheckUpdate  # 只查最新版本号，不测
 )
 
-$script:AppVersion = '1.1.4.1'
+$script:AppVersion = '1.1.5.0'
 $script:ProjectUrl = 'https://github.com/neurotracee/github-netcheck'
 $script:MirrorUrl  = 'https://gitee.com/bio234/github-netcheck'
 
@@ -685,6 +685,139 @@ function Get-RemoteVersion {
     return $null
 }
 
+# 完整读一段 JSON / 文本（自带的 Invoke-Https 为测速只收 8KB，发布列表会远远超出）。
+# 只用于「读发布说明」这类小体积公开文本，不参与任何测速数字。
+function Get-JsonText {
+    param([string]$Url, [int]$TimeoutMs = 8000, [string]$Accept = 'application/json')
+    try {
+        Add-Type -AssemblyName System.Net.Http -ErrorAction Stop
+        try {
+            [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+        } catch { }
+        $cli = New-Object System.Net.Http.HttpClient
+        $cli.Timeout = [TimeSpan]::FromMilliseconds($TimeoutMs)
+        [void]$cli.DefaultRequestHeaders.TryAddWithoutValidation('User-Agent', 'NetCheck/1.0')
+        [void]$cli.DefaultRequestHeaders.TryAddWithoutValidation('Accept', $Accept)
+        $resp = $cli.GetAsync($Url).GetAwaiter().GetResult()
+        if (-not $resp.IsSuccessStatusCode) { $cli.Dispose(); return $null }
+        $text = $resp.Content.ReadAsStringAsync().GetAwaiter().GetResult()
+        $resp.Dispose()
+        $cli.Dispose()
+        return $text
+    } catch {
+        return $null
+    }
+}
+
+# 发布正文（Markdown）→ 弹窗里能直接读的纯文本。
+# 与安卓端 ReleaseDigest 同一套约定：一级标题是语言分界，二级标题是条目，
+# 「> 一句话」是摘要。这里只做去记号，不重排内容，免得把发布页的意思改掉。
+function ConvertFrom-ReleaseBody {
+    param([string]$Body)
+    if ([string]::IsNullOrWhiteSpace($Body)) { return '' }
+    $t = $Body -replace "`r`n", "`n"
+    $t = [regex]::Replace($t, '(?s)<!--.*?-->', '')
+    $t = [regex]::Replace($t, '!\[[^\]]*\]\([^)]*\)', '')
+    $t = [regex]::Replace($t, '\[([^\]]+)\]\([^)]*\)', '$1')
+    $t = $t -replace '\*\*', ''
+    $t = $t -replace '__', ''
+    $t = $t -replace '`', ''
+    $out = New-Object System.Collections.Generic.List[string]
+    $skipSection = $false
+    foreach ($raw in ($t -split "`n")) {
+        $s = $raw.TrimEnd()
+        if ($s -match '^\s*$') {
+            if ($out.Count -gt 0 -and $out[$out.Count - 1] -ne '') { $out.Add('') }
+            continue
+        }
+        if ($s.StartsWith('# ')) { continue }          # 一级标题（中英分界）不显示
+        # 发布正文的固定抬头与更新级别标记：弹窗顶部已有版本号与来源，不必重复
+        if ($s -match '(PowerShell 5\.1，免安装)|(Android 8\.0\+，APK)|(两个平台内容一致)') { continue }
+        if ($s -match '^(更新级别|更新说明)\s*[：:]') { continue }
+        if ($s -match '^【?GitHub 网络自检\s*v[\d.]+】?$') { continue }
+        if ($s -match '^【?Net\s*Check\s*v?[\d.]+】?$') { continue }
+        if ($s -match '^\s{0,2}(#{2,4})\s+(.*)$') {
+            $title = ([string]$Matches[2]).Trim()
+            if ($title -match '^(下载|校验|目录|附件|[Dd]ownloads?|[Cc]hecksums?|[Cc]ontents)') {
+                $skipSection = $true
+                continue
+            }
+            $skipSection = $false
+            $out.Add('【' + $title + '】')
+            continue
+        }
+        if ($skipSection) { continue }                 # 下载 / 校验段落的正文也不进弹窗
+        if ($s -match '^\s*\|') { continue }           # 表格
+        if ($s -match '^\s*-{3,}') { continue }
+        if ($s -match '^\s*[-*+]\s+(.*)$') {
+            if ($out.Count -gt 0 -and $out[$out.Count - 1] -ne '') { } 
+            $out.Add('· ' + ([string]$Matches[1]).Trim())
+            continue
+        }
+        if ($s -match '^\s*>+\s*(.*)$') { $out.Add(([string]$Matches[1]).Trim()); continue }
+        $out.Add($s.Trim())
+    }
+    $joined = ($out -join "`n")
+    $joined = [regex]::Replace($joined, "(`n){3,}", "`n`n")
+    return $joined.Trim()
+}
+
+# 读发布列表，拿「本平台真的发过包」的各版正文。
+# 只给安卓发包的版本对 Windows 等于没有更新，所以这类版本一律跳过——
+# 这既是单端发版不误报的根因，也是 pending（落后几版）列表不被污染的前提。
+function Get-ReleaseNotes {
+    param([string]$Source = 'gitee', [int]$TimeoutMs = 6000, [string]$Local = '')
+    if ($Source -eq 'github') {
+        $raw = Get-JsonText -Url 'https://api.github.com/repos/neurotracee/github-netcheck/releases?per_page=20' -TimeoutMs $TimeoutMs -Accept 'application/vnd.github+json'
+    } else {
+        $raw = Get-JsonText -Url 'https://gitee.com/api/v5/repos/bio234/github-netcheck/releases?per_page=20' -TimeoutMs $TimeoutMs
+    }
+    if ([string]::IsNullOrWhiteSpace($raw)) { return $null }
+    $list = $null
+    try { $list = $raw | ConvertFrom-Json } catch { return $null }
+    if (-not $list) { return $null }
+    if ($list -isnot [array]) { $list = @($list) }
+
+    $bodies = @{}
+    $bestVer = ''
+    foreach ($rel in $list) {
+        if ($null -eq $rel) { continue }
+        $isDraft = $false; $isPre = $false
+        try { $isDraft = [bool]$rel.draft } catch { }
+        try { $isPre = [bool]$rel.prerelease } catch { }
+        if ($isDraft -or $isPre) { continue }
+        $ver = ''
+        foreach ($a in @($rel.assets)) {
+            if ($null -eq $a) { continue }
+            $n = [string]$a.name
+            if ($n -notmatch '(?i)\.zip$') { continue }
+            $m = [regex]::Match($n, '(\d+\.\d+\.\d+\.\d+)')
+            if ($m.Success) { $ver = $m.Groups[1].Value; break }
+        }
+        if (-not $ver) { continue }
+        $bodies[$ver] = [string]$rel.body
+        if ($bestVer -eq '' -or (Compare-VersionText -Remote $ver -Local $bestVer) -gt 0) { $bestVer = $ver }
+    }
+    if ($bestVer -eq '') { return $null }
+
+    # 未更新的各版：比本机新，按版本升序，最多留最近 4 版
+    $newer = @()
+    foreach ($k in $bodies.Keys) {
+        if ((Compare-VersionText -Remote $k -Local $Local) -gt 0) { $newer += $k }
+    }
+    $sorted = @($newer | Sort-Object { try { [version]$_ } catch { [version]'0.0.0.0' } })
+    if ($sorted.Count -gt 4) { $sorted = @($sorted[($sorted.Count - 4)..($sorted.Count - 1)]) }
+    $pending = @()
+    foreach ($v in $sorted) {
+        $pending += [pscustomobject]@{ Ver = [string]$v; Text = (ConvertFrom-ReleaseBody ([string]$bodies[$v])) }
+    }
+    return @{
+        BestVer = [string]$bestVer
+        BestText = (ConvertFrom-ReleaseBody ([string]$bodies[$bestVer]))
+        Pending = $pending
+    }
+}
+
 # 更新源顺序：默认 Gitee。
 # 只有「明确迹象」说明大概率不在中国大陆时才默认 GitHub ——
 # 系统语言不是中文，且时区也不是 UTC+8；判断不出来一律走 Gitee。
@@ -699,51 +832,158 @@ function Resolve-UpdateSource {
     return 'gitee'
 }
 
-# 查到新版本时的提示窗：三个出口 —— 用浏览器打开下载 / 复制链接 / 以后再说
+# 查到新版本时的提示窗：说明区（可上下滚动、可翻看更早版本）+ 三个出口
+# 与安卓端 UpdateNotes 一致：翻页只换「看哪一版说明」，下载永远是 --Update.Remote 那一版。
 function Show-UpdatePrompt {
     param($Update)
     Add-Type -AssemblyName System.Windows.Forms
     Add-Type -AssemblyName System.Drawing
     $font = New-Object System.Drawing.Font('Microsoft YaHei UI', 9)
+    $fontBold = New-Object System.Drawing.Font('Microsoft YaHei UI', 12, [System.Drawing.FontStyle]::Bold)
+    $fontSmall = New-Object System.Drawing.Font('Microsoft YaHei UI', 8)
+
     $form = New-Object System.Windows.Forms.Form
     $form.Text = '发现新版本 · GitHub 网络自检'
-    $form.Size = New-Object System.Drawing.Size(480, 236)
+    $form.ClientSize = New-Object System.Drawing.Size(596, 544)
     $form.StartPosition = 'CenterScreen'
     $form.BackColor = [System.Drawing.Color]::FromArgb(244, 246, 248)
     $form.Font = $font
+    $form.FormBorderStyle = 'FixedSingle'
+    $form.MaximizeBox = $false
+    $form.MinimizeBox = $false
 
     $t1 = New-Object System.Windows.Forms.Label
-    $t1.Text = ('发现新版本 ' + $Update.Remote + '（当前 ' + $script:AppVersion + '）')
-    $t1.Font = New-Object System.Drawing.Font('Microsoft YaHei UI', 12, [System.Drawing.FontStyle]::Bold)
+    $t1.Text = ('发现新版本 v' + $Update.Remote + '（当前 v' + $script:AppVersion + '）')
+    $t1.Font = $fontBold
     $t1.AutoSize = $true
-    $t1.Location = New-Object System.Drawing.Point(22, 22)
+    $t1.Location = New-Object System.Drawing.Point(22, 18)
     $form.Controls.Add($t1)
 
+    $srcName = ''
+    try { $srcName = [string]$Update.Source } catch { }
     $t2 = New-Object System.Windows.Forms.Label
-    $t2.Text = '不更新也一模一样用，只是新版顺手修了几个小毛病，用起来更稳。' + "`r`n" +
-               '下载的是单文件便携版，覆盖旧的那一个即可，设置与历史报告都会保留。' + "`r`n" +
-               '下次打开还会再提醒一次，到时候想换也来得及。'
-    $t2.AutoSize = $true
+    $t2.Text = ('来源 ' + $srcName + '　·　不更新也一模一样用，只是新版顺手修了几个小毛病；下次打开还会再提醒一次。')
     $t2.ForeColor = [System.Drawing.Color]::FromArgb(107, 119, 133)
-    $t2.Location = New-Object System.Drawing.Point(24, 58)
+    $t2.Font = $fontSmall
+    $t2.AutoSize = $true
+    $t2.Location = New-Object System.Drawing.Point(24, 50)
     $form.Controls.Add($t2)
+
+    $cap = New-Object System.Windows.Forms.Label
+    $cap.Text = '这一版改了什么（说明太长时可在框内上下滚动）：'
+    $cap.AutoSize = $true
+    $cap.ForeColor = [System.Drawing.Color]::FromArgb(60, 72, 86)
+    $cap.Location = New-Object System.Drawing.Point(24, 76)
+    $form.Controls.Add($cap)
+
+    $box = New-Object System.Windows.Forms.TextBox
+    $box.Multiline = $true
+    $box.ReadOnly = $true
+    $box.ScrollBars = 'Vertical'
+    $box.WordWrap = $true
+    $box.BackColor = [System.Drawing.Color]::White
+    $box.BorderStyle = 'FixedSingle'
+    $box.Size = New-Object System.Drawing.Size(548, 210)
+    $box.Location = New-Object System.Drawing.Point(24, 98)
+    $form.Controls.Add($box)
+
+    $prev = New-Object System.Windows.Forms.Button
+    $prev.Text = '‹ 更早版本'
+    $prev.Size = New-Object System.Drawing.Size(104, 26)
+    $prev.Location = New-Object System.Drawing.Point(24, 318)
+    $prev.FlatStyle = 'Flat'
+    $form.Controls.Add($prev)
+
+    $page = New-Object System.Windows.Forms.Label
+    $page.TextAlign = 'MiddleCenter'
+    $page.Size = New-Object System.Drawing.Size(220, 26)
+    $page.Location = New-Object System.Drawing.Point(190, 318)
+    $page.ForeColor = [System.Drawing.Color]::FromArgb(107, 119, 133)
+    $form.Controls.Add($page)
+
+    $next = New-Object System.Windows.Forms.Button
+    $next.Text = '更新版本 ›'
+    $next.Size = New-Object System.Drawing.Size(104, 26)
+    $next.Location = New-Object System.Drawing.Point(468, 318)
+    $next.FlatStyle = 'Flat'
+    $form.Controls.Add($next)
+
+    $target = New-Object System.Windows.Forms.Label
+    $target.Text = ('下载目标始终是：最新版 v' + $Update.Remote + '。左右翻页只换说明，不会改变要装的版本。')
+    $target.BackColor = [System.Drawing.Color]::FromArgb(242, 251, 244)
+    $target.ForeColor = [System.Drawing.Color]::FromArgb(20, 80, 31)
+    $target.BorderStyle = 'FixedSingle'
+    $target.TextAlign = 'MiddleLeft'
+    $target.Padding = New-Object System.Windows.Forms.Padding(10, 0, 10, 0)
+    $target.Size = New-Object System.Drawing.Size(548, 46)
+    $target.Location = New-Object System.Drawing.Point(24, 356)
+    $form.Controls.Add($target)
+
+    # 组装要翻的页：落后几版就几页；一页都没有时也留一页（写「说明在发布页」）
+    $notes = $null
+    try { $notes = $Update.Notes } catch { }
+    $pages = @()
+    if ($notes) {
+        foreach ($p in @($notes.Pending)) { $pages += [pscustomobject]@{ Ver = [string]$p.Ver; Text = [string]$p.Text } }
+    }
+    if ($pages.Count -eq 0) {
+        $bt = ''
+        if ($notes) { $bt = [string]$notes.BestText }
+        $pages = @([pscustomobject]@{ Ver = [string]$Update.Remote; Text = $bt })
+    }
+    if ($pages[$pages.Count - 1].Ver -ne [string]$Update.Remote) {
+        $bt = ''
+        if ($notes -and [string]$notes.BestVer -eq [string]$Update.Remote) { $bt = [string]$notes.BestText }
+        $pages = @($pages) + @([pscustomobject]@{ Ver = [string]$Update.Remote; Text = $bt })
+    }
+
+    $script:updPages = $pages
+    $script:updIdx = $pages.Count - 1
+    $script:updBox = $box
+    $script:updPage = $page
+    $script:updPrev = $prev
+    $script:updNext = $next
+    $script:updShow = {
+        param([int]$i)
+        if ($script:updPages.Count -le 0) { return }
+        $i = [Math]::Max(0, [Math]::Min($i, $script:updPages.Count - 1))
+        $script:updIdx = $i
+        $cur = $script:updPages[$i]
+        $txt = [string]$cur.Text
+        if ([string]::IsNullOrWhiteSpace($txt)) {
+            $txt = '这一版的说明写在发布页上，点下面的「用浏览器打开下载」就能看到完整内容。'
+        }
+        $script:updBox.Text = $txt
+        if ($script:updPages.Count -gt 1) {
+            $script:updPage.Text = ('正在看 v' + $cur.Ver + '　·　' + ($i + 1) + ' / ' + $script:updPages.Count)
+            $script:updPrev.Enabled = ($i -gt 0)
+            $script:updNext.Enabled = ($i -lt $script:updPages.Count - 1)
+        } else {
+            $script:updPage.Text = ('v' + $cur.Ver)
+            $script:updPrev.Enabled = $false
+            $script:updNext.Enabled = $false
+        }
+    }
+    $prev.Add_Click({ & $script:updShow ($script:updIdx - 1) })
+    $next.Add_Click({ & $script:updShow ($script:updIdx + 1) })
+    & $script:updShow ($script:updPages.Count - 1)
 
     $url = $script:ProjectUrl + '/releases/latest'
 
     $go = New-Object System.Windows.Forms.Button
     $go.Text = '用浏览器打开下载'
-    $go.Size = New-Object System.Drawing.Size(140, 32)
-    $go.Location = New-Object System.Drawing.Point(24, 168)
+    $go.Size = New-Object System.Drawing.Size(168, 34)
+    $go.Location = New-Object System.Drawing.Point(24, 424)
     $go.BackColor = [System.Drawing.Color]::FromArgb(18, 161, 80)
     $go.ForeColor = [System.Drawing.Color]::White
     $go.FlatStyle = 'Flat'
-    $go.Add_Click({ try { Start-Process $url } catch { }; $form.Close() })
+    $go.Add_Click({ try { Start-Process $url } catch { }; $script:updForm.Close() })
     $form.Controls.Add($go)
 
     $copy = New-Object System.Windows.Forms.Button
     $copy.Text = '复制链接'
-    $copy.Size = New-Object System.Drawing.Size(104, 32)
-    $copy.Location = New-Object System.Drawing.Point(176, 168)
+    $copy.Size = New-Object System.Drawing.Size(104, 34)
+    $copy.Location = New-Object System.Drawing.Point(202, 424)
     $copy.FlatStyle = 'Flat'
     $copy.Add_Click({
         try { [System.Windows.Forms.Clipboard]::SetText($url); $copy.Text = '已复制' } catch { }
@@ -752,13 +992,15 @@ function Show-UpdatePrompt {
 
     $later = New-Object System.Windows.Forms.Button
     $later.Text = '以后再说'
-    $later.Size = New-Object System.Drawing.Size(104, 32)
-    $later.Location = New-Object System.Drawing.Point(292, 168)
+    $later.Size = New-Object System.Drawing.Size(104, 34)
+    $later.Location = New-Object System.Drawing.Point(316, 424)
     $later.FlatStyle = 'Flat'
-    $later.Add_Click({ $form.Close() })
+    $later.Add_Click({ $script:updForm.Close() })
     $form.Controls.Add($later)
 
+    $script:updForm = $form
     $form.ShowDialog() | Out-Null
+    Remove-Variable -Name updPages, updIdx, updBox, updPage, updPrev, updNext, updShow, updForm -Scope Script -ErrorAction SilentlyContinue
 }
 
 function Invoke-UpdateCheck {
@@ -773,15 +1015,21 @@ function Invoke-UpdateCheck {
         if ($tag) {
             $cmp = Compare-VersionText -Remote $tag -Local $script:AppVersion
             if ($cmp -gt 0) {
-                return @{ Ok = $true; HasNew = $true; Source = $srcName; Remote = $tag;
+                # 只在真有更新时多读一次发布列表（说明正文），已是最新就不打扰网络
+                $notes = $null
+                try { $notes = Get-ReleaseNotes -Source $s -TimeoutMs 6000 -Local $script:AppVersion } catch { }
+                if ($notes -and [string]$notes.BestVer -ne '') {
+                    if ((Compare-VersionText -Remote ([string]$notes.BestVer) -Local $tag) -gt 0) { $tag = [string]$notes.BestVer }
+                }
+                return @{ Ok = $true; HasNew = $true; Source = $srcName; Remote = $tag; Notes = $notes;
                           Text = ('发现新版本 ' + $tag + '（当前 ' + $script:AppVersion + '，来源 ' + $srcName + '）') }
             }
-            return @{ Ok = $true; HasNew = $false; Source = $srcName; Remote = $tag;
+            return @{ Ok = $true; HasNew = $false; Source = $srcName; Remote = $tag; Notes = $null;
                       Text = ('已是最新版本（当前 ' + $script:AppVersion + '，远端 ' + $tag + '，来源 ' + $srcName + '）') }
         }
         $errs += ($srcName + ' 连不上')
     }
-    return @{ Ok = $false; HasNew = $false; Source = ''; Remote = '';
+    return @{ Ok = $false; HasNew = $false; Source = ''; Remote = ''; Notes = $null;
               Text = ('检查不到更新：' + ($errs -join '，') + '（不影响自检）') }
 }
 
