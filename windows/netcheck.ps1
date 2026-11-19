@@ -730,6 +730,8 @@ function ConvertFrom-ReleaseBody {
             if ($out.Count -gt 0 -and $out[$out.Count - 1] -ne '') { $out.Add('') }
             continue
         }
+        # 英文段（# Release Notes / # What's New 之类）到此为止：中文界面的弹窗不需要再读一遍英文
+        if ($s -match '^#\s' -and $s -notmatch '[\u4e00-\u9fff]' -and $s -match '(?i)release\s*notes?|what''?s\s*new') { break }
         if ($s.StartsWith('# ')) { continue }          # 一级标题（中英分界）不显示
         # 发布正文的固定抬头与更新级别标记：弹窗顶部已有版本号与来源，不必重复
         if ($s -match '(PowerShell 5\.1，免安装)|(Android 8\.0\+，APK)|(两个平台内容一致)') { continue }
