@@ -91,7 +91,7 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 | Windows · 控制台（选 1 的结果） | 14 个点位逐条给出 DNS / TCP / TLS / HTTP 四段耗时，末尾汇总「可连通 X/14、平均建连、耗时、最快 / 最慢 / 不通」 |
 | Windows · 关于窗 | 选项 3 弹出：同一份「关于与开源信息」文案，外加赞赏码与两个仓库的 Star 直达按钮 |
 
-> 手机图拍摄于 v1.1.5.5（11 月 19 日）：中文三张与英文三张都是深色主题，各自成套。
+> 手机图拍摄于 v1.1.5.5（11 月 19 日）：中文三张与英文三张都是深色主题，各自成套。英文图里那两处中文（`Network 移动数据`、设置页「未设置」）已在 v1.1.5.6 修掉，图还没重拍。
 > 关于窗那张是 v1.1.5.2 重拍的；控制台菜单页是 v1.1.5.2 刚截的（双击 .bat 的原样）。
 > 套壳脚本：手机 `docs/tools/frame_ui.py`（机身壳，批量用 `frame_batch.py`），Windows `docs/tools/frame_window.py`（窗口壳）；换新截图重跑一遍就行，不用手工修图。
 
@@ -111,7 +111,7 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
   <img src="docs/img/ui-android-about-en-dark-device.png" width="230" alt="Android about (English)">
 </p>
 <p align="center">
-  <sub>↑ English UI: main · settings · about, all shot in the dark theme.</sub>
+  <sub>↑ English UI: main · settings · about, all shot in the dark theme (v1.1.5.5). Two leftovers visible here — the <code>Network 移动数据</code> pill and “未设置（每次走分享面板）” — are fixed in v1.1.5.6; shots to be retaken.</sub>
 </p>
 
 <p align="center">
