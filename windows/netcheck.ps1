@@ -25,7 +25,7 @@ param(
     [switch]$CheckUpdate  # 只查最新版本号，不测
 )
 
-$script:AppVersion = '1.1.4.0'
+$script:AppVersion = '1.1.4.1'
 $script:ProjectUrl = 'https://github.com/neurotracee/github-netcheck'
 $script:MirrorUrl  = 'https://gitee.com/bio234/github-netcheck'
 
@@ -224,6 +224,13 @@ function Show-AboutWindow {
 
     $starTip = New-Object System.Windows.Forms.Label
     $starTip.Text = '觉得好用？GitHub 和 Gitee 两个仓库都点个 Star（标星 / 收藏），就是对作者最大的支持。'
+    $starTip2 = New-Object System.Windows.Forms.Label
+    $starTip2.Text = "愿意请我喝杯奶茶的话，左边这张码扫码即可——完全自愿，不打赏功能一个不少。"
+    $starTip2.AutoSize = $false
+    $starTip2.Size = New-Object System.Drawing.Size(380, 44)
+    $starTip2.ForeColor = [System.Drawing.Color]::FromArgb(107, 119, 133)
+    $starTip2.Location = New-Object System.Drawing.Point(206, 600)
+    $form.Controls.Add($starTip2)
     $starTip.AutoSize = $false
     $starTip.Size = New-Object System.Drawing.Size(380, 44)
     $starTip.ForeColor = [System.Drawing.Color]::FromArgb(107, 119, 133)

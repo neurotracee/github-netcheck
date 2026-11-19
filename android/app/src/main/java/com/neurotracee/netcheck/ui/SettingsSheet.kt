@@ -413,8 +413,8 @@ fun AboutSheet(versionName: String, onDismiss: () -> Unit, onToast: (String) -> 
                 Column {
                     Text(t("给两个仓库都点个 Star（标星）", "Star both repos"), fontSize = 13.5.sp, fontWeight = FontWeight.SemiBold, color = p.ink)
                     Spacer(Modifier.height(4.dp))
-                    Text(t("不想花钱也没关系，GitHub 和 Gitee 两个仓库各点一颗 Star（收藏）就是最好的支持 —— 别人搜得到，我才更有动力维护。",
-                        "No money needed. A star on either GitHub or Gitee is the best support: it makes the project findable."),
+                    Text(t("不想花钱也没关系，GitHub 和 Gitee 两个仓库各点一颗 Star（收藏）就是最好的支持 —— 别人搜得到，我才更有动力维护。愿意请我喝杯奶茶的话，下面就有赞赏码，完全自愿。",
+                        "No money needed. A star on either GitHub or Gitee is the best support: it makes the project findable. A tip is welcome but entirely optional — the QR code is right below."),
                         fontSize = 11.5.sp, color = p.sub, lineHeight = 18.sp)
                     Spacer(Modifier.height(10.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {

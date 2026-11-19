@@ -37,13 +37,13 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 
 ## 下载（先点这里）
 
-**当前版本 v1.1.4.0**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
+**当前版本 v1.1.4.1**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
 
 | 你要的 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
 | 最新下载页 | https://github.com/neurotracee/github-netcheck/releases/latest | https://gitee.com/bio234/github-netcheck/releases/latest |
-| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.4.0/NetCheck-1.1.4.0.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.4.0/NetCheck-1.1.4.0.apk |
-| Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.4.0/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.4.0/NetCheck-Windows.zip |
+| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.4.1/NetCheck-1.1.4.1.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.4.1/NetCheck-1.1.4.1.apk |
+| Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.4.1/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.4.1/NetCheck-Windows.zip |
 | 仓库首页 | https://github.com/neurotracee/github-netcheck | https://gitee.com/bio234/github-netcheck |
 
 解压 Windows 包后双击 **一键网络自检.bat**；APK 直接安装（系统会提示「未知来源」，原因见下一节）。
@@ -59,12 +59,16 @@ Gitee 的附件总容量只有 1GB，装不下所有历史包，所以安装包�
 
 | 版本档位 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
-| **最新版**（当前 v1.1.4.0，APK + Windows zip） | 保留附件 | **保留附件** |
-| **上一版**（v1.1.3.4，APK + Windows zip） | 保留附件 | 保留附件（方便覆盖升级过渡） |
+| **最新版**（当前 v1.1.4.1，APK + Windows zip） | 保留附件 | **保留附件** |
+| **上一版**（v1.1.4.0，APK + Windows zip） | 保留附件 | 保留附件（方便覆盖升级过渡） |
 | **更早的旧版本** | 保留全部附件 | **附件已撤下**，只留发布说明 |
 
 也就是说：**最新版和上一版的 Windows 包、安卓包在 Gitee 都能下**；只有更早的旧版本才需要到 GitHub 发布页找。
 旧版本下载地址：https://github.com/neurotracee/github-netcheck/releases （Gitee 对应旧发布页里也会注明「旧版请到 GitHub 下载」并给出链接）。
+
+**觉得有用就走，不用付钱。** 两个仓库各点一颗 Star（标星 / 收藏）就是最好的支持——别人搜得到，我才更有动力维护：
+[GitHub Star](https://github.com/neurotracee/github-netcheck) ｜ [Gitee Star](https://gitee.com/bio234/github-netcheck) 。
+要是这个小工具帮你省了点时间、愿意请我喝杯奶茶，文末「[赞赏](#赞赏)」一节有张微信赞赏码，**完全自愿，不打赏功能一个都不少**。
 
 **版本说明**：这是四段版本号（主.次.修订.补丁），小修小改只加最后一段。所以 1.1.2.0 → 1.1.3.2 属于功能级更新（赞赏入口 + 启动查更新提示），
 而 1.1.3.2 → 1.1.3.2 是**纯文案更新**：把「图标里含 GitHub 的 Octocat、本项目无授权无背书、仅限非商业使用、请勿复用图标」这段声明
@@ -570,10 +574,16 @@ limitations under the License.
 
 ![微信赞赏码](docs/img/wechat-donate.png)
 
+> **这张图在 GitHub 页面上显示不出来？** 不是你操作错了，也不是图片删了。README 里的仓库内图片在 GitHub 页面上走
+> `raw.githubusercontent.com`，这个域名在国内常被掐断——本工具测的正是这个点位。到 Gitee 仓库的同一页看就有图：
+> https://gitee.com/bio234/github-netcheck （文末「赞赏」一节）。两端程序里的二维码是**内置图片**，不依赖网络，
+> 断网也能看：Windows 端「关于与开源信息」窗口、安卓端「关于」页最下面的「赞赏（完全自愿）」卡片。
+
 程序里也能直接看到这张码：Windows 端「关于与开源信息」窗口、安卓端「关于」页的「赞赏（完全自愿）」卡片，
 文案是同一句——**要是这个小工具帮你省了点时间，愿意的话可以请我喝杯奶茶；不打赏也一模一样用，功能一个都不少。**
 
-> **点 Star 比打赏更有用。**不想花钱完全没问题：到仓库点一颗 Star 就是最好的支持，别人搜得到，我才更有动力维护。
+> **点 Star 比打赏更有用。**不想花钱完全没问题：GitHub 和 Gitee 两个仓库各点一颗 Star（标星 / 收藏）就是最好的支持，
+> 别人搜得到，我才更有动力维护。
 >
 > 国内用户也可以扫码请我喝杯奶茶——完全自愿，不打赏一样免费、功能不缺。
 
