@@ -77,18 +77,30 @@ internal fun UpdateActionBlock(
     var started by remember(info) { mutableStateOf(false) }
     var error by remember(info) { mutableStateOf("") }
     var apk by remember(info) { mutableStateOf<File?>(null) }
+    // 下载进度：total <= 0 表示还不知道总大小（连接中或服务器没给长度）
+    var gotBytes by remember(info) { mutableStateOf(0L) }
+    var totalBytes by remember(info) { mutableStateOf(0L) }
+    // 上次是不是用备用源下的，重试时沿用，免得来回跳
+    var usingAlt by remember(info) { mutableStateOf(false) }
 
-    fun begin() {
+    fun begin(alt: Boolean) {
+        val url = if (alt) info.altApk else info.apk
+        if (url.isBlank()) return
+        usingAlt = alt
         downloading = true
         percent = 0
+        gotBytes = 0
+        totalBytes = 0
         error = ""
         needPerm = false
         scope.launch {
             val f = UpdateApk.fetchAndInstall(
                 ctx = ctx,
-                url = info.apk,
+                url = url,
                 version = info.tag
             ) { done, total ->
+                gotBytes = done
+                totalBytes = total
                 percent = if (total > 0) ((done * 100) / total).toInt().coerceIn(0, 100) else 0
             }
             apk = f.apk
@@ -102,7 +114,7 @@ internal fun UpdateActionBlock(
     }
 
     fun resume() {
-        val f = apk ?: run { begin(); return }
+        val f = apk ?: run { begin(usingAlt); return }
         when (val o = UpdateApk.retryInstall(ctx, f)) {
             is UpdateApk.Outcome.Started -> { started = true; needPerm = false; onDone() }
             is UpdateApk.Outcome.NeedPermission -> needPerm = true
@@ -126,6 +138,14 @@ internal fun UpdateActionBlock(
         // ---- 状态说明 ----
         Text(
             when {
+                downloading && totalBytes <= 0L && gotBytes == 0L -> t(
+                    "正在连接 v${info.tag} 的下载地址…（这一步最容易卡，连不上会自动换一次源，不用关页面）",
+                    "Connecting to the v${info.tag} download… (this step is the slowest; it retries on its own, keep this open)"
+                )
+                downloading && totalBytes <= 0L -> t(
+                    "已连上，正在接收 v${info.tag}… 已收 ${mb(gotBytes)}（服务器没给总大小，进度条只表示「在动」）",
+                    "Receiving v${info.tag}… ${mb(gotBytes)} so far (no total size from the server, the bar just means “moving”)"
+                )
                 downloading -> t(
                     "正在下载 v${info.tag}… $percent%（不用离开这个页面，下完直接弹出安装）",
                     "Downloading v${info.tag}… $percent% — stay here, the installer opens by itself"
@@ -154,11 +174,19 @@ internal fun UpdateActionBlock(
 
         if (downloading) {
             Spacer(Modifier.height(8.dp))
-            LinearProgressIndicator(
-                progress = { percent / 100f },
-                modifier = Modifier.fillMaxWidth(),
-                color = accent
-            )
+            if (totalBytes > 0L) {
+                LinearProgressIndicator(
+                    progress = { percent / 100f },
+                    modifier = Modifier.fillMaxWidth(),
+                    color = accent
+                )
+            } else {
+                // 总大小还没拿到：用不确定态，至少让用户看到它在动
+                LinearProgressIndicator(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = accent
+                )
+            }
         }
 
         // ---- 按钮 ----
@@ -182,7 +210,7 @@ internal fun UpdateActionBlock(
                                 ).show()
                             }
                             apk != null -> resume()
-                            else -> begin()
+                            else -> begin(usingAlt)
                         }
                     },
                     shape = RoundedCornerShape(10.dp),
@@ -190,6 +218,8 @@ internal fun UpdateActionBlock(
                 ) {
                     Text(
                         when {
+                            downloading && totalBytes <= 0L && gotBytes == 0L -> t("连接中…", "Connecting…")
+                            downloading && totalBytes <= 0L -> t("已收 ${mb(gotBytes)}", "${mb(gotBytes)}")
                             downloading -> t("下载中 $percent%", "Downloading $percent%")
                             needPerm -> t("继续安装", "Continue")
                             apk != null -> t("继续安装", "Continue")
@@ -205,6 +235,12 @@ internal fun UpdateActionBlock(
             }
             TextButton(onClick = onCopyLink) {
                 Text(t("复制链接", "Copy link"), fontSize = 12.sp)
+            }
+            // 主源下不动时给一次「换另一个仓库下」的机会，不用让人只靠浏览器
+            if (!downloading && error.isNotBlank() && info.altApk.isNotBlank() && !usingAlt) {
+                TextButton(onClick = { begin(true) }) {
+                    Text(t("换源再试", "Other source"), fontSize = 12.sp)
+                }
             }
         }
 
@@ -225,6 +261,10 @@ internal fun UpdateActionBlock(
         }
     }
 }
+
+/** 字节数写成 MB，给「总大小未知」时的进度文字用 */
+private fun mb(bytes: Long): String =
+    String.format(java.util.Locale.US, "%.1f MB", bytes / 1048576.0)
 
 /** 用系统默认浏览器打开；打不开返回 false，交给界面给备选路径 */
 internal fun openUrlInBrowser(ctx: Context, url: String): Boolean = try {

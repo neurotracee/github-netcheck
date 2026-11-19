@@ -27,6 +27,8 @@ object UpdateChecker {
         val tag: String,
         val url: String,
         val apk: String = "",
+        /** 另一个源的同版本包：主地址下不动时的备选（仍只给自家域名） */
+        val altApk: String = "",
         val body: String = "",
         val pending: List<Pending> = emptyList()
     )
@@ -114,13 +116,17 @@ object UpdateChecker {
             }
             if (target.isBlank()) continue
 
-            // 直链：优先「与 target 版本对得上」的那一条
+            // 直链：**只认当前源的自家地址**。
+            // version.json 里的 apk 字段固定写的是 GitHub 直链，国内基本连不上，
+            // 一旦发布列表读取失败就落到它头上，会让用户对着 0% 干等。
+            // 所以这里改成「拿不到发布列表就按版本号拼当前源的下载地址」，绝不跨源。
             val apk = when {
                 rel != null && rel.bestVer == target && rel.bestApk.isNotBlank() -> rel.bestApk
-                vj != null && vj.tag == target && vj.apk.isNotBlank() -> vj.apk
-                rel != null && rel.bestApk.isNotBlank() && rel.bestVer == target -> rel.bestApk
-                else -> ""
+                else -> assetUrl(ch, target)
             }
+            // 备用直链：换另一个源的同版本包，主地址下不动时由界面提供
+            val altChannel = if (ch === GITEE) GITHUB else GITEE
+            val altApk = assetUrl(altChannel, target)
             // 正文：target 那一版在发布列表里就用它的；否则空着（弹窗回到模板话术）
             val body = when {
                 rel == null -> ""
@@ -131,8 +137,10 @@ object UpdateChecker {
             return Result.success(
                 Info(
                     tag = target.trim(),
-                    url = vj?.url?.takeIf { it.isNotBlank() } ?: ch.page,
+                    // 发布页也跟着当前源走：从 Gitee 读到更新的人，点「详见发布页」不该被送到 GitHub
+                    url = ch.page,
                     apk = apk.trim(),
+                    altApk = altApk.trim(),
                     body = body,
                     pending = rel?.pending ?: emptyList()
                 )
@@ -231,6 +239,18 @@ object UpdateChecker {
     private fun versionFromName(name: String): String {
         val m = Regex("""(\d+(?:\.\d+){1,3})""").find(name) ?: return ""
         return m.groupValues[1]
+    }
+
+    /**
+     * 按版本号拼当前源的安装包直链。
+     *
+     * 两个仓库的发布资产命名规则是固定的（NetCheck-<版本>.apk），所以拿不到发布列表时
+     * 也能直接拼出地址，不必去读 version.json 里写死的 GitHub 链接——这正是
+     * 之前「默认 Gitee 却去 GitHub 下载、卡在 0%」的来路。
+     */
+    private fun assetUrl(ch: Channel, ver: String): String = when (ch.name) {
+        "Gitee" -> "https://gitee.com/bio234/github-netcheck/releases/download/v$ver/NetCheck-$ver.apk"
+        else -> "https://github.com/neurotracee/github-netcheck/releases/download/v$ver/NetCheck-$ver.apk"
     }
 
     /** 两个版本号比较大小：-1 / 0 / 1 */

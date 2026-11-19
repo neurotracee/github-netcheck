@@ -40,6 +40,9 @@ object UpdateApk {
     private const val MAX_BYTES = 300L * 1024 * 1024
     private const val PROGRESS_GAP_MS = 120L
 
+    /** 下载失败重来的次数上限：一次重来就能绕开大多数「连接被重置」 */
+    private const val ATTEMPTS = 3
+
     sealed class Outcome {
         /** 已经拉起系统安装界面 */
         object Started : Outcome()
@@ -91,8 +94,38 @@ object UpdateApk {
         if (apk.exists()) install(ctx, apk)
         else Outcome.Failed(tr(ctx, "安装包已经不在了，请重新下载", "The file is gone — please download again"))
 
-    /** 下载安装包到缓存目录。完成时返回文件；任何一步不对都抛异常，由调用方转成提示。 */
+    /**
+     * 下载安装包到缓存目录。完成时返回文件；任何一步不对都抛异常，由调用方转成提示。
+     *
+     * Gitee 的附件要连跳三次（releases → attach_files → foruda.gitee.com 的带 token 地址），
+     * 中途任何一次被重置都会让进度停住。所以这里失败会重来，最多三次：
+     * 每次重来都会重新走一遍跳转、拿到新的 token，比干等同一个地址强。
+     */
     fun download(
+        ctx: Context,
+        url: String,
+        version: String,
+        onProgress: (Long, Long) -> Unit
+    ): File {
+        // 先告诉界面「在连，还没开始收数据」：total 用 -1 表示未知
+        onProgress(0L, -1L)
+
+        var lastError: Exception? = null
+        repeat(ATTEMPTS) { i ->
+            try {
+                return downloadOnce(ctx, url, version, onProgress)
+            } catch (e: Exception) {
+                lastError = e
+                if (i < ATTEMPTS - 1) {
+                    // 短暂停一下再试，避免撞上同一个冷连接
+                    try { Thread.sleep(600L) } catch (ignored: Exception) { }
+                }
+            }
+        }
+        throw (lastError ?: IOException(tr(ctx, "下载没完成", "The download did not finish")))
+    }
+
+    private fun downloadOnce(
         ctx: Context,
         url: String,
         version: String,
@@ -132,12 +165,13 @@ object UpdateApk {
                         val now = System.currentTimeMillis()
                         if (now - lastPush >= PROGRESS_GAP_MS) {
                             lastPush = now
-                            if (total > 0) main.post { onProgress(done, total) }
+                            // 不知道总大小时也要回传已下载字节数：否则界面永远停在 0%，看着像卡死
+                            main.post { onProgress(done, total) }
                         }
                     }
                 }
             }
-            if (total > 0) main.post { onProgress(done, total) }
+            main.post { onProgress(done, total) }
 
             if (total > 0 && done != total) {
                 throw IOException(
@@ -265,8 +299,10 @@ object UpdateApk {
         while (true) {
             val conn = URL(current).openConnection() as HttpURLConnection
             conn.instanceFollowRedirects = false
-            conn.connectTimeout = 15000
-            conn.readTimeout = 30000
+            // 手机网络下 Gitee 的跳转链有时会先「挂住几十秒」再断，超时短一点失败得更快，
+            // 失败后由外层重来，比让用户盯着 0% 干等强
+            conn.connectTimeout = 12000
+            conn.readTimeout = 25000
             conn.requestMethod = "GET"
             conn.setRequestProperty("User-Agent", "NetCheck-Android")
             conn.setRequestProperty("Accept", "*/*")

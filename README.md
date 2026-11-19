@@ -37,12 +37,12 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 
 ## 下载（先点这里）
 
-**当前版本 v1.1.5.0**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
+**当前版本：安卓 v1.1.5.1 ・ Windows v1.1.5.0**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
 
 | 你要的 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
 | 最新下载页 | https://github.com/neurotracee/github-netcheck/releases/latest | https://gitee.com/bio234/github-netcheck/releases/latest |
-| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.0/NetCheck-1.1.5.0.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.5.0/NetCheck-1.1.5.0.apk |
+| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.1/NetCheck-1.1.5.1.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.5.1/NetCheck-1.1.5.1.apk |
 | Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.0/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.5.0/NetCheck-Windows.zip |
 | 仓库首页 | https://github.com/neurotracee/github-netcheck | https://gitee.com/bio234/github-netcheck |
 
@@ -59,8 +59,8 @@ Gitee 的附件总容量只有 1GB，装不下所有历史包，所以安装包�
 
 | 版本档位 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
-| **最新版**（当前 v1.1.5.0，APK + Windows zip） | 保留附件 | **保留附件** |
-| **上一版**（v1.1.4.1，APK + Windows zip） | 保留附件 | 保留附件（方便覆盖升级过渡） |
+| **最新版**（安卓 v1.1.5.1 的 APK、Windows v1.1.5.0 的 zip） | 保留附件 | **保留附件** |
+| **上一版**（v1.1.5.0，APK + Windows zip） | 保留附件 | 保留附件（方便覆盖升级过渡） |
 | **更早的旧版本** | 保留全部附件 | **附件已撤下**，只留发布说明 |
 
 也就是说：**最新版和上一版的 Windows 包、安卓包在 Gitee 都能下**；只有更早的旧版本才需要到 GitHub 发布页找。
