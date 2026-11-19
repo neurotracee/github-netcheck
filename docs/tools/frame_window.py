@@ -126,11 +126,11 @@ def frame(shot_path: Path, out_path: Path) -> None:
 
 
 def frame_terminal(shot_path: Path, out_path: Path, title: str = "GitHub 网络自检 · 控制台",
-                   head_crop: int = 62, right_crop: int = 32, bottom_crop: int = 20) -> None:
+                   head_crop: int = 62, right_crop: int = 32, bottom_crop: int = 20, left_crop: int = 0) -> None:
     """给终端截图套壳：裁掉终端自带的标签栏与滚动条，换成深色标题栏。"""
     shot = Image.open(shot_path).convert("RGBA")
     w, h = shot.size
-    shot = shot.crop((0, head_crop, w - right_crop, h - bottom_crop))
+    shot = shot.crop((left_crop, head_crop, w - right_crop, h - bottom_crop))
     sw, sh = shot.size
 
     BAR = 56

@@ -61,14 +61,21 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 <br>
 
 <h3 align="center">Windows：控制台才是主程序</h3>
-<p align="center">双击「一键网络自检.bat」出菜单：选 1 直接开测，14 个点位逐条给结果；选 3 弹关于窗、选 4 弹设置窗、选 5 只查更新。<br>
-那两个窗口只是壳，主界面就是下面这张控制台 —— 真机跑出来的一次完整结果，长的那两行是连接失败时的原始异常信息。</p>
+<p align="center">双击「一键网络自检.bat」，<strong>先出来的是这张菜单</strong>：输入数字选功能，选 1 直接开测、选 3 弹关于窗、选 4 弹设置窗、选 5 只查更新、选 0 退出。<br>
+选完 1 才开始跑，跑完就是下面第二张。那两个弹窗只是壳，主界面自始至终是控制台。</p>
 
 <p align="center">
-  <img src="docs/img/ui-windows-console-device.png" width="100%" alt="Windows 控制台：跑完一次 14 个点位的完整结果">
+  <img src="docs/img/ui-windows-menu-device.png" width="100%" alt="Windows 控制台：刚打开发出的菜单，输入数字选功能">
 </p>
 <p align="center">
-  <sub>↑ 控制台主界面（选 1，跑完全部 14 个点位）</sub><br>
+  <sub>↑ 执行前：刚打开就长这样，标题、作者与两个仓库地址写在最上面，「请选择：」在等你输数字</sub>
+</p>
+
+<p align="center">
+  <img src="docs/img/ui-windows-console-device.png" width="100%" alt="Windows 控制台：选 1 跑完一次 14 个点位的完整结果">
+</p>
+<p align="center">
+  <sub>↑ 执行后：选 1 跑完全部 14 个点位。长的那两行是连接失败时的原始异常信息，没做美化</sub><br>
   <img src="docs/img/ui-windows-about-device.png" width="380" alt="Windows 关于与开源信息窗口">
   <br><sub>↑ 选 3 弹出的「关于与开源信息」窗，不是主界面</sub>
 </p>
@@ -80,12 +87,13 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 | 安卓 · 主界面 | 标题区 + 环境标签 + 两个按钮 + 四张汇总卡 + 逐条结果卡（点一条展开细节） |
 | 安卓 · 设置页 | 界面语言 / 外观 / 报告保存位置 / 更新检查方式 / 更新源（自动默认 Gitee / 只用 Gitee / 只用 GitHub）/ 版本与检查更新 / 关于入口 |
 | 安卓 · 关于页 | 指导作者、开发（豆包工作任务的 Agent × DeepSeek-V4.1-Flash）、协议、两个地址、隐私、三条硬要求、维护节奏 |
-| Windows · 控制台（主程序） | 选项 1：14 个点位逐条给出 DNS / TCP / TLS / HTTP 四段耗时，末尾汇总「可连通 X/14、平均建连、耗时、最快 / 最慢 / 不通」 |
+| Windows · 菜单页（入口） | 双击 .bat 立刻出现：标题区 + 作者 / 开发 / 协议 / 两个地址 + `[1]`–`[5]` 五项 + `[0]` 退出 +「请选择：」 |
+| Windows · 控制台（选 1 的结果） | 14 个点位逐条给出 DNS / TCP / TLS / HTTP 四段耗时，末尾汇总「可连通 X/14、平均建连、耗时、最快 / 最慢 / 不通」 |
 | Windows · 关于窗 | 选项 3 弹出：同一份「关于与开源信息」文案，外加赞赏码与两个仓库的 Star 直达按钮 |
 
-> 手机三张图拍摄于 v1.1.0.x（11 月 14 日），界面结构一直没变；目标数量后来加到 14 个、版本号走到 1.1.5.x，以你现在装的那版为准。
-> 关于窗那张是 v1.1.5.2 重拍的。
-> 套壳脚本：手机 `docs/tools/frame_ui.py`（机身壳），Windows `docs/tools/frame_window.py`（窗口壳）；换新截图重跑一遍就行，不用手工修图。
+> 手机图拍摄于 v1.1.5.5（11 月 19 日，深色主题）；英文三张同版本，主界面与关于页是浅色主题、设置页是深色，分开拍的，凑不成同一套深浅。
+> 关于窗那张是 v1.1.5.2 重拍的；控制台菜单页是 v1.1.5.2 刚截的（双击 .bat 的原样）。
+> 套壳脚本：手机 `docs/tools/frame_ui.py`（机身壳，批量用 `frame_batch.py`），Windows `docs/tools/frame_window.py`（窗口壳）；换新截图重跑一遍就行，不用手工修图。
 
 <h3 align="center">In English</h3>
 
@@ -98,17 +106,29 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
   <b>Android</b> — one run, all verdicts at a glance. 14 endpoints, each reported with DNS / TCP / TLS / HTTP timings; tap a row for details.
 </p>
 <p align="center">
-  <img src="docs/img/ui-android-main-device.png" width="230" alt="Android main screen">
-  <img src="docs/img/ui-android-settings-device.png" width="230" alt="Android settings">
-  <img src="docs/img/ui-android-about-device.png" width="230" alt="Android about">
+  <img src="docs/img/ui-android-main-en-light-device.png" width="230" alt="Android main screen (English)">
+  <img src="docs/img/ui-android-settings-en-dark-device.png" width="230" alt="Android settings (English)">
+  <img src="docs/img/ui-android-about-en-light-device.png" width="230" alt="Android about (English)">
+</p>
+<p align="center">
+  <sub>↑ English UI: main · settings · about. Main and About are shot in the light theme, Settings in the dark one — they are separate takes, so the theme differs.</sub>
 </p>
 
 <p align="center">
-  <b>Windows</b> — the console is the program; the windows are just shells. Run <code>一键网络自检.bat</code>,
-  pick 1 to start the check (14 endpoints), 3 for About, 4 for Settings, 5 to check for updates.
+  <b>Windows</b> — the console is the program; the windows are just shells. Run <code>一键网络自检.bat</code> and
+  the menu below comes up first: type a number to pick a feature (1 check, 2 GitHub-only, 3 About, 4 Settings, 5 update check, 0 quit).
+</p>
+<p align="center">
+  <img src="docs/img/ui-windows-menu-device.png" width="100%" alt="Windows console: the menu you get on launch, before anything runs">
+</p>
+<p align="center">
+  <sub>↑ before running: title, author and both repo links on top, then the numbered menu and a “请选择:” prompt</sub>
 </p>
 <p align="center">
   <img src="docs/img/ui-windows-console-device.png" width="100%" alt="Windows console: one full run over 14 endpoints">
+</p>
+<p align="center">
+  <sub>↑ after running: choice 1, all 14 endpoints. Those two long lines are raw connection-failure exceptions, left unedited</sub>
 </p>
 <p align="center">
   <img src="docs/img/ui-windows-about-device.png" width="340" alt="Windows About window (menu item 3)">
