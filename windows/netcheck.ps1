@@ -25,7 +25,7 @@ param(
     [switch]$CheckUpdate  # 只查最新版本号，不测
 )
 
-$script:AppVersion = '1.1.5.0'
+$script:AppVersion = '1.1.5.1'
 $script:ProjectUrl = 'https://github.com/neurotracee/github-netcheck'
 $script:MirrorUrl  = 'https://gitee.com/bio234/github-netcheck'
 
@@ -169,7 +169,7 @@ function Show-AboutWindow {
         '　　　　　代码全部公开，修不动的地方欢迎自己改、自己接着用。',
         '　　　　　协议允许商用，不用付钱也不用问我，照上面三条做就行。',
         '',
-        '如果这个工具帮到了你：给仓库点个 Star 就是最好的支持。'
+        '如果这个工具帮到了你：GitHub 和 Gitee 两个仓库各点一颗 Star（标星 / 收藏）就是最好的支持，下面两个按钮都能直达。'
     )
     $text.Text = ($lines -join "`r`n")
     $text.SelectionStart = 0
