@@ -57,12 +57,17 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 
 <br>
 
-<h3 align="center">Windows：一个菜单，两个窗口</h3>
-<p align="center">双击 BAT 出菜单：选 1 直接自检，选 3 弹关于窗、选 4 弹设置窗、选 5 只查更新。<br>
-窗口里的内容与安卓的「设置 / 关于」两屏一一对应，连 Star 引导都是同一句话。</p>
+<h3 align="center">Windows：控制台才是主程序</h3>
+<p align="center">双击「一键网络自检.bat」出菜单：选 1 直接开测，14 个点位逐条给结果；选 3 弹关于窗、选 4 弹设置窗、选 5 只查更新。<br>
+那两个窗口只是壳，主界面就是下面这张控制台 —— 真机跑出来的一次完整结果，长的那两行是连接失败时的原始异常信息。</p>
 
 <p align="center">
-  <img src="docs/img/ui-windows-about-device.png" width="430" alt="Windows 关于与开源信息窗口">
+  <img src="docs/img/ui-windows-console-device.png" width="100%" alt="Windows 控制台：跑完一次 14 个点位的完整结果">
+</p>
+<p align="center">
+  <sub>↑ 控制台主界面（选 1，跑完全部 14 个点位）</sub><br>
+  <img src="docs/img/ui-windows-about-device.png" width="380" alt="Windows 关于与开源信息窗口">
+  <br><sub>↑ 选 3 弹出的「关于与开源信息」窗，不是主界面</sub>
 </p>
 
 <br>
@@ -72,7 +77,8 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 | 安卓 · 主界面 | 标题区 + 环境标签 + 两个按钮 + 四张汇总卡 + 逐条结果卡（点一条展开细节） |
 | 安卓 · 设置页 | 界面语言 / 外观 / 报告保存位置 / 更新检查方式 / 更新源（自动默认 Gitee / 只用 Gitee / 只用 GitHub）/ 版本与检查更新 / 关于入口 |
 | 安卓 · 关于页 | 指导作者、开发（豆包工作任务的 Agent × DeepSeek-V4.1-Flash）、协议、两个地址、隐私、三条硬要求、维护节奏 |
-| Windows · 关于窗 | 同一份「关于与开源信息」文案，外加赞赏码与两个仓库的 Star 直达按钮 |
+| Windows · 控制台（主程序） | 选项 1：14 个点位逐条给出 DNS / TCP / TLS / HTTP 四段耗时，末尾汇总「可连通 X/14、平均建连、耗时、最快 / 最慢 / 不通」 |
+| Windows · 关于窗 | 选项 3 弹出：同一份「关于与开源信息」文案，外加赞赏码与两个仓库的 Star 直达按钮 |
 
 > 手机三张图拍摄于 v1.1.0.x（11 月 14 日），界面结构一直没变；目标数量后来加到 14 个、版本号走到 1.1.5.x，以你现在装的那版为准。
 > 关于窗那张是 v1.1.5.2 重拍的。
@@ -95,11 +101,14 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 </p>
 
 <p align="center">
-  <b>Windows</b> — one menu, two windows. Pick 1 to run the check, 3 for About, 4 for Settings, 5 to check for updates.<br>
-  The two windows mirror the Android Settings / About screens, down to the same Star prompt.
+  <b>Windows</b> — the console is the program; the windows are just shells. Run <code>一键网络自检.bat</code>,
+  pick 1 to start the check (14 endpoints), 3 for About, 4 for Settings, 5 to check for updates.
 </p>
 <p align="center">
-  <img src="docs/img/ui-windows-about-device.png" width="380" alt="Windows About window">
+  <img src="docs/img/ui-windows-console-device.png" width="100%" alt="Windows console: one full run over 14 endpoints">
+</p>
+<p align="center">
+  <img src="docs/img/ui-windows-about-device.png" width="340" alt="Windows About window (menu item 3)">
 </p>
 
 ---

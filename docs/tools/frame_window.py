@@ -125,16 +125,78 @@ def frame(shot_path: Path, out_path: Path) -> None:
     print(f"{out_path.name}  {canvas.size}")
 
 
+def frame_terminal(shot_path: Path, out_path: Path, title: str = "GitHub 网络自检 · 控制台",
+                   head_crop: int = 62, right_crop: int = 32, bottom_crop: int = 20) -> None:
+    """给终端截图套壳：裁掉终端自带的标签栏与滚动条，换成深色标题栏。"""
+    shot = Image.open(shot_path).convert("RGBA")
+    w, h = shot.size
+    shot = shot.crop((0, head_crop, w - right_crop, h - bottom_crop))
+    sw, sh = shot.size
+
+    BAR = 56
+    RADIUS = 14
+    ww, hh = sw + 2, sh + BAR
+    cw, ch = ww + PAD * 2, hh + PAD * 2
+    canvas = Image.new("RGBA", (cw, ch), (0, 0, 0, 0))
+
+    canvas.alpha_composite(shadow((ww, hh), RADIUS, 46, 80), (PAD - 4, PAD + 26))
+    canvas.alpha_composite(shadow((ww, hh), RADIUS, 16, 50), (PAD, PAD + 6))
+
+    card = Image.new("RGBA", (ww, hh), (0, 0, 0, 0))
+    ImageDraw.Draw(card).rounded_rectangle([0, 0, ww - 1, hh - 1], RADIUS, fill=(24, 26, 30, 255))
+    canvas.alpha_composite(card, (PAD, PAD))
+
+    bar = Image.new("RGBA", (ww, BAR), (0, 0, 0, 0))
+    bd = ImageDraw.Draw(bar)
+    bd.rounded_rectangle([0, 0, ww - 1, BAR + RADIUS], RADIUS, fill=(42, 45, 51, 255))
+    bd.rectangle([0, BAR - 1, ww - 1, BAR], fill=(60, 64, 72, 255))
+    canvas.alpha_composite(bar, (PAD, PAD))
+
+    f_title = load_font(18)
+    d = ImageDraw.Draw(canvas)
+    d.text((PAD + 20, PAD + 16), title, font=f_title, fill=(226, 230, 236, 255))
+
+    # 右侧三键（深色版配色）
+    bx = PAD + ww - 22
+    by = PAD + BAR // 2
+    d.line([bx - 34 - 11, by, bx - 34 + 11, by], fill=(150, 156, 166, 255), width=2)
+    d.rectangle([bx - 11 - 9, by - 9, bx - 11 + 9, by + 9], outline=(150, 156, 166, 255), width=2)
+    d.line([bx + 11 - 10, by - 10, bx + 11 + 10, by + 10], fill=(214, 108, 108, 255), width=2)
+    d.line([bx + 11 - 10, by + 10, bx + 11 + 10, by - 10], fill=(214, 108, 108, 255), width=2)
+
+    # 终端内容：底部两角跟窗口圆角一致
+    content = shot.copy()
+    mask = Image.new("L", (sw, sh), 255)
+    r2 = Image.new("L", (sw, RADIUS + 2), 0)
+    ImageDraw.Draw(r2).rounded_rectangle([0, 0, sw - 1, RADIUS * 2], RADIUS, fill=255)
+    mask.paste(r2, (0, sh - RADIUS - 2))
+    content.putalpha(mask)
+    canvas.alpha_composite(content, (PAD + 1, PAD + BAR))
+
+    d.rounded_rectangle([PAD, PAD, PAD + ww - 1, PAD + hh - 1], RADIUS, outline=(70, 74, 82, 255), width=1)
+
+    canvas.save(out_path)
+    print(f"{out_path.name}  {canvas.size}")
+
+
 def main() -> int:
     src = IMG / "raw-windows-about.png"
-    if not src.exists():
+    if src.exists():
+        frame(src, IMG / "ui-windows-about-device.png")
+    else:
         print("缺 raw-windows-about.png")
-        return 1
-    frame(src, IMG / "ui-windows-about-device.png")
+
+    con = IMG / "raw-windows-console.png"
+    if con.exists():
+        frame_terminal(con, IMG / "ui-windows-console-device.png")
+    else:
+        print("缺 raw-windows-console.png")
     return 0
 
 
 if __name__ == "__main__":
     sys.exit(main())
+
+
 
 
