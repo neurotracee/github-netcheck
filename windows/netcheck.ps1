@@ -223,18 +223,18 @@ function Show-AboutWindow {
     }
 
     $starTip = New-Object System.Windows.Forms.Label
-    $starTip.Text = '觉得好用？GitHub 和 Gitee 两个仓库都点个 Star（标星 / 收藏），就是对作者最大的支持。'
+    $starTip.Text = '两个都点一下最实在：GitHub 让外面的人搜得到，Gitee 让不翻墙的人打得开；只点一边，另一半人就找不到。不方便点一个也行，功能一个不少。'
     $starTip2 = New-Object System.Windows.Forms.Label
     $starTip2.Text = "愿意请我喝杯奶茶的话，左边这张码扫码即可——完全自愿，不打赏功能一个不少。"
     $starTip2.AutoSize = $false
     $starTip2.Size = New-Object System.Drawing.Size(380, 44)
     $starTip2.ForeColor = [System.Drawing.Color]::FromArgb(107, 119, 133)
-    $starTip2.Location = New-Object System.Drawing.Point(206, 600)
+    $starTip2.Location = New-Object System.Drawing.Point(206, 616)
     $form.Controls.Add($starTip2)
     $starTip.AutoSize = $false
-    $starTip.Size = New-Object System.Drawing.Size(380, 44)
+    $starTip.Size = New-Object System.Drawing.Size(386, 62)
     $starTip.ForeColor = [System.Drawing.Color]::FromArgb(107, 119, 133)
-    $starTip.Location = New-Object System.Drawing.Point(206, 556)
+    $starTip.Location = New-Object System.Drawing.Point(206, 546)
     $form.Controls.Add($starTip)
 
     $chkUpd = New-Object System.Windows.Forms.Button
