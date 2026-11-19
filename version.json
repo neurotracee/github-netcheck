@@ -6,9 +6,9 @@
     "apk": "https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.3/NetCheck-1.1.5.3.apk"
   },
   "windows": {
-    "version": "1.1.5.1",
+    "version": "1.1.5.2",
     "url": "https://github.com/neurotracee/github-netcheck/releases",
-    "apk": "https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.1/NetCheck-Windows.zip"
+    "apk": "https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.2/NetCheck-Windows.zip"
   },
   "updated": "2026-11-19"
 }

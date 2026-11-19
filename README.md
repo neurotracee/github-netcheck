@@ -37,13 +37,13 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 
 ## 下载（先点这里）
 
-**当前版本：安卓 v1.1.5.3 ・ Windows v1.1.5.1**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
+**当前版本：安卓 v1.1.5.3 ・ Windows v1.1.5.2**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
 
 | 你要的 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
 | 最新下载页 | https://github.com/neurotracee/github-netcheck/releases/latest | https://gitee.com/bio234/github-netcheck/releases/latest |
 | 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.3/NetCheck-1.1.5.3.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.5.3/NetCheck-1.1.5.3.apk |
-| Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.1/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.5.1/NetCheck-Windows.zip |
+| Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.2/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.5.2/NetCheck-Windows.zip |
 | 仓库首页 | https://github.com/neurotracee/github-netcheck | https://gitee.com/bio234/github-netcheck |
 
 解压 Windows 包后双击 **一键网络自检.bat**；APK 直接安装（系统会提示「未知来源」，原因见下一节）。
@@ -59,7 +59,7 @@ Gitee 的附件总容量只有 1GB，装不下所有历史包，所以安装包�
 
 | 版本档位 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
-| **最新版**（安卓 v1.1.5.3 的 APK、Windows v1.1.5.1 的 zip） | 保留附件 | **保留附件** |
+| **最新版**（安卓 v1.1.5.3 的 APK、Windows v1.1.5.2 的 zip） | 保留附件 | **保留附件** |
 | **上一版**（v1.1.5.1 的安卓 APK、v1.1.5.0 的 Windows zip） | 保留附件 | 保留附件（方便覆盖升级过渡） |
 | **更早的旧版本** | 保留全部附件 | **附件已撤下**，只留发布说明 |
 
@@ -115,31 +115,68 @@ apksigner verify -v --print-certs NetCheck-<版本号>.apk
 
 ## 界面
 
-安卓端三屏，**真机截图**（OPPO Find X6 Pro / Android 14，装的正是本版 APK；这张屏上的 7 / 11 是「只测 GitHub 系」跑出来的，
-hosts 里那 2 条本地映射把 GitHub Pages 顶成了 127.0.0.1，所以它报「不通」——这正是工具该发现的东西）。
-设置页是照 PDF 隐私打码工具那套「齿轮 → 设置 → 关于」的结构做的。
-下面的图都套了机身壳，脚本在 `docs/tools/frame_ui.py`，换了新截图重跑一遍即可。
+<h3 align="center">两端界面</h3>
 
 <p align="center">
-  <img src="docs/img/ui-android-main-device.png" width="300" alt="安卓主界面：跑完一次的结果">
-  <img src="docs/img/ui-android-settings-device.png" width="300" alt="安卓设置页">
-  <img src="docs/img/ui-android-about-device.png" width="300" alt="安卓关于页">
+  两端全部是真机截图，没有拼图、没有示意。图上看到的话术，就是程序里正在用的那一套。<br>
+  安卓界面内置中英双语（「设置 → 界面语言」，默认跟随系统）；Windows 端目前是中文界面。下面是中文版，英文说明见本节末尾。
 </p>
+
+<h3 align="center">安卓：跑完一次，结论一眼看完</h3>
+<p align="center">主界面 · 设置 · 关于。14 个点位逐条给出 DNS / TCP / TLS / HTTP 四段耗时，点一条展开细节。</p>
+
+<p align="center">
+  <img src="docs/img/ui-android-main-device.png" width="252" alt="安卓主界面：跑完一次的结果">
+  <img src="docs/img/ui-android-settings-device.png" width="252" alt="安卓设置页">
+  <img src="docs/img/ui-android-about-device.png" width="252" alt="安卓关于页">
+</p>
+
+<br>
+
+<h3 align="center">Windows：一个菜单，两个窗口</h3>
+<p align="center">双击 BAT 出菜单：选 1 直接自检，选 3 弹关于窗、选 4 弹设置窗、选 5 只查更新。<br>
+窗口里的内容与安卓的「设置 / 关于」两屏一一对应，连 Star 引导都是同一句话。</p>
+
+<p align="center">
+  <img src="docs/img/ui-windows-about-device.png" width="430" alt="Windows 关于与开源信息窗口">
+</p>
+
+<br>
 
 | 界面 | 说明 |
 | --- | --- |
-| 主界面 | 标题区 + 环境标签 + 两个按钮 + 四张汇总卡 + 逐条结果卡（点一条展开细节） |
-| 设置页 | 界面语言 / 外观 / 报告保存位置 / 更新检查方式 / 更新源（自动默认 Gitee / 只用 Gitee / 只用 GitHub）/ 版本与检查更新 / 关于入口 |
-| 关于页 | 指导作者、开发（豆包工作任务的 Agent × DeepSeek-V4.1-Flash）、协议、两个地址、隐私、三条硬要求、维护节奏 |
+| 安卓 · 主界面 | 标题区 + 环境标签 + 两个按钮 + 四张汇总卡 + 逐条结果卡（点一条展开细节） |
+| 安卓 · 设置页 | 界面语言 / 外观 / 报告保存位置 / 更新检查方式 / 更新源（自动默认 Gitee / 只用 Gitee / 只用 GitHub）/ 版本与检查更新 / 关于入口 |
+| 安卓 · 关于页 | 指导作者、开发（豆包工作任务的 Agent × DeepSeek-V4.1-Flash）、协议、两个地址、隐私、三条硬要求、维护节奏 |
+| Windows · 关于窗 | 同一份「关于与开源信息」文案，外加赞赏码与两个仓库的 Star 直达按钮 |
 
-> 三张图拍摄于 v1.1.0.x（11 月 14 日），界面结构一直没变；目标数量后来加到 14 个、版本号也走到 1.1.5.x，以你现在装的那版为准。
+> 手机三张图拍摄于 v1.1.0.x（11 月 14 日），界面结构一直没变；目标数量后来加到 14 个、版本号走到 1.1.5.x，以你现在装的那版为准。
+> 关于窗那张是 v1.1.5.2 重拍的。
+> 套壳脚本：手机 `docs/tools/frame_ui.py`（机身壳），Windows `docs/tools/frame_window.py`（窗口壳）；换新截图重跑一遍就行，不用手工修图。
 
-Windows 端是控制台 + 两个 WinForms 窗口：菜单式 BAT 选 `1` 直接自检，选 `3` 弹关于窗、选 `4` 弹设置窗、选 `5` 只查更新。
-窗口内容与安卓的「关于 / 设置」两屏一一对应（同一份文案，见 `windows/netcheck.ps1` 的 `Show-AboutWindow` / `Show-SettingsWindow`）。
+<h3 align="center">In English</h3>
 
-下面是这台机器上真实跑出来的关于窗（不是示意图，窗口边框是系统原生的，所以不用套壳）：
+<p align="center">
+  Everything above is a real-device screenshot — nothing is a mockup. The wording on screen is exactly the wording shipped in the app.<br>
+  The Android UI ships with a built-in Chinese/English switch (<i>Settings → Language</i>, defaults to the system language); the Windows build is Chinese-only for now.
+</p>
 
-![Windows 关于窗](docs/img/ui-windows-about.png)
+<p align="center">
+  <b>Android</b> — one run, all verdicts at a glance. 14 endpoints, each reported with DNS / TCP / TLS / HTTP timings; tap a row for details.
+</p>
+<p align="center">
+  <img src="docs/img/ui-android-main-device.png" width="230" alt="Android main screen">
+  <img src="docs/img/ui-android-settings-device.png" width="230" alt="Android settings">
+  <img src="docs/img/ui-android-about-device.png" width="230" alt="Android about">
+</p>
+
+<p align="center">
+  <b>Windows</b> — one menu, two windows. Pick 1 to run the check, 3 for About, 4 for Settings, 5 to check for updates.<br>
+  The two windows mirror the Android Settings / About screens, down to the same Star prompt.
+</p>
+<p align="center">
+  <img src="docs/img/ui-windows-about-device.png" width="380" alt="Windows About window">
+</p>
 
 ## 这个项目是谁做的
 

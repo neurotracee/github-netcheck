@@ -4,7 +4,7 @@
 #  测四项：DNS 解析 / TCP 建连 / TLS 握手 / HTTPS 首字节
 #  输出：控制台结果 + reports 目录下的 HTML 可视化报告
 #
-#  版本：1.1.3.4
+#  版本：1.1.5.2
 #  开源协议：Apache License 2.0
 #  原项目地址：https://github.com/neurotracee/github-netcheck
 #  镜像（Gitee）：https://gitee.com/bio234/github-netcheck
@@ -25,7 +25,7 @@ param(
     [switch]$CheckUpdate  # 只查最新版本号，不测
 )
 
-$script:AppVersion = '1.1.5.1'
+$script:AppVersion = '1.1.5.2'
 $script:ProjectUrl = 'https://github.com/neurotracee/github-netcheck'
 $script:MirrorUrl  = 'https://gitee.com/bio234/github-netcheck'
 
@@ -229,12 +229,12 @@ function Show-AboutWindow {
     $starTip2.AutoSize = $false
     $starTip2.Size = New-Object System.Drawing.Size(380, 44)
     $starTip2.ForeColor = [System.Drawing.Color]::FromArgb(107, 119, 133)
-    $starTip2.Location = New-Object System.Drawing.Point(206, 616)
+    $starTip2.Location = New-Object System.Drawing.Point(206, 546)
     $form.Controls.Add($starTip2)
     $starTip.AutoSize = $false
     $starTip.Size = New-Object System.Drawing.Size(386, 62)
     $starTip.ForeColor = [System.Drawing.Color]::FromArgb(107, 119, 133)
-    $starTip.Location = New-Object System.Drawing.Point(206, 546)
+    $starTip.Location = New-Object System.Drawing.Point(206, 606)
     $form.Controls.Add($starTip)
 
     $chkUpd = New-Object System.Windows.Forms.Button
@@ -657,31 +657,52 @@ function Compare-VersionText {
 
 function Get-RemoteVersion {
     param([string]$Source = 'gitee', [int]$TimeoutMs = 5000)
-    # 先读仓库里的 version.json —— 它按平台分别写版本号，单端更新不会误报到另一端
+    # 先读仓库里的 version.json —— 它按平台分别写版本号，单端更新不会误报到另一端。
+    # 注意：Gitee 的 raw 链接会 302 跳到 raw.giteeusercontent.com，手写的 TCP/TLS 请求不跟跳转，
+    # 所以这里必须走 Get-JsonText（HttpClient，自动跟随 3xx），否则永远读不到 JSON、
+    # 只能落到下面的兜底逻辑，反而更容易被源码归档带偏。
     if ($Source -eq 'github') {
-        $resp = Invoke-Https -HostName 'raw.githubusercontent.com' -Path '/neurotracee/github-netcheck/main/version.json' -TimeoutMs $TimeoutMs -Accept 'application/json'
+        $raw = Get-JsonText -Url 'https://raw.githubusercontent.com/neurotracee/github-netcheck/main/version.json' -TimeoutMs $TimeoutMs
     } else {
-        $resp = Invoke-Https -HostName 'gitee.com' -Path '/bio234/github-netcheck/raw/main/version.json' -TimeoutMs $TimeoutMs -Accept 'application/json'
+        $raw = Get-JsonText -Url 'https://gitee.com/bio234/github-netcheck/raw/main/version.json' -TimeoutMs $TimeoutMs
     }
-    if ($resp.Ok -and $resp.Body) {
-        $m = [regex]::Match($resp.Body, '"windows"\s*:\s*\{[^}]*"version"\s*:\s*"([^"]+)"')
-        if (-not $m.Success) { $m = [regex]::Match($resp.Body, '"windows"\s*:\s*\{[^}]*\}') }
-        if ($m.Success -and $m.Groups.Count -ge 2 -and $m.Groups[1].Value) { return $m.Groups[1].Value }
+    if ($raw) {
+        $m = [regex]::Match($raw, '"windows"\s*:\s*\{[^}]*"version"\s*:\s*"([^"]+)"')
+        if ($m.Success -and $m.Groups[1].Value) { return $m.Groups[1].Value }
     }
-    # 兜底：version.json 拿不到时才看 Release。只认本平台的 .zip 附件，
-    # 某一版只给安卓发过包时，对 Windows 等于没有更新，不再拿 tag 兜底误报。
-    if ($Source -eq 'github') {
-        $resp = Invoke-Https -HostName 'api.github.com' -Path '/repos/neurotracee/github-netcheck/releases/latest' -TimeoutMs $TimeoutMs -Accept 'application/vnd.github+json'
+
+    # 兜底：version.json 拿不到时才看发布列表。
+    # 只认「名字以 NetCheck 开头、以 .zip 结尾」的附件——那才是 Windows 安装包。
+    # 两个坑都在这儿：① 只给安卓发包的版本不算 Windows 的更新；
+    # ② Gitee / GitHub 给每个 tag 自动生成的源码归档叫 v1.1.5.3.zip，版本号也长得一样，
+    #    以前正是它被当成安装包，才让 Windows 端把安卓专属版本报成更新。
+    $listUrl = if ($Source -eq 'github') {
+        'https://api.github.com/repos/neurotracee/github-netcheck/releases?per_page=20'
     } else {
-        $resp = Invoke-Https -HostName 'gitee.com' -Path '/api/v5/repos/bio234/github-netcheck/releases/latest' -TimeoutMs $TimeoutMs -Accept 'application/json'
+        'https://gitee.com/api/v5/repos/bio234/github-netcheck/releases?per_page=20'
     }
-    if (-not $resp.Ok) { return $null }
-    $asset = [regex]::Match($resp.Body, '"name"\s*:\s*"([^"]*\.zip)"')
-    if (-not $asset.Success) { return $null }
-    $ver = [regex]::Match($asset.Groups[1].Value, '(\d+\.\d+\.\d+\.\d+)')
-    if ($ver.Success) { return $ver.Groups[1].Value }
-    $tag = [regex]::Match($resp.Body, '"tag_name"\s*:\s*"([^"]+)"')
-    if ($tag.Success) { return $tag.Groups[1].Value }
+    $accept = if ($Source -eq 'github') { 'application/vnd.github+json' } else { 'application/json' }
+    $raw = Get-JsonText -Url $listUrl -TimeoutMs $TimeoutMs -Accept $accept
+    if ([string]::IsNullOrWhiteSpace($raw)) { return $null }
+    $list = $null
+    try { $list = $raw | ConvertFrom-Json } catch { return $null }
+    if (-not $list) { return $null }
+    if ($list -isnot [array]) { $list = @($list) }
+    foreach ($rel in $list) {
+        if ($null -eq $rel) { continue }
+        $isDraft = $false; $isPre = $false
+        try { $isDraft = [bool]$rel.draft } catch { }
+        try { $isPre = [bool]$rel.prerelease } catch { }
+        if ($isDraft -or $isPre) { continue }
+        foreach ($a in @($rel.assets)) {
+            if ($null -eq $a) { continue }
+            $n = [string]$a.name
+            if ($n -notmatch '(?i)^NetCheck' -or $n -notmatch '(?i)\.zip$') { continue }
+            $ver = [regex]::Match($n, '\d+\.\d+\.\d+\.\d+')
+            if (-not $ver.Success) { $ver = [regex]::Match([string]$rel.tag_name, '\d+\.\d+\.\d+\.\d+') }
+            if ($ver.Success) { return $ver.Value }
+        }
+    }
     return $null
 }
 
@@ -792,8 +813,11 @@ function Get-ReleaseNotes {
         foreach ($a in @($rel.assets)) {
             if ($null -eq $a) { continue }
             $n = [string]$a.name
-            if ($n -notmatch '(?i)\.zip$') { continue }
+            # 只认官方 Windows 包（NetCheck 开头 + .zip）。tag 源码归档叫 v1.1.5.3.zip，
+            # 版本号一模一样，一旦认进来，安卓专属版本就会被当成 Windows 的更新。
+            if ($n -notmatch '(?i)^NetCheck' -or $n -notmatch '(?i)\.zip$') { continue }
             $m = [regex]::Match($n, '(\d+\.\d+\.\d+\.\d+)')
+            if (-not $m.Success) { $m = [regex]::Match([string]$rel.tag_name, '(\d+\.\d+\.\d+\.\d+)') }
             if ($m.Success) { $ver = $m.Groups[1].Value; break }
         }
         if (-not $ver) { continue }
