@@ -12,8 +12,9 @@
 > （https://gitee.com/bio234/github-netcheck），两边内容一致，不存在谁抄谁。
 >
 > 作者的另一项目：**PDF 隐私打码工具**（本地离线给 PDF 打码，不上传文件）——
-> GitHub https://github.com/neurotracee/pdf-privacy-masker ｜
-   Gitee https://gitee.com/bio234/pdf-privacy-masker 。
+
+> GitHub https://github.com/neurotracee/pdf-privacy-masker
+> Gitee https://gitee.com/bio234/pdf-privacy-masker 。
 > 那个项目用 AGPL-3.0，本项目用 Apache-2.0，协议不同，别混用。
 
 一个纯本地、零依赖的网络连通性自检工具，专门盯着**中国大陆能不能连上 GitHub 系服务**：**不代理、不加速、不改 hosts，只测量**。
