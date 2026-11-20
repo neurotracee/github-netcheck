@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>netcheck hero</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 2100px; height: 1182px; overflow: hidden;
+    font-family: "Microsoft YaHei", "Segoe UI", sans-serif;
+    color: #E8EEF5;
+    background: #070A0E;
+    background-image:
+      radial-gradient(1180px 720px at 76% 4%, rgba(52, 211, 153, .17), transparent 62%),
+      radial-gradient(900px 620px at 6% 96%, rgba(96, 165, 250, .10), transparent 66%),
+      linear-gradient(178deg, #0B1017 0%, #070A0E 62%, #06080B 100%);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .grid {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+    background-size: 60px 60px;
+    -webkit-mask-image: radial-gradient(ellipse 62% 58% at 50% 34%, #000 26%, transparent 76%);
+    mask-image: radial-gradient(ellipse 62% 58% at 50% 34%, #000 26%, transparent 76%);
+  }
+
+  .glow { position: absolute; border-radius: 999px; filter: blur(1px); }
+  .hair { position: absolute; left: 108px; right: 108px; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.10), transparent); }
+
+  /* ── 左上角标识 ───────────────────────────── */
+  .kicker {
+    position: absolute; left: 108px; top: 96px;
+    display: flex; align-items: center; gap: 14px;
+    font-size: 21px; letter-spacing: .32em; color: #34D399; font-weight: 700;
+  }
+  .kicker i {
+    width: 11px; height: 11px; border-radius: 3px; background: #34D399;
+    box-shadow: 0 0 18px rgba(52,211,153,.85);
+  }
+  .kicker span.plain { color: #6C7A89; letter-spacing: .18em; font-weight: 400; }
+
+  .title {
+    position: absolute; left: 104px; top: 148px;
+    font-size: 92px; line-height: 1.06; font-weight: 700; letter-spacing: -.5px;
+    background: linear-gradient(96deg, #FFFFFF 22%, #CFE9E0 66%, #9FD8C6 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .subtitle {
+    position: absolute; left: 108px; top: 286px; width: 760px;
+    font-size: 30px; line-height: 1.55; color: #9CA9B6;
+  }
+  .subtitle b { color: #D8E4EE; font-weight: 600; }
+
+  /* ── 要点 ─────────────────────────────────── */
+  .points { position: absolute; left: 108px; top: 472px; width: 740px; }
+  .pt { display: flex; gap: 20px; margin-bottom: 34px; }
+  .pt .bar {
+    width: 5px; border-radius: 4px; background: #34D399; flex: 0 0 auto;
+    box-shadow: 0 0 16px rgba(52,211,153,.55);
+  }
+  .pt .txt .h { font-size: 29px; font-weight: 600; color: #E9F0F6; line-height: 1.35; }
+  .pt .txt .d { font-size: 20px; color: #78868F; margin-top: 7px; line-height: 1.45; }
+
+  .ruler { position: absolute; left: 108px; top: 812px; width: 700px; }
+  .ruler .lab { font-size: 17px; color: #71808D; letter-spacing: .1em; margin-bottom: 12px; }
+  .bar-track { display: flex; height: 10px; border-radius: 6px; overflow: hidden; gap: 3px; }
+  .seg { height: 100%; border-radius: 3px; }
+  .s1 { width: 34%; background: linear-gradient(90deg, #22C55E, #34D399); }
+  .s2 { width: 26%; background: linear-gradient(90deg, #86C46A, #A9CE6E); }
+  .s3 { width: 22%; background: linear-gradient(90deg, #D6B25E, #E2C167); }
+  .s4 { width: 18%; background: linear-gradient(90deg, #B8755F, #C9846B); }
+  .ticks { display: flex; justify-content: space-between; margin-top: 10px; font-size: 16px; color: #6B7A87; }
+
+  /* ── 仓库地址 ─────────────────────────────── */
+  .repos { position: absolute; left: 108px; bottom: 96px; font-size: 20px; color: #6E7C89; line-height: 1.7; }
+  .repos b { color: #A9B8C5; font-weight: 500; }
+  .repos kbd {
+    font-family: "Segoe UI", sans-serif; font-size: 16px; color: #8FA0AE;
+    border: 1px solid rgba(255,255,255,.13); border-radius: 7px; padding: 3px 9px; margin-right: 10px;
+  }
+
+  /* ── 右侧主视觉 ──────────────────────────── */
+  .shot-win {
+    position: absolute; right: 208px; top: 286px; width: 994px;
+    border-radius: 16px; overflow: hidden;
+    box-shadow: 0 40px 90px rgba(0,0,0,.62), 0 0 0 1px rgba(255,255,255,.07),
+                0 0 70px rgba(52,211,153,.10);
+  }
+  .shot-win img { width: 100%; display: block; }
+
+  .shot-phone {
+    position: absolute; right: 118px; top: 398px; width: 366px;
+    border-radius: 26px; overflow: hidden;
+    box-shadow: 0 46px 96px rgba(0,0,0,.72), 0 0 0 1px rgba(255,255,255,.08),
+                0 0 60px rgba(52,211,153,.10);
+  }
+  .shot-phone img { width: 100%; display: block; }
+
+
+  .pill-ver {
+    position: absolute; right: 196px; top: 176px;
+    display: flex; align-items: center; gap: 14px;
+    padding: 11px 22px; border-radius: 999px;
+    background: rgba(255,255,255,.045); border: 1px solid rgba(255,255,255,.10);
+    font-size: 19px; color: #9FB0BE;
+  }
+  .pill-ver em { font-style: normal; color: #34D399; font-weight: 600; }
+
+  /* ── 右下角声明 ───────────────────────────── */
+  .credit {
+    position: absolute; right: 104px; bottom: 60px;
+    text-align: right; font-size: 15px; line-height: 1.75; color: rgba(226,236,244,.34);
+    letter-spacing: .02em;
+  }
+  .credit .l2 { color: rgba(226,236,244,.28); }
+</style>
+</head>
+<body>
+  <div class="grid"></div>
+
+  <div class="kicker">
+    <i></i>ON-DEVICE<span class="plain">·</span>NO UPLOAD
+  </div>
+
+  <div class="title">GitHub 网络自检</div>
+
+  <div class="subtitle">
+    14 个点位，<b>DNS / TCP / TLS / HTTP 四段分别计时</b>。<br>
+    卡在哪一段、慢在谁身上，一次自检就说清楚。
+  </div>
+
+  <div class="points">
+    <div class="pt">
+      <div class="bar"></div>
+      <div class="txt">
+        <div class="h">全部在本机跑完，不上传任何数据</div>
+        <div class="d">不打点、不埋数据、不接第三方统计</div>
+      </div>
+    </div>
+    <div class="pt">
+      <div class="bar"></div>
+      <div class="txt">
+        <div class="h">四段拆开计时，不是只给一个总耗时</div>
+        <div class="d">解析慢、握手慢、首字节慢，指向的原因完全不同</div>
+      </div>
+    </div>
+    <div class="pt">
+      <div class="bar"></div>
+      <div class="txt">
+        <div class="h">Windows 与安卓，同一份点位表、同一套评级</div>
+        <div class="d">两端结果可以直接对读，换设备不用换判断标准</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ruler">
+    <div class="lab">评级按 TCP 建连延迟</div>
+    <div class="bar-track">
+      <div class="seg s1"></div><div class="seg s2"></div>
+      <div class="seg s3"></div><div class="seg s4"></div>
+    </div>
+    <div class="ticks">
+      <span>≤120ms 优秀</span><span>≤400ms 良好</span><span>≤1000ms 一般</span><span>&gt;1000ms 较慢</span>
+    </div>
+  </div>
+
+  <div class="repos">
+    <div><kbd>主</kbd><b>github.com/neurotracee/github-netcheck</b></div>
+    <div><kbd>镜像</kbd><b>gitee.com/bio234/github-netcheck</b></div>
+  </div>
+
+  <div class="shot-win">
+    <img src="../img/ui-windows-console-device.png" alt="">
+  </div>
+
+  <div class="shot-phone">
+    <img src="../img/ui-android-main-device.png" alt="">
+  </div>
+
+  <div class="pill-ver">netcheck <em>v1.1.5.6</em></div>
+
+  <div class="credit">
+    <div class="l1">仅供创意，具体以实际为准；本图为 AI 生成</div>
+    <div class="l2">图面思路借鉴 DSH Go 项目</div>
+  </div>
+</body>
+</html>

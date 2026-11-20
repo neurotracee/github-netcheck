@@ -20,6 +20,14 @@
 
 一个纯本地、零依赖的网络连通性自检工具，专门盯着**中国大陆能不能连上 GitHub 系服务**：**不代理、不加速、不改 hosts，只测量**。
 
+<p align="center">
+  <img src="docs/img/hero.png" width="100%" alt="GitHub 网络自检：左边 Windows 控制台真实输出，右边安卓端真机截图，14 个点位、四段分别计时">
+</p>
+<p align="center">
+  <sub>↑ 主视觉设计图：构图、配色与文案是设计的；两侧画面分别是 Windows 控制台的真实输出和安卓端真机截图，界面内容没有改过。<br>
+  右下角的「仅供创意，具体以实际为准；本图为 AI 生成 / 图面思路借鉴 DSH Go 项目」是这张图自己的声明，不代表界面长成什么样——真实界面见下面的截图一节。</sub>
+</p>
+
 > **创建时间**：本项目创建于 **2026 年 11 月 14 日**，同日完成 Windows 端脚本、安卓端 APK 与两平台仓库（GitHub `neurotracee/github-netcheck`、Gitee `bio234/github-netcheck`）。
 
 > **关于名字**：本项目原名「网络连通性自检」，容易被理解成泛泛的测网速工具。它的实际用途是排查 GitHub（含 Pages、raw、
@@ -100,6 +108,10 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 <p align="center">
   Everything above is a real-device screenshot — nothing is a mockup. The wording on screen is exactly the wording shipped in the app.<br>
   The Android UI ships with a built-in Chinese/English switch (<i>Settings → Language</i>, defaults to the system language); the Windows build is Chinese-only for now.
+</p>
+
+<p align="center">
+  <sub>The hero image at the very top is a design composition, not a program output — the left panel is a real Windows console capture, the right one a real-device Android shot, both untouched. The credit line in its bottom-right corner (“仅供创意… AI 生成 / 思路借鉴 DSH Go 项目”) belongs to that artwork only.</sub>
 </p>
 
 <p align="center">
