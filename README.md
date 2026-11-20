@@ -58,12 +58,17 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 </p>
 
 <h3 align="center">安卓：跑完一次，结论一眼看完</h3>
-<p align="center">主界面 · 设置 · 关于。14 个点位逐条给出 DNS / TCP / TLS / HTTP 四段耗时，点一条展开细节。</p>
+<p align="center">主界面 · 结果 · 历史 · 历史详情。14 个点位逐条给出 DNS / TCP / TLS / HTTP 四段耗时，异常默认置顶，历史里能回看每一次。</p>
 
 <p align="center">
-  <img src="docs/img/ui-android-main-device.png" width="252" alt="安卓主界面：跑完一次的结果">
-  <img src="docs/img/ui-android-settings-device.png" width="252" alt="安卓设置页">
-  <img src="docs/img/ui-android-about-device.png" width="252" alt="安卓关于页">
+  <img src="docs/img/ui-android-main-device.png" width="196" alt="安卓主界面：中文浅色，待机状态，卡片式布局">
+  <img src="docs/img/ui-android-result-device.png" width="196" alt="安卓结果页：中文浅色，默认只列异常，可分严重 / 中等 / 轻微">
+  <img src="docs/img/ui-android-history-device.png" width="196" alt="安卓历史记录：中文浅色，保留最近 100 次，中途停止也会留档">
+  <img src="docs/img/ui-android-history-detail-device.png" width="196" alt="安卓历史详情：中文浅色，逐点位四段耗时">
+</p>
+<p align="center">
+  <sub>↑ 这四张都是中文浅色。深色版统一放在本节末尾的英文段——纯粹是两种语言各担一半截图任务，同一组界面不用重复出四张，不代表哪种语言只配哪种主题；两个语言、两种主题在应用里对所有人都是同样可选的。<br>
+  图中那两条「中途停止 · 已测 5/14」是截图时真的按了停止，不是摆拍。</sub>
 </p>
 
 <br>
@@ -123,15 +128,19 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 </p>
 
 <p align="center">
-  <b>Android</b> — one run, all verdicts at a glance. 14 endpoints, each reported with DNS / TCP / TLS / HTTP timings; tap a row for details.
+  <b>Android</b> — one run, all verdicts at a glance. 14 endpoints, each reported with DNS / TCP / TLS / HTTP timings. Issues come first; the run can be filtered by severity (severe / moderate / mild) with a tap or a horizontal swipe, and every run is kept in local history.
 </p>
 <p align="center">
-  <img src="docs/img/ui-android-main-en-dark-device.png" width="230" alt="Android main screen (English)">
-  <img src="docs/img/ui-android-settings-en-dark-device.png" width="230" alt="Android settings (English)">
-  <img src="docs/img/ui-android-about-en-dark-device.png" width="230" alt="Android about (English)">
+  <img src="docs/img/ui-android-main-en-dark-device.png" width="196" alt="Android main screen (English, dark)">
+  <img src="docs/img/ui-android-result-en-dark-device.png" width="196" alt="Android result screen (English, dark), issues listed by severity">
+  <img src="docs/img/ui-android-history-en-dark-device.png" width="196" alt="Android history list (English, dark), 100 most recent runs, interrupted runs included">
+  <img src="docs/img/ui-android-history-detail-en-dark-device.png" width="196" alt="Android history detail (English, dark), four-stage timings per endpoint">
 </p>
 <p align="center">
-  <sub>↑ English UI: main · settings · about, all shot in the dark theme (v1.1.5.5). Two leftovers visible here — the <code>Network 移动数据</code> pill and “未设置（每次走分享面板）” — are fixed in v1.1.5.6; shots to be retaken.</sub>
+  <sub>
+  ↑ The four English shots above are the <b>dark theme</b> set. This is only a division of labour between the two languages: the Chinese set above already shows light mode, so the dark-mode set is demonstrated in English instead of repeating the same four screens twice. It is not a statement about which language or which audience deserves which theme — the app ships both themes and both languages to everyone, chosen independently in <code>Settings → Language</code> and <code>Settings → Appearance</code>.<br>
+  Endpoint names stay in Chinese in these shots on purpose: switching the app language only changes the UI chrome, not the endpoint descriptions (the Settings screen says so).
+  </sub>
 </p>
 
 <p align="center">

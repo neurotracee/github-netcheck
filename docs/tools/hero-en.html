@@ -78,20 +78,16 @@
     padding: 3px 9px; margin-right: 10px; box-shadow: 0 1px 2px rgba(15,23,42,.05);
   }
 
-  /* status matrix card */
-  .matrix {
-    position: absolute; right: 562px; top: 322px; width: 540px;
-    background: #FFFFFF; border-radius: 18px; padding: 26px 28px 22px;
-    border: 1px solid rgba(15,23,42,.09);
-    box-shadow: 0 26px 56px rgba(15,23,42,.14), 0 2px 6px rgba(15,23,42,.06);
+  .shot-win {
+    position: absolute; right: 208px; top: 250px; width: 1010px;
+    border-radius: 16px; overflow: hidden;
+    box-shadow: 0 34px 74px rgba(15,23,42,.22), 0 0 0 1px rgba(15,23,42,.09),
+                0 2px 6px rgba(15,23,42,.08);
   }
-  .m-head { font-size: 21px; color: #33465B; font-weight: 600; margin-bottom: 18px; }
-  .m-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 9px; }
-  .cell { height: 46px; border-radius: 8px; }
-  .m-foot { margin-top: 18px; font-size: 16px; color: #8A99AB; letter-spacing: .04em; }
+  .shot-win img { width: 100%; display: block; }
 
   .shot-phone {
-    position: absolute; right: 156px; top: 268px; width: 366px;
+    position: absolute; right: 146px; top: 296px; width: 372px;
     filter: drop-shadow(0 22px 34px rgba(15,23,42,.30)) drop-shadow(0 2px 5px rgba(15,23,42,.12));
   }
   .shot-phone img { width: 100%; display: block; }
@@ -168,32 +164,15 @@
     <div><kbd>mirror</kbd><b>gitee.com/bio234/github-netcheck</b></div>
   </div>
 
-  <div class="matrix">
-    <div class="m-head">14 targets · 4 stages each</div>
-    <div class="m-grid">
-      <div class="cell" style="background:#10B981"></div>
-      <div class="cell" style="background:#10B981"></div>
-      <div class="cell" style="background:#34D399"></div>
-      <div class="cell" style="background:#10B981"></div>
-      <div class="cell" style="background:#7CC163"></div>
-      <div class="cell" style="background:#34D399"></div>
-      <div class="cell" style="background:#10B981"></div>
-      <div class="cell" style="background:#D6B25E"></div>
-      <div class="cell" style="background:#10B981"></div>
-      <div class="cell" style="background:#A5CE6C"></div>
-      <div class="cell" style="background:#10B981"></div>
-      <div class="cell" style="background:#C1664F"></div>
-      <div class="cell" style="background:#D6B25E"></div>
-      <div class="cell" style="background:#10B981"></div>
-    </div>
-    <div class="m-foot">DNS → TCP → TLS → HTTP</div>
+  <div class="shot-win">
+    <img src="../img/ui-windows-menu-device.png" alt="">
   </div>
 
   <div class="shot-phone">
-    <img src="../img/ui-android-main-en-light-device.png" alt="">
+    <img src="../img/ui-android-main-en-dark-device.png" alt="">
   </div>
 
-  <div class="pill-ver">netcheck <em>v1.1.5.6</em></div>
+  <div class="pill-ver">netcheck <em>v1.1.6.0</em></div>
 
   <div class="credit">
     <div class="l1">Creative work only — the actual product takes precedence. This image is AI-generated.</div>
