@@ -178,24 +178,24 @@ class HistoryStore(context: Context) {
 }
 
 /**
- * 时间写法：中文「2026年11月20日 下午 10:12:33」，英文「Nov 20, 2026 10:12 PM」。
- * 用 Calendar 判上午下午，避免 24 小时制那种机器味。
+ * 时间写法：中文「2026年11月20日 晚上 23:17:32」，英文「Nov 20, 2026 23:17:32」。
+ * 中文按 24 小时制写，前面带时段词（凌晨 / 上午 / 下午 / 晚上），读起来比纯数字更顺口。
  */
 fun historyTimeText(millis: Long, en: Boolean): String {
     val date = Date(millis)
     return if (en) {
-        SimpleDateFormat("MMM d, yyyy h:mm a", Locale.US).format(date)
+        SimpleDateFormat("MMM d, yyyy HH:mm:ss", Locale.US).format(date)
     } else {
         val cal = Calendar.getInstance().apply { time = date }
         val hour = cal.get(Calendar.HOUR_OF_DAY)
-        val half = if (hour < 12) "上午" else "下午"
-        val h12 = when {
-            hour == 0 -> 12
-            hour > 12 -> hour - 12
-            else -> hour
+        val half = when {
+            hour < 6 -> "凌晨"
+            hour < 12 -> "上午"
+            hour < 18 -> "下午"
+            else -> "晚上"
         }
         val body = SimpleDateFormat("yyyy年M月d日", Locale.CHINA).format(date)
-        val clock = SimpleDateFormat("mm:ss", Locale.CHINA).format(date)
-        "$body $half $h12:$clock"
+        val clock = SimpleDateFormat("HH:mm:ss", Locale.CHINA).format(date)
+        "$body $half $clock"
     }
 }
