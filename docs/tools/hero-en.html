@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>netcheck hero (EN)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 2100px; height: 1182px; overflow: hidden;
+    font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+    color: #0B1220;
+    background: #F5F8FB;
+    background-image:
+      radial-gradient(1100px 700px at 82% 2%, rgba(16, 185, 129, .13), transparent 62%),
+      radial-gradient(860px 600px at 4% 98%, rgba(59, 130, 246, .09), transparent 66%),
+      linear-gradient(178deg, #FBFCFF 0%, #F3F7FB 58%, #ECF2F8 100%);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .grid {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(15,23,42,.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(15,23,42,.055) 1px, transparent 1px);
+    background-size: 60px 60px;
+    -webkit-mask-image: radial-gradient(ellipse 66% 62% at 50% 32%, #000 22%, transparent 78%);
+    mask-image: radial-gradient(ellipse 66% 62% at 50% 32%, #000 22%, transparent 78%);
+  }
+
+  .kicker {
+    position: absolute; left: 108px; top: 96px;
+    display: flex; align-items: center; gap: 14px;
+    font-size: 21px; letter-spacing: .28em; color: #0B9E74; font-weight: 700;
+  }
+  .kicker i {
+    width: 11px; height: 11px; border-radius: 3px; background: #10B981;
+    box-shadow: 0 0 16px rgba(16,185,129,.65);
+  }
+  .kicker span.plain { color: #94A3B8; letter-spacing: .16em; font-weight: 400; }
+
+  .title {
+    position: absolute; left: 104px; top: 150px; width: 900px;
+    font-size: 74px; line-height: 1.08; font-weight: 700; letter-spacing: -1.2px;
+    background: linear-gradient(96deg, #0A101C 24%, #11332B 68%, #0F6B54 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .subtitle {
+    position: absolute; left: 108px; top: 246px; width: 800px;
+    font-size: 29px; line-height: 1.55; color: #5B6B7C;
+  }
+  .subtitle b { color: #101A28; font-weight: 600; }
+
+  .points { position: absolute; left: 108px; top: 396px; width: 810px; }
+  .pt { display: flex; gap: 20px; margin-bottom: 30px; }
+  .pt .bar {
+    width: 5px; border-radius: 4px; background: #0FA97A; flex: 0 0 auto;
+    box-shadow: 0 0 14px rgba(16,185,129,.35);
+  }
+  .pt .txt .h { font-size: 27px; font-weight: 600; color: #16202E; line-height: 1.35; }
+  .pt .txt .d { font-size: 19px; color: #77869A; margin-top: 6px; line-height: 1.45; }
+
+  .ruler { position: absolute; left: 108px; top: 792px; width: 720px; }
+  .ruler .lab { font-size: 17px; color: #8291A5; letter-spacing: .1em; margin-bottom: 12px; }
+  .bar-track { display: flex; height: 10px; border-radius: 6px; overflow: hidden; gap: 3px; }
+  .seg { height: 100%; border-radius: 3px; }
+  .s1 { width: 34%; background: linear-gradient(90deg, #10B981, #34D399); }
+  .s2 { width: 26%; background: linear-gradient(90deg, #7CC163, #A5CE6C); }
+  .s3 { width: 22%; background: linear-gradient(90deg, #D6B25E, #E2C167); }
+  .s4 { width: 18%; background: linear-gradient(90deg, #C1664F, #D3795D); }
+  .ticks { display: flex; justify-content: space-between; margin-top: 10px; font-size: 16px; color: #7D8C9E; }
+
+  .repos { position: absolute; left: 108px; bottom: 150px; font-size: 19px; color: #6E7D90; line-height: 1.72; }
+  .repos b { color: #33465B; font-weight: 500; }
+  .repos kbd {
+    font-family: "Segoe UI", sans-serif; font-size: 15px; color: #5C6E83;
+    background: #FFFFFF; border: 1px solid rgba(15,23,42,.12); border-radius: 7px;
+    padding: 3px 9px; margin-right: 10px; box-shadow: 0 1px 2px rgba(15,23,42,.05);
+  }
+
+  /* status matrix card */
+  .matrix {
+    position: absolute; right: 562px; top: 322px; width: 540px;
+    background: #FFFFFF; border-radius: 18px; padding: 26px 28px 22px;
+    border: 1px solid rgba(15,23,42,.09);
+    box-shadow: 0 26px 56px rgba(15,23,42,.14), 0 2px 6px rgba(15,23,42,.06);
+  }
+  .m-head { font-size: 21px; color: #33465B; font-weight: 600; margin-bottom: 18px; }
+  .m-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 9px; }
+  .cell { height: 46px; border-radius: 8px; }
+  .m-foot { margin-top: 18px; font-size: 16px; color: #8A99AB; letter-spacing: .04em; }
+
+  .shot-phone {
+    position: absolute; right: 156px; top: 268px; width: 366px;
+    filter: drop-shadow(0 22px 34px rgba(15,23,42,.30)) drop-shadow(0 2px 5px rgba(15,23,42,.12));
+  }
+  .shot-phone img { width: 100%; display: block; }
+
+  .pill-ver {
+    position: absolute; right: 196px; top: 168px;
+    display: flex; align-items: center; gap: 14px;
+    padding: 11px 22px; border-radius: 999px;
+    background: rgba(255,255,255,.85); border: 1px solid rgba(15,23,42,.10);
+    box-shadow: 0 3px 10px rgba(15,23,42,.06);
+    font-size: 19px; color: #4B5D72;
+  }
+  .pill-ver em { font-style: normal; color: #0B9E74; font-weight: 600; }
+
+  .credit {
+    position: absolute; right: 104px; bottom: 150px;
+    text-align: right; font-size: 15px; line-height: 1.82; color: rgba(41,56,74,.40);
+  }
+  .credit .l2 { color: rgba(41,56,74,.34); }
+  .credit b { font-weight: 500; color: rgba(41,56,74,.48); }
+</style>
+</head>
+<body>
+  <div class="grid"></div>
+
+  <div class="kicker">
+    <i></i>ON-DEVICE<span class="plain">·</span>NO UPLOAD
+  </div>
+
+  <div class="title">GitHub Network Check</div>
+
+  <div class="subtitle">
+    14 endpoints, <b>DNS / TCP / TLS / HTTP timed separately</b>.<br>
+    One run tells you which stage stalls — and who stalled it.
+  </div>
+
+  <div class="points">
+    <div class="pt">
+      <div class="bar"></div>
+      <div class="txt">
+        <div class="h">Runs entirely on your device. Nothing is uploaded.</div>
+        <div class="d">No telemetry, no analytics, no third-party calls.</div>
+      </div>
+    </div>
+    <div class="pt">
+      <div class="bar"></div>
+      <div class="txt">
+        <div class="h">Four stages timed separately, not one total.</div>
+        <div class="d">Slow resolve, slow handshake and slow first byte point to different causes.</div>
+      </div>
+    </div>
+    <div class="pt">
+      <div class="bar"></div>
+      <div class="txt">
+        <div class="h">Windows and Android share one target list, one grading scale.</div>
+        <div class="d">Results from both devices are directly comparable.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ruler">
+    <div class="lab">GRADED BY TCP CONNECT TIME</div>
+    <div class="bar-track">
+      <div class="seg s1"></div><div class="seg s2"></div>
+      <div class="seg s3"></div><div class="seg s4"></div>
+    </div>
+    <div class="ticks">
+      <span>≤120ms excellent</span><span>≤400ms good</span><span>≤1000ms fair</span><span>&gt;1000ms slow</span>
+    </div>
+  </div>
+
+  <div class="repos">
+    <div><kbd>primary</kbd><b>github.com/neurotracee/github-netcheck</b></div>
+    <div><kbd>mirror</kbd><b>gitee.com/bio234/github-netcheck</b></div>
+  </div>
+
+  <div class="matrix">
+    <div class="m-head">14 targets · 4 stages each</div>
+    <div class="m-grid">
+      <div class="cell" style="background:#10B981"></div>
+      <div class="cell" style="background:#10B981"></div>
+      <div class="cell" style="background:#34D399"></div>
+      <div class="cell" style="background:#10B981"></div>
+      <div class="cell" style="background:#7CC163"></div>
+      <div class="cell" style="background:#34D399"></div>
+      <div class="cell" style="background:#10B981"></div>
+      <div class="cell" style="background:#D6B25E"></div>
+      <div class="cell" style="background:#10B981"></div>
+      <div class="cell" style="background:#A5CE6C"></div>
+      <div class="cell" style="background:#10B981"></div>
+      <div class="cell" style="background:#C1664F"></div>
+      <div class="cell" style="background:#D6B25E"></div>
+      <div class="cell" style="background:#10B981"></div>
+    </div>
+    <div class="m-foot">DNS → TCP → TLS → HTTP</div>
+  </div>
+
+  <div class="shot-phone">
+    <img src="../img/ui-android-main-en-light-device.png" alt="">
+  </div>
+
+  <div class="pill-ver">netcheck <em>v1.1.5.6</em></div>
+
+  <div class="credit">
+    <div class="l1">Creative work only — the actual product takes precedence. This image is AI-generated.</div>
+    <div class="l2">Design direction borrowed from the DSH Go project (see GitHub: <b>ccch1mneyyy/dsh-go</b>)</div>
+  </div>
+</body>
+</html>
