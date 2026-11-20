@@ -54,7 +54,7 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 
 <p align="center">
   两端全部是真机截图，没有拼图、没有示意。图上看到的话术，就是程序里正在用的那一套。<br>
-  安卓界面内置中英双语（「设置 → 界面语言」，默认跟随系统）；Windows 端目前是中文界面。下面是中文版，英文说明见本节末尾。
+  安卓界面内置中英双语（「设置 → 界面语言」，默认跟随系统）；Windows 端目前是中文界面。下面是中文界面，英文界面截图和英文说明统一放在本文最后的英文段。
 </p>
 
 <h3 align="center">安卓：跑完一次，结论一眼看完</h3>
@@ -97,82 +97,32 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 
 | 界面 | 说明 |
 | --- | --- |
-| 安卓 · 主界面 | 标题区 + 环境标签 + 两个按钮 + 四张汇总卡 + 逐条结果卡（点一条展开细节） |
+| 安卓 · 主界面 | 标题区 + 点位数胶囊 + 齿轮入口；主卡显示当前状态与「开始自检」；下面两张信息卡说明当前网络与本地 hosts |
+| 安卓 · 结果页 | 汇总卡 + 「导出报告 / 分享 CSV」；默认只列异常，顶部「异常 / 正常」可点可滑，异常内再分「严重 / 中等 / 轻微」 |
+| 安卓 · 历史记录 | 顶部「全部 / 正常 / 异常」按次数筛，异常内再三档；每条记录写清时间和结果，中途停止的标「未测完」 |
+| 安卓 · 历史详情 | 单次结果，逐点位四段耗时，可在「全部 / 异常」之间切 |
 | 安卓 · 设置页 | 界面语言 / 外观 / 报告保存位置 / 更新检查方式 / 更新源（自动默认 Gitee / 只用 Gitee / 只用 GitHub）/ 版本与检查更新 / 关于入口 |
-| 安卓 · 关于页 | 指导作者、开发（豆包工作任务的 Agent × DeepSeek-V4.1-Flash）、协议、两个地址、隐私、三条硬要求、维护节奏 |
+| 安卓 · 关于页 | 指导作者、开发（豆包工作任务的 Agent × DeepSeek-V4.1-Flash）、协议、两个地址、隐私、三条硬要求、测试方法、维护节奏 |
 | Windows · 菜单页（入口） | 双击 .bat 立刻出现：标题区 + 作者 / 开发 / 协议 / 两个地址 + `[1]`–`[5]` 五项 + `[0]` 退出 +「请选择：」 |
 | Windows · 控制台（选 1 的结果） | 14 个点位逐条给出 DNS / TCP / TLS / HTTP 四段耗时，末尾汇总「可连通 X/14、平均建连、耗时、最快 / 最慢 / 不通」 |
 | Windows · 关于窗 | 选项 3 弹出：同一份「关于与开源信息」文案，外加赞赏码与两个仓库的 Star 直达按钮 |
 
-> 手机图拍摄于 v1.1.5.5（11 月 19 日）：中文三张与英文三张都是深色主题，各自成套。英文图里那两处中文（`Network 移动数据`、设置页「未设置」）已在 v1.1.5.6 修掉，图还没重拍。
+> 手机图是 v1.1.6.0 真机重拍的（11 月 20 日）：中文四张浅色、英文四张深色。之所以一浅一深，只是两种语言各担一半截图任务，不是给哪种语言配哪种主题——应用里语言和主题都能各自单独选，理由在文末英文段里也写了一遍。
+> 设置页与关于页暂时沿用旧图（功能未改，但关于页版本号仍是 1.1.5.5，且缺新增的「测试方法」段落），后面补拍。
 > 关于窗那张是 v1.1.5.2 重拍的；控制台菜单页是 v1.1.5.2 刚截的（双击 .bat 的原样）。
 > 套壳脚本：手机 `docs/tools/frame_ui.py`（机身壳，批量用 `frame_batch.py`），Windows `docs/tools/frame_window.py`（窗口壳）；换新截图重跑一遍就行，不用手工修图。
-
-<h3 align="center">In English</h3>
-
-<p align="center">
-  Everything above is a real-device screenshot — nothing is a mockup. The wording on screen is exactly the wording shipped in the app.<br>
-  The Android UI ships with a built-in Chinese/English switch (<i>Settings → Language</i>, defaults to the system language); the Windows build is Chinese-only for now.
-</p>
-
-<p align="center">
-  <sub>The hero image at the very top is a design composition, not a program output — the left panel is a real Windows console capture, the right one a real-device Android shot, both untouched. The credit line in its bottom-right corner (“仅供创意… AI 生成 / 思路借鉴 DSH Go 项目”) belongs to that artwork only.</sub>
-</p>
-
-<p align="center">
-  <img src="docs/img/hero-en.png" width="100%" alt="GitHub Network Check: real Windows console output on the left, Android device on the right, 14 endpoints with four stages timed separately">
-</p>
-<p align="center">
-  <sub>↑ English hero artwork. The layout, colours and copy are designed; both panels are real captures, unedited.<br>
-  The two credit lines in the bottom-right corner (“Creative work only … AI-generated” and “Design direction borrowed from the DSH Go project, see GitHub: ccch1mneyyy/dsh-go”) belong to this artwork only — the actual UI is in the screenshots section below.</sub>
-</p>
-
-<p align="center">
-  <b>Android</b> — one run, all verdicts at a glance. 14 endpoints, each reported with DNS / TCP / TLS / HTTP timings. Issues come first; the run can be filtered by severity (severe / moderate / mild) with a tap or a horizontal swipe, and every run is kept in local history.
-</p>
-<p align="center">
-  <img src="docs/img/ui-android-main-en-dark-device.png" width="196" alt="Android main screen (English, dark)">
-  <img src="docs/img/ui-android-result-en-dark-device.png" width="196" alt="Android result screen (English, dark), issues listed by severity">
-  <img src="docs/img/ui-android-history-en-dark-device.png" width="196" alt="Android history list (English, dark), 100 most recent runs, interrupted runs included">
-  <img src="docs/img/ui-android-history-detail-en-dark-device.png" width="196" alt="Android history detail (English, dark), four-stage timings per endpoint">
-</p>
-<p align="center">
-  <sub>
-  ↑ The four English shots above are the <b>dark theme</b> set. This is only a division of labour between the two languages: the Chinese set above already shows light mode, so the dark-mode set is demonstrated in English instead of repeating the same four screens twice. It is not a statement about which language or which audience deserves which theme — the app ships both themes and both languages to everyone, chosen independently in <code>Settings → Language</code> and <code>Settings → Appearance</code>.<br>
-  Endpoint names stay in Chinese in these shots on purpose: switching the app language only changes the UI chrome, not the endpoint descriptions (the Settings screen says so).
-  </sub>
-</p>
-
-<p align="center">
-  <b>Windows</b> — the console is the program; the windows are just shells. Run <code>一键网络自检.bat</code> and
-  the menu below comes up first: type a number to pick a feature (1 check, 2 GitHub-only, 3 About, 4 Settings, 5 update check, 0 quit).
-</p>
-<p align="center">
-  <img src="docs/img/ui-windows-menu-device.png" width="100%" alt="Windows console: the menu you get on launch, before anything runs">
-</p>
-<p align="center">
-  <sub>↑ before running: title, author and both repo links on top, then the numbered menu and a “请选择:” prompt</sub>
-</p>
-<p align="center">
-  <img src="docs/img/ui-windows-console-device.png" width="100%" alt="Windows console: one full run over 14 endpoints">
-</p>
-<p align="center">
-  <sub>↑ after running: choice 1, all 14 endpoints. Those two long lines are raw connection-failure exceptions, left unedited</sub>
-</p>
-<p align="center">
-  <img src="docs/img/ui-windows-about-device.png" width="340" alt="Windows About window (menu item 3)">
-</p>
+> 英文界面的截图统一放在本文最后（英文段内的 Screenshots 一节），不在这里和中文图混排。
 
 ---
 
 ## 下载（先点这里）
 
-**当前版本：安卓 v1.1.5.6 ・ Windows v1.1.5.2**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
+**当前版本：安卓 v1.1.6.1 ・ Windows v1.1.5.2**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
 
 | 你要的 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
 | 最新下载页 | https://github.com/neurotracee/github-netcheck/releases/latest | https://gitee.com/bio234/github-netcheck/releases/latest |
-| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.6/NetCheck-1.1.5.6.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.5.6/NetCheck-1.1.5.6.apk |
+| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.6.1/NetCheck-1.1.6.1.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.6.1/NetCheck-1.1.6.1.apk |
 | Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.2/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.5.2/NetCheck-Windows.zip |
 | 仓库首页 | https://github.com/neurotracee/github-netcheck | https://gitee.com/bio234/github-netcheck |
 
@@ -189,8 +139,8 @@ Gitee 的附件总容量只有 1GB，装不下所有历史包，所以安装包�
 
 | 版本档位 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
-| **最新版**（安卓 v1.1.5.6 的 APK、Windows v1.1.5.2 的 zip） | 保留附件 | **保留附件** |
-| **上一版**（v1.1.5.5 的安卓 APK、v1.1.5.1 的 Windows zip） | 保留附件 | 保留附件（方便覆盖升级过渡） |
+| **最新版**（安卓 v1.1.6.1 的 APK、Windows v1.1.5.2 的 zip） | 保留附件 | **保留附件** |
+| **上一版**（v1.1.6.0 的安卓 APK、v1.1.5.1 的 Windows zip） | 保留附件 | 保留附件（方便覆盖升级过渡） |
 | **更早的旧版本** | 保留全部附件 | **附件已撤下**，只留发布说明 |
 
 也就是说：**最新版和上一版的 Windows 包、安卓包在 Gitee 都能下**；只有更早的旧版本才需要到 GitHub 发布页找。
@@ -703,8 +653,6 @@ limitations under the License.
 
 ---
 
----
-
 # NetCheck — GitHub Network Self-Check
 
 [中文](#github-网络自检) | **English**
@@ -747,3 +695,65 @@ Attribution and project-URL requirements are described in [ADDITIONAL-TERMS.md](
 **Permissions (Android):** `INTERNET`, `ACCESS_NETWORK_STATE` and `REQUEST_INSTALL_PACKAGES` (the last one only hands a downloaded APK to the system installer on update) — no storage, no contacts, no telemetry.
 
 **Release assets on the mirror.** Gitee's attachment quota is limited to 1 GB, so the mirror keeps only the latest release and the previous release (both APK and Windows zip). Older installers were removed from Gitee and remain on GitHub: https://github.com/neurotracee/github-netcheck/releases . The latest Windows package is always available on Gitee too — only older versions moved to GitHub.
+
+**Download.** Android APK `v1.1.6.1` — [GitHub](https://github.com/neurotracee/github-netcheck/releases/download/v1.1.6.1/NetCheck-1.1.6.1.apk) ｜ [Gitee mirror](https://gitee.com/bio234/github-netcheck/releases/download/v1.1.6.1/NetCheck-1.1.6.1.apk).
+Windows package `v1.1.5.2` — [GitHub](https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.2/NetCheck-Windows.zip) ｜ [Gitee mirror](https://gitee.com/bio234/github-netcheck/releases/download/v1.1.5.2/NetCheck-Windows.zip).
+All releases: [GitHub](https://github.com/neurotracee/github-netcheck/releases/latest) ｜ [Gitee](https://gitee.com/bio234/github-netcheck/releases/latest).
+
+---
+
+## Screenshots
+
+<p align="center">
+  Every screenshot in this section is a real-device capture — nothing is a mockup, and the wording on screen is exactly the wording shipped in the app.<br>
+  The Chinese UI shots are the light-theme set and live in the Chinese section above; the English ones here are the dark-theme set. Same app, same build — language and theme are two independent settings.<br>
+  The Android UI ships with a built-in Chinese/English switch (<i>Settings → Language</i>, defaults to the system language); the Windows build is Chinese-only for now.
+</p>
+
+<p align="center">
+  <sub>The hero image at the very top is a design composition, not a program output — the left panel is a real Windows console capture, the right one a real-device Android shot, both untouched. The credit line in its bottom-right corner (“仅供创意… AI 生成 / 思路借鉴 DSH Go 项目”) belongs to that artwork only.</sub>
+</p>
+
+<p align="center">
+  <img src="docs/img/hero-en.png" width="100%" alt="GitHub Network Check: real Windows console output on the left, Android device on the right, 14 endpoints with four stages timed separately">
+</p>
+<p align="center">
+  <sub>↑ English hero artwork. The layout, colours and copy are designed; both panels are real captures, unedited.<br>
+  The two credit lines in the bottom-right corner (“Creative work only … AI-generated” and “Design direction borrowed from the DSH Go project, see GitHub: ccch1mneyyy/dsh-go”) belong to this artwork only — the actual UI is in the screenshots section below.</sub>
+</p>
+
+<p align="center">
+  <b>Android</b> — one run, all verdicts at a glance. 14 endpoints, each reported with DNS / TCP / TLS / HTTP timings. Issues come first; the run can be filtered by severity (severe / moderate / mild) with a tap or a horizontal swipe, and every run is kept in local history.
+</p>
+<p align="center">
+  <img src="docs/img/ui-android-main-en-dark-device.png" width="196" alt="Android main screen (English, dark)">
+  <img src="docs/img/ui-android-result-en-dark-device.png" width="196" alt="Android result screen (English, dark), issues listed by severity">
+  <img src="docs/img/ui-android-history-en-dark-device.png" width="196" alt="Android history list (English, dark), 100 most recent runs, interrupted runs included">
+  <img src="docs/img/ui-android-history-detail-en-dark-device.png" width="196" alt="Android history detail (English, dark), four-stage timings per endpoint">
+</p>
+<p align="center">
+  <sub>
+  ↑ The four English shots above are the <b>dark theme</b> set. This is only a division of labour between the two languages: the Chinese set above already shows light mode, so the dark-mode set is demonstrated in English instead of repeating the same four screens twice. It is not a statement about which language or which audience deserves which theme — the app ships both themes and both languages to everyone, chosen independently in <code>Settings → Language</code> and <code>Settings → Appearance</code>.<br>
+  Endpoint names stay in Chinese in these shots on purpose: switching the app language only changes the UI chrome, not the endpoint descriptions (the Settings screen says so).
+  </sub>
+</p>
+
+<p align="center">
+  <b>Windows</b> — the console is the program; the windows are just shells. Run <code>一键网络自检.bat</code> and
+  the menu below comes up first: type a number to pick a feature (1 check, 2 GitHub-only, 3 About, 4 Settings, 5 update check, 0 quit).
+</p>
+<p align="center">
+  <img src="docs/img/ui-windows-menu-device.png" width="100%" alt="Windows console: the menu you get on launch, before anything runs">
+</p>
+<p align="center">
+  <sub>↑ before running: title, author and both repo links on top, then the numbered menu and a “请选择:” prompt</sub>
+</p>
+<p align="center">
+  <img src="docs/img/ui-windows-console-device.png" width="100%" alt="Windows console: one full run over 14 endpoints">
+</p>
+<p align="center">
+  <sub>↑ after running: choice 1, all 14 endpoints. Those two long lines are raw connection-failure exceptions, left unedited</sub>
+</p>
+<p align="center">
+  <img src="docs/img/ui-windows-about-device.png" width="340" alt="Windows About window (menu item 3)">
+</p>
