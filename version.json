@@ -1,14 +1,14 @@
 {
   "_comment": "按平台分开的版本号。只改你要发的那个平台，另一端的更新检查不会误报。apk 字段是安装包直链，弹窗点「下载新版本」直接落文件。",
   "android": {
-    "version": "1.1.5.6",
+    "version": "1.1.6.0",
     "url": "https://github.com/neurotracee/github-netcheck/releases",
-    "apk": "https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.6/NetCheck-1.1.5.6.apk"
+    "apk": "https://github.com/neurotracee/github-netcheck/releases/download/v1.1.6.0/NetCheck-1.1.6.0.apk"
   },
   "windows": {
     "version": "1.1.5.2",
     "url": "https://github.com/neurotracee/github-netcheck/releases",
     "apk": "https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.2/NetCheck-Windows.zip"
   },
-  "updated": "2026-11-19"
+  "updated": "2026-11-20"
 }

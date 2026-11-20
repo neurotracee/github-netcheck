@@ -311,7 +311,22 @@ fun AboutSheet(versionName: String, onDismiss: () -> Unit, onToast: (String) -> 
                     "An offline network reachability checker: Windows script + Android APK, same targets and grading."),
                 fontSize = 12.5.sp, color = p.sub, lineHeight = 20.sp
             )
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(14.dp))
+            Text(t("测试方法", "How it measures"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = p.ink)
+            Spacer(Modifier.height(6.dp))
+            Text(
+                t("每个点位按四段分别计时：DNS 解析 → TCP 443 建连 → TLS 握手 → 发送 HTTP 请求测首字节。\n"
+                        + "评级按 TCP 建连延迟：≤120ms 优秀，≤400ms 良好，≤1000ms 一般，>1000ms 较慢，失败为不通。\n"
+                        + "DoH 对照用阿里公共 DNS 的加密查询，用来发现 hosts 改写或 DNS 污染。",
+                    "Each endpoint is timed in four separate stages: DNS lookup → TCP connect to 443 → TLS handshake "
+                            + "→ HTTP request for first byte.\n"
+                            + "Graded by TCP connect time: ≤120ms excellent, ≤400ms good, ≤1000ms fair, >1000ms slow, "
+                            + "failure means unreachable.\n"
+                            + "The DoH column queries Ali public DNS over HTTPS, to expose hosts rewrites or DNS poisoning."),
+                fontSize = 12.sp, color = p.sub, lineHeight = 19.sp
+            )
+
+            Spacer(Modifier.height(14.dp))
             Box(Modifier.fillMaxWidth().height(1.dp).background(p.line))
             Spacer(Modifier.height(12.dp))
 

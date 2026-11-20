@@ -8,6 +8,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.neurotracee.netcheck.data.HistoryEntry
+import com.neurotracee.netcheck.data.HistoryStore
 import com.neurotracee.netcheck.data.ReportStore
 import com.neurotracee.netcheck.model.NetEnv
 import com.neurotracee.netcheck.model.RunResult
@@ -28,8 +30,11 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     private val envReader = NetEnvReader(app)
     private val store = ReportStore(app)
+    private val historyStore = HistoryStore(app)
     private val main = Handler(Looper.getMainLooper())
     private var job: Job? = null
+    private var checkerRef: Checker? = null
+    private var runId = 0
     private var startedAt = 0L
 
     var phase by mutableStateOf(Phase.Idle)
@@ -49,10 +54,19 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     var quickMode by mutableStateOf(false)
         private set
     var message by mutableStateOf<String?>(null)
+    var history by mutableStateOf<List<HistoryEntry>>(emptyList())
+        private set
 
     init {
         viewModelScope.launch {
             env = withContext(Dispatchers.IO) { envReader.read() }
+            history = withContext(Dispatchers.IO) { historyStore.load() }
+        }
+    }
+
+    fun clearHistory() {
+        viewModelScope.launch {
+            history = withContext(Dispatchers.IO) { historyStore.clear() }
         }
     }
 
@@ -74,30 +88,37 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         progressTotal = targets.size
         currentName = "准备中"
         startedAt = System.currentTimeMillis()
+        val thisRun = ++runId
 
         job = viewModelScope.launch {
             val began = System.currentTimeMillis()
             try {
                 val checker = Checker()
+                checkerRef = checker
                 val rateInfo = withContext(Dispatchers.IO) {
                     checker.run(
                         targets = targets,
                         onStart = { index, total, target ->
                             main.post {
-                                progressCurrent = index
-                                progressTotal = total
-                                currentName = target.name
+                                if (thisRun == runId) {
+                                    progressCurrent = index
+                                    progressTotal = total
+                                    currentName = target.name
+                                }
                             }
                         },
                         onResult = { result ->
-                            main.post { results = results + result }
+                            // 停止之后旧回调可能还在排队，用运行编号把它们丢掉
+                            main.post { if (thisRun == runId) results = results + result }
                         }
                     )
                 }
+                // 被用户按下停止：不再写结果，直接回首页
+                if (checker.canceled || thisRun != runId) return@launch
                 val elapsed = ((System.currentTimeMillis() - began) / 1000).toInt()
                 val envNow = withContext(Dispatchers.IO) { envReader.read() }
                 env = envNow
-                run = RunResult(
+                val completed = RunResult(
                     results = results,
                     startedAtMillis = startedAt,
                     elapsedSec = elapsed,
@@ -105,7 +126,11 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                     rateInfo = rateInfo,
                     quick = quick
                 )
+                run = completed
                 phase = Phase.Done
+                // 一次跑完就落一条历史，最多留 100 条
+                val entry = HistoryEntry.from(completed, startedAt, quick)
+                history = withContext(Dispatchers.IO) { historyStore.add(entry) }
             } catch (e: CancellationException) {
                 phase = Phase.Idle
                 message = "已停止本次自检"
@@ -118,8 +143,34 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun cancel() {
+        // 先把「这一次」存进历史：测了几个算几个，一个都没测也要留一条，
+        // 不然用户点了开始又马上停止，历史里什么都没有，反而像是没跑过
+        val done = results
+        val planned = if (progressTotal > 0) progressTotal else Targets.all.size
+        if (startedAt > 0) {
+            val elapsed = ((System.currentTimeMillis() - startedAt) / 1000).toInt().coerceAtLeast(1)
+            val entry = HistoryEntry.partial(
+                startedAtMillis = startedAt,
+                plannedTotal = planned,
+                elapsedSec = elapsed,
+                results = done,
+                quick = quickMode
+            )
+            viewModelScope.launch {
+                history = withContext(Dispatchers.IO) { historyStore.add(entry) }
+            }
+        }
+        // 再让阻塞中的探测在下一个检查点退出，并把界面立刻切回首页
+        checkerRef?.cancel()
         job?.cancel()
         job = null
+        runId++
+        phase = Phase.Idle
+        results = emptyList()
+        run = null
+        progressCurrent = 0
+        currentName = ""
+        message = "已停止本次自检"
     }
 
     fun exportHtml(): File? {

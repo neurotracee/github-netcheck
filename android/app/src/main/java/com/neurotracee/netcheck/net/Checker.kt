@@ -18,6 +18,18 @@ import com.neurotracee.netcheck.model.Verdict
  */
 class Checker(private val timeoutMs: Int = 3000) {
 
+    /**
+     * 停止标志。这个类的 run() 是纯阻塞循环，协程的 cancel() 在阻塞代码里插不进来，
+     * 所以必须自己带一个标志，在点位之间检查；点停止后最多再等当前这一项超时（≤3 秒）。
+     */
+    @Volatile
+    var canceled: Boolean = false
+        private set
+
+    fun cancel() {
+        canceled = true
+    }
+
     fun run(
         targets: List<Target>,
         onStart: (index: Int, total: Int, target: Target) -> Unit,
@@ -25,12 +37,15 @@ class Checker(private val timeoutMs: Int = 3000) {
     ): String {
         var rateInfo = ""
         for (i in targets.indices) {
+            if (canceled) break
             val target = targets[i]
             onStart(i + 1, targets.size, target)
 
             val dns = Probe.resolve(target.host, timeoutMs)
             var https = HttpsOutcome(ok = false, tcpOk = false)
             var doh = ""
+
+            if (canceled) break
 
             if (dns.ok) {
                 https = Probe.https(
