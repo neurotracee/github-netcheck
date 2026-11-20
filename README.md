@@ -67,7 +67,7 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
   <img src="docs/img/ui-android-history-detail-device.png" width="196" alt="安卓历史详情：中文浅色，逐点位四段耗时">
 </p>
 <p align="center">
-  <sub>↑ 这四张都是中文浅色。深色版统一放在本节末尾的英文段——纯粹是两种语言各担一半截图任务，同一组界面不用重复出四张，不代表哪种语言只配哪种主题；两个语言、两种主题在应用里对所有人都是同样可选的。<br>
+  <sub>↑ 这四张都是中文浅色。深色版统一放在文末的英文段——纯粹是两种语言各担一半截图任务，同一组界面不用重复出四张，不代表哪种语言只配哪种主题；两个语言、两种主题在应用里对所有人都是同样可选的。<br>
   图中那两条「中途停止 · 已测 5/14」是截图时真的按了停止，不是摆拍。</sub>
 </p>
 
@@ -655,76 +655,59 @@ limitations under the License.
 
 # NetCheck — GitHub Network Self-Check
 
-[中文](#github-网络自检) | **English**
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](https://github.com/neurotracee/github-netcheck/blob/main/LICENSE)
+[![Latest release](https://img.shields.io/github/v/release/neurotracee/github-netcheck?label=latest)](https://github.com/neurotracee/github-netcheck/releases/latest)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Android-blue.svg)](https://github.com/neurotracee/github-netcheck/releases)
+[![Gitee](https://img.shields.io/badge/Gitee-mirror-c71d23.svg)](https://gitee.com/bio234/github-netcheck)
+[![selfcheck](https://github.com/neurotracee/github-netcheck/actions/workflows/ci.yml/badge.svg)](https://github.com/neurotracee/github-netcheck/actions/workflows/ci.yml)
 
-> **This project has the same author as PDF Privacy Masker.** The GitHub repository was created first;
-> Gitee (https://gitee.com/bio234/github-netcheck) is the developer's own mirror for faster access in mainland China.
+**English** | [中文](#github-网络自检)
 
-A local-only, dependency-free connectivity probe. **It does not proxy, does not accelerate, does not touch hosts — it only measures.**
-
-It times 14 targets that commonly break, splitting each one into **DNS → TCP connect → TLS handshake → HTTP time-to-first-byte**, four separately measured stages, then writes an HTML report. One glance tells you whether the problem is resolution, connection, handshake interference, or a slow-but-working link.
-
-The Windows build is a single PowerShell script you double-click; the Android build is an APK.
-Both share the **same target list, same grading thresholds, same report layout**, so a phone report and a desktop report can be compared side by side.
-
-**License:** Apache License 2.0 — commercial use, modification and closed-source redistribution are all permitted.
-Attribution and project-URL requirements are described in [ADDITIONAL-TERMS.md](ADDITIONAL-TERMS.md) (Apache-2.0 §4 and §6) and are part of the terms.
-
-> **Icon and trademark notice (this section prevails over anything above that mentions the icon).**
-> The project icon (the PNG/ICO files under `assets/icon/` and the app icons used by the Windows and Android builds)
-> contains a silhouette of **Octocat**, GitHub's mascot. **Octocat® is a registered trademark of GitHub, Inc.**
-> (GitHub, Inc. is a subsidiary of Microsoft), and the design is also registered with the U.S. Copyright Office.
-> Those rights are **not owned by this project's author**, and this project has **no authorization, approval or
-> endorsement from GitHub, Inc. or Microsoft**. The word "GitHub" in the project name is used only to describe
-> **what this tool measures** (connectivity to GitHub services) — a nominative use — and implies no affiliation.
+> **This project has the same origin and the same author as the PDF Privacy Masker tool.** The GitHub repository was created first; Gitee is the mainland-China mirror maintained by the same developer
+> (https://gitee.com/bio234/github-netcheck). Both sides carry identical content — neither is a copy of the other.
 >
-> - **This project itself is for personal, non-commercial use only.** The author does not sell it, does not publish
->   it on app stores, grants no commercial licence, and earns nothing from it (the donation QR code is voluntary
->   pocket money from readers and grants no rights). **Commercial use of this project is prohibited.**
-> - **You are strongly advised not to reuse this icon.** If you fork, modify, rename, redistribute, or use it in any
->   other project, **replace the icon with one that contains no third-party trademark elements**. Do not keep it as-is
->   and do not reuse a modified version. Using it on your own machine is not affected.
-> - **The rights holder may ask for removal.** If GitHub, Inc. or Microsoft objects, the icon will be replaced and
->   the related documentation cleaned up as soon as the request is received via a repository issue.
-> - **This notice is not a licence.** It states the author's position and the intended usage boundary only. It cannot
->   substitute for the rights holder's permission, and it does not exempt any user from liability. For commercial
->   use or wide public distribution, obtain written permission from the rights holder first.
+> The author's other project: **PDF Privacy Masker** (local, offline redaction of PDFs, files never leave your machine) —
+> GitHub: https://github.com/neurotracee/pdf-privacy-masker
+>
+> Gitee: https://gitee.com/bio234/pdf-privacy-masker
+>
+> That project is under AGPL-3.0, this one under Apache-2.0. The licences differ; do not mix them.
 
-**Privacy:** no upload, no telemetry, no proxy, no hosts modification. The only outbound connections are the 14 test targets plus one DNS-over-HTTPS lookup to Alibaba Public DNS used as a ground-truth comparison.
-
-**Permissions (Android):** `INTERNET`, `ACCESS_NETWORK_STATE` and `REQUEST_INSTALL_PACKAGES` (the last one only hands a downloaded APK to the system installer on update) — no storage, no contacts, no telemetry.
-
-**Release assets on the mirror.** Gitee's attachment quota is limited to 1 GB, so the mirror keeps only the latest release and the previous release (both APK and Windows zip). Older installers were removed from Gitee and remain on GitHub: https://github.com/neurotracee/github-netcheck/releases . The latest Windows package is always available on Gitee too — only older versions moved to GitHub.
-
-**Download.** Android APK `v1.1.6.1` — [GitHub](https://github.com/neurotracee/github-netcheck/releases/download/v1.1.6.1/NetCheck-1.1.6.1.apk) ｜ [Gitee mirror](https://gitee.com/bio234/github-netcheck/releases/download/v1.1.6.1/NetCheck-1.1.6.1.apk).
-Windows package `v1.1.5.2` — [GitHub](https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.2/NetCheck-Windows.zip) ｜ [Gitee mirror](https://gitee.com/bio234/github-netcheck/releases/download/v1.1.5.2/NetCheck-Windows.zip).
-All releases: [GitHub](https://github.com/neurotracee/github-netcheck/releases/latest) ｜ [Gitee](https://gitee.com/bio234/github-netcheck/releases/latest).
-
----
-
-## Screenshots
-
-<p align="center">
-  Every screenshot in this section is a real-device capture — nothing is a mockup, and the wording on screen is exactly the wording shipped in the app.<br>
-  The Chinese UI shots are the light-theme set and live in the Chinese section above; the English ones here are the dark-theme set. Same app, same build — language and theme are two independent settings.<br>
-  The Android UI ships with a built-in Chinese/English switch (<i>Settings → Language</i>, defaults to the system language); the Windows build is Chinese-only for now.
-</p>
-
-<p align="center">
-  <sub>The hero image at the very top is a design composition, not a program output — the left panel is a real Windows console capture, the right one a real-device Android shot, both untouched. The credit line in its bottom-right corner (“仅供创意… AI 生成 / 思路借鉴 DSH Go 项目”) belongs to that artwork only.</sub>
-</p>
+A purely local, zero-dependency connectivity probe that watches one thing: **whether mainland China can reach GitHub-family services**. **It does not proxy, does not accelerate, does not touch hosts — it only measures.**
 
 <p align="center">
   <img src="docs/img/hero-en.png" width="100%" alt="GitHub Network Check: real Windows console output on the left, Android device on the right, 14 endpoints with four stages timed separately">
 </p>
 <p align="center">
-  <sub>↑ English hero artwork. The layout, colours and copy are designed; both panels are real captures, unedited.<br>
-  The two credit lines in the bottom-right corner (“Creative work only … AI-generated” and “Design direction borrowed from the DSH Go project, see GitHub: ccch1mneyyy/dsh-go”) belong to this artwork only — the actual UI is in the screenshots section below.</sub>
+  <sub>↑ Hero artwork: the composition, colours and copy are designed; the two panels are a real Windows console capture and a real-device Android capture, with the UI content untouched.<br>
+  The two small lines in its bottom-right corner (“Creative work only, the actual UI prevails; this image is AI-generated” and “Design direction borrowed from the DSH Go project, see GitHub: ccch1mneyyy/dsh-go”) belong to that artwork and say nothing about what the UI looks like — the real UI is in the interface section below.</sub>
 </p>
 
+> **Created on 14 November 2026.** The Windows script, the Android APK and both repositories (GitHub `neurotracee/github-netcheck`, Gitee `bio234/github-netcheck`) were all finished the same day.
+
+> **About the name.** This project used to be called "网络连通性自检" (generic network self-check), which read like yet another bandwidth tester. What it actually diagnoses is GitHub — Pages, raw, API, object storage, clone and download — plus development resources that commonly stall, such as Hugging Face and Docker. So from 1.1.0.3 both builds were renamed **GitHub 网络自检** (GitHub Network Self-Check), and the repository went from `netcheck` to **`github-netcheck`** (renamed on GitHub and Gitee together; old links redirect to the new address) — otherwise the repository name would still only say "network check". The package name `com.neurotracee.netcheck` and the script name `netcheck.ps1` were deliberately left alone: changing the package name would break in-place upgrades of the version already installed on phones.
+
+**Keywords (tags for search)** — kept in Chinese because that is what local search engines index: GitHub 连不上 排查 · GitHub 加速检测 · GitHub Pages 打不开 · raw.githubusercontent 加载失败 · 网络连通性自检 · 连通性检测 · DNS 解析 / TCP 建连 / TLS 握手 / HTTP 首字节（四段分别计时）· 延迟测试 · hosts 映射检查 · 系统代理检查 · Hugging Face 下载慢 · Docker 拉取失败 · 国内网络环境 · Android APK · PowerShell 脚本 · Kotlin / Jetpack Compose · Apache-2.0 · 零第三方依赖
+
+It walks through the 14 targets that usually stall, splitting each one into **DNS resolve → TCP connect → TLS handshake → HTTP time-to-first-byte**, four stages timed separately, then writes an HTML report. One glance tells you whether the problem is "cannot resolve", "cannot connect", "connects but the handshake is cut", or "the link works but is slow".
+
+The Windows build is a PowerShell script you double-click — nothing to install. The Android build is an APK — one tap to start.
+**Both share the same target list, the same grading thresholds and the same report layout**, so a phone report and a desktop report can be compared side by side.
+
+---
+
+## Interface
+
+<h3 align="center">Screens on both platforms</h3>
+
 <p align="center">
-  <b>Android</b> — one run, all verdicts at a glance. 14 endpoints, each reported with DNS / TCP / TLS / HTTP timings. Issues come first; the run can be filtered by severity (severe / moderate / mild) with a tap or a horizontal swipe, and every run is kept in local history.
+  Every screenshot below is a real-device capture — no collages, no mockups. The wording you see on screen is exactly the wording the program is using.<br>
+  The Android UI ships with a built-in Chinese/English switch (“Settings → Language”, defaults to the system language); the Windows build is Chinese-only for now. This section shows the English UI; the Chinese UI screenshots are in the Chinese section at the top of this README.
 </p>
+
+<h3 align="center">Android: one run, every verdict at a glance</h3>
+<p align="center">Main · Result · History · History detail. All 14 endpoints report DNS / TCP / TLS / HTTP timings, issues are listed first, and every run can be revisited in history.</p>
+
 <p align="center">
   <img src="docs/img/ui-android-main-en-dark-device.png" width="196" alt="Android main screen (English, dark)">
   <img src="docs/img/ui-android-result-en-dark-device.png" width="196" alt="Android result screen (English, dark), issues listed by severity">
@@ -732,28 +715,583 @@ All releases: [GitHub](https://github.com/neurotracee/github-netcheck/releases/l
   <img src="docs/img/ui-android-history-detail-en-dark-device.png" width="196" alt="Android history detail (English, dark), four-stage timings per endpoint">
 </p>
 <p align="center">
-  <sub>
-  ↑ The four English shots above are the <b>dark theme</b> set. This is only a division of labour between the two languages: the Chinese set above already shows light mode, so the dark-mode set is demonstrated in English instead of repeating the same four screens twice. It is not a statement about which language or which audience deserves which theme — the app ships both themes and both languages to everyone, chosen independently in <code>Settings → Language</code> and <code>Settings → Appearance</code>.<br>
-  Endpoint names stay in Chinese in these shots on purpose: switching the app language only changes the UI chrome, not the endpoint descriptions (the Settings screen says so).
-  </sub>
+  <sub>↑ These four are the English dark-theme set. The Chinese set at the top of this README is the light-theme set. That is only a division of labour between the two languages — the same four screens do not need to be published twice — and it says nothing about which language deserves which theme: both themes and both languages are selectable, independently, by everyone, in the app.<br>
+  The two “中途停止 · 已测 5/14” rows in the history shot are real: the stop button was actually pressed while taking these screenshots.</sub>
 </p>
 
-<p align="center">
-  <b>Windows</b> — the console is the program; the windows are just shells. Run <code>一键网络自检.bat</code> and
-  the menu below comes up first: type a number to pick a feature (1 check, 2 GitHub-only, 3 About, 4 Settings, 5 update check, 0 quit).
-</p>
+<br>
+
+<h3 align="center">Windows: the console is the program</h3>
+<p align="center">Double-click “一键网络自检.bat” and <strong>this menu is the first thing you get</strong>: type a number to pick a function — 1 runs the check, 3 opens the About window, 4 opens Settings, 5 only checks for updates, 0 quits.<br>
+Nothing runs until you press 1; that is the second image below. The two dialogs are shells only — the main interface is the console, from start to finish.</p>
+
 <p align="center">
   <img src="docs/img/ui-windows-menu-device.png" width="100%" alt="Windows console: the menu you get on launch, before anything runs">
 </p>
 <p align="center">
-  <sub>↑ before running: title, author and both repo links on top, then the numbered menu and a “请选择:” prompt</sub>
+  <sub>↑ before running: this is what you see right after launch — title, author and both repository URLs at the top, and “请选择:” waiting for a number</sub>
 </p>
+
 <p align="center">
   <img src="docs/img/ui-windows-console-device.png" width="100%" alt="Windows console: one full run over 14 endpoints">
 </p>
 <p align="center">
-  <sub>↑ after running: choice 1, all 14 endpoints. Those two long lines are raw connection-failure exceptions, left unedited</sub>
+  <sub>↑ after running: choice 1, all 14 endpoints. Those two long lines are raw connection-failure exceptions, left unedited</sub><br>
+  <img src="docs/img/ui-windows-about-device.png" width="380" alt="Windows About window (menu item 3)">
+  <br><sub>↑ the “About and open-source information” window from choice 3 — not the main interface</sub>
 </p>
-<p align="center">
-  <img src="docs/img/ui-windows-about-device.png" width="340" alt="Windows About window (menu item 3)">
-</p>
+
+<br>
+
+| Screen | What is on it |
+| --- | --- |
+| Android · Main | Title row + endpoint-count pill + gear entry; the main card shows the current state and a “Start check” button; two info cards below describe the current network and local hosts |
+| Android · Result | Summary card + “Export report / Share CSV”; issues are listed by default, and the “Issues / OK” pair at the top can be tapped or swiped, with issues further split into “severe / moderate / mild” |
+| Android · History | The “All / OK / Issues” row filters by run count, and issues are split into three grades again; each row states its time and result, and interrupted runs are marked “Incomplete” |
+| Android · History detail | One run, with four-stage timings per endpoint, switchable between “All / Issues” |
+| Android · Settings | Language / appearance / report location / update-check mode / update source (auto, Gitee defaults — Gitee only / GitHub only) / version and update check / About entry |
+| Android · About | Guiding author, development (Doubao work-task Agent × DeepSeek-V4.1-Flash), licence, both URLs, privacy, the three hard requirements, test method, maintenance rhythm |
+| Windows · Menu (entry) | Appears the moment the .bat is double-clicked: title block + author / development / licence / both URLs + items `[1]`–`[5]` + `[0]` quit + “请选择:” |
+| Windows · Console (result of 1) | All 14 endpoints with DNS / TCP / TLS / HTTP timings, ending with “reachable X/14, average connect time, elapsed, fastest / slowest / dead” |
+| Windows · About window | Opened by 3: the same “about and open-source” text, plus the donation QR code and direct Star buttons for both repositories |
+
+> The Android screenshots were retaken on a real device running v1.1.6.0 (20 November): four in Chinese (light) and four in English (dark). The one-light-one-dark split is only a division of labour between the two languages, not a statement that one language gets one theme — language and theme are separate settings for everyone. The same reasoning is repeated in the Chinese section.
+> The Settings and About screenshots are still the older ones (the features did not change, but the About page still shows 1.1.5.5 and lacks the “test method” paragraph added later); they will be retaken.
+> The About window shot was retaken for v1.1.5.2; the console menu shot is also from v1.1.5.2, captured as it appears when you double-click the .bat.
+> Framing scripts: phones use `docs/tools/frame_ui.py` (device shell; batch version `frame_batch.py`), Windows uses `docs/tools/frame_window.py` (window shell). Re-running one command after replacing a screenshot is enough — no manual image editing.
+> Endpoint names stay in Chinese inside the English screenshots on purpose: switching the app language changes the UI chrome and the interface copy, while the target names come from the shared target list and stay as they are (the Settings screen says so).
+> **The three Windows screenshots are shared by both language sections**, because the Windows build currently has a Chinese-only interface — there is no English Windows UI to photograph.
+
+---
+
+## Download (start here)
+
+**Current versions: Android v1.1.6.1 ・ Windows v1.1.5.2**. Both platforms carry the same content; pick whichever opens for you (with slow mainland connectivity, prefer Gitee).
+
+| What you want | GitHub | Gitee (mainland mirror) |
+| --- | --- | --- |
+| Latest release page | https://github.com/neurotracee/github-netcheck/releases/latest | https://gitee.com/bio234/github-netcheck/releases/latest |
+| Android APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.6.1/NetCheck-1.1.6.1.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.6.1/NetCheck-1.1.6.1.apk |
+| Windows package (zip) | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.2/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.5.2/NetCheck-Windows.zip |
+| Repository home | https://github.com/neurotracee/github-netcheck | https://gitee.com/bio234/github-netcheck |
+
+Unzip the Windows package and double-click **一键网络自检.bat**; install the APK directly (the system will warn about an “unknown source” — the reason is in the next section).
+SHA-256 checksums are in the [release notes](https://github.com/neurotracee/github-netcheck/releases/latest); after downloading you can verify them yourself with `certutil -hashfile <filename> SHA256`.
+
+> **Did your Gitee APK download arrive as .zip? The file is not corrupt.** Gitee's download server sniffs the file header and serves APKs as `application/zip`;
+> some mobile browsers (Edge mobile, for instance) then rename the file to `.zip`. Rename it back to `.apk` and it installs normally — the bytes are identical.
+> If that is annoying, simply take the APK from the GitHub release page (it is served as `application/vnd.android.package-archive` and is never renamed).
+
+### Where older releases live (Gitee has limited capacity)
+
+Gitee's total attachment quota is only 1 GB, which cannot hold every historical build, so the installers are kept in three tiers on both platforms — **Windows and Android are treated exactly the same**:
+
+| Tier | GitHub | Gitee (mainland mirror) |
+| --- | --- | --- |
+| **Latest** (Android v1.1.6.1 APK, Windows v1.1.5.2 zip) | attachments kept | **attachments kept** |
+| **Previous** (Android v1.1.6.0 APK, Windows v1.1.5.1 zip) | attachments kept | attachments kept (for in-place upgrades in transition) |
+| **Anything older** | every attachment kept | **attachments removed**, release notes only |
+
+In other words: **the latest and the previous Windows and Android packages can both be downloaded from Gitee**; only older versions have to be fetched from the GitHub release page.
+Older releases: https://github.com/neurotracee/github-netcheck/releases (the corresponding Gitee release notes also say “older versions: download from GitHub” and link there).
+
+**Found it useful? Just go — no payment needed.** The most practical help is one click on both: the GitHub star lets people abroad and search engines find it, the Gitee star lets people who cannot reach GitHub still find it. Star only one and half the audience never sees it — one star missing, half the audience gone. If that is inconvenient, one is enough.
+[GitHub Star](https://github.com/neurotracee/github-netcheck) ｜ [Gitee Star](https://gitee.com/bio234/github-netcheck)
+If this little tool saved you some time and you feel like buying me a milk tea, the “赞赏 / Donations” section at the end has a WeChat QR code — **entirely voluntary; nothing is missing if you do not donate**.
+
+**Version numbering.** Versions have four parts (major.minor.revision.patch); small text changes and small fixes bump only the last part. So 1.1.2.0 → 1.1.3.2 was a feature-level update (donation entry + update prompt on launch),
+while 1.1.3.2 → 1.1.3.2 was a **pure wording update**: the statement “the icon contains GitHub's Octocat, this project has no authorisation or endorsement, personal non-commercial use only, do not reuse the icon” was
+written into both programs (About page, console, report footer), with not a single line of functionality touched.
+
+## Three things to know before installing
+
+**① Why it is only on Releases and not in an app store.**
+The author is a minor. Developer registration in the Huawei / Xiaomi / OPPO / vivo app markets requires mutual certification: photographing an ID card in hand plus binding **a real-name bank card in the author's own name**.
+The author cannot get a real-name bank card (minors cannot open one), and the family does not understand the “upload your ID card and bank card” process and is highly wary of being scammed, so this route is closed — not out of laziness. The APK therefore sits directly in GitHub / Gitee Releases, signed with the author's own certificate; the system will warn about an “unknown source” — **that is the inevitable result of not going through a store, not a problem with the app itself**.
+
+**② What is that “information may be collected by third parties” warning during installation?**
+It is the standard risk warning Android (especially vendor ROM installers) shows for **any APK that does not come from an app store**. It is addressed to everyone, is not aimed at this app, and does not mean this app collects anything. This app requests only three permissions (`INTERNET`, `ACCESS_NETWORK_STATE`,
+`REQUEST_INSTALL_PACKAGES` — the last one only hands a downloaded package to the system installer on update, and the system asks once more whether to install), with no storage, location, contacts, SMS or camera permissions, and no analytics / advertising / crash-reporting SDK (verify it yourself against
+[AndroidManifest.xml](android/app/src/main/AndroidManifest.xml) and [NOTICE.md](NOTICE.md)).
+The signing certificate fingerprint is published in the release notes, so you can check it yourself.
+
+**About the signature itself** (since 1.1.0.3): the APK is signed with **APK Signature Scheme v2 + v3** (v2 for Android 7–8, v3 for 9 and above, which is sturdier than v2 alone because some vendor ROM installers check v3 strictly). The certificate is self-signed, DN
+`CN=NetCheck, OU=OpenSource, O=neurotracee, L=Datong, ST=Shanxi, C=CN`,
+SHA-256 fingerprint `c43205775efaf5d088b646d6999e81e08213c43969b3140b541c29d0c7bb8b5a` — check it yourself with:
+
+```text
+apksigner verify -v --print-certs NetCheck-<version>.apk
+```
+
+A self-signed certificate only means “no commercial CA vouches for it”; it does not mean insecure; **it is not a passport for app stores, and it does not affect in-place upgrades**.
+The same key has been used from 1.0.0.0 through 1.1.0.3, so older builds can be installed over it without uninstalling.
+
+**③ What exactly does it connect to?**
+The only network permission is `INTERNET`, used for three things: **an automatic update check at launch (can be switched off in settings)**,
+**a manual “check for updates”**, and **timing those 14 endpoints**.
+The update check reaches **two repositories only** — Gitee in mainland China (https://gitee.com/bio234/github-netcheck) and GitHub abroad
+(https://github.com/neurotracee/github-netcheck) — the script picks whichever is reachable and reads one public line with the version number.
+**Nothing is uploaded: no files, no accounts, no device identifiers**; when timing latency it only opens connections and reads one response header, never sending content.
+
+![Icon](assets/icon/netcheck-1024-plate.png)
+
+---
+
+## Who made this project
+
+- **Guiding author: a middle-school student at the time of the project's creation.** They are responsible for exactly three things: stating the requirements, deciding which endpoints to keep and what the grading criteria are, and accepting or rejecting the result and filing feedback. They do not write code.
+- **Development: the Doubao work-task Agent × DeepSeek-V4.1-Flash.** All of the construction — both clients' code, builds, signing, creating the repositories and publishing — was done by the Agent under their repeated requirements and feedback.
+- **Terminology (do not confuse these):** **the Agent is provided by the Doubao work task**, and **the model is DeepSeek's (V4.1-Flash, chosen by the guiding author in their own client)**. So this is not “Doubao's model” and not a Tencent product — it has nothing to do with Tencent.
+- **Licence: Apache License 2.0.** See [LICENSE](LICENSE); attribution and source requirements are in [ADDITIONAL-TERMS.md](ADDITIONAL-TERMS.md) and [NOTICE.md](NOTICE.md).
+- **Maintenance:** maintained in personal spare time, all code public, anyone may fork and improve it without asking. Rhythm and feedback channels: the “[Maintenance and feedback](#maintenance-and-feedback)” section at the end.
+
+## About attribution (read this before forking or commercial use)
+
+This project **permits commercial use, permits derivative work, permits closed-source distribution** (Apache-2.0 is not copyleft and carries no forced-open-source infection),
+with no fee, no application, no need to wait for the author's approval (the author checks the project roughly once every month or two, so replies can be slow).
+
+But the **three requirements below are hard**, under Apache-2.0 §4 (b)(c)(d) and §6 (trademarks); details in [ADDITIONAL-TERMS.md](ADDITIONAL-TERMS.md):
+
+### ① Keep the author attribution
+
+Keep these two lines, verbatim, and do not replace them with someone else's name:
+
+```
+指导作者：项目创作时为初中生
+由 豆包工作任务的 Agent × DeepSeek-V4.1-Flash 开发
+```
+
+(Guiding author: a middle-school student at the time of creation / Developed by the Doubao work-task Agent × DeepSeek-V4.1-Flash.)
+
+Under Apache-2.0 §4 (c): copyright, patent, trademark and attribution notices in the source must be retained.
+
+### ② Show the original project URL inside the program
+
+```
+https://github.com/neurotracee/github-netcheck
+https://gitee.com/bio234/github-netcheck      # mirror / 镜像（国内访问更快）
+```
+
+**Users must be able to see it** — the About window, the home-screen footer, a help menu, the report footer, or `--about` output: any one of these is enough.
+Writing it only in the `LICENSE` file or in a source comment hundreds of lines away **does not count**, because users never see it in normal operation.
+
+How this project does it (safe to copy):
+
+| Where | What |
+| --- | --- |
+| Android home footer | `原项目地址：https://github.com/neurotracee/github-netcheck` + `镜像（Gitee）：gitee.com/bio234/github-netcheck` (two tappable lines that copy on tap) |
+| Generated HTML report | the same two URL lines in the report footer |
+| Windows build | first lines of the console, and the first screen of the documentation |
+
+### ③ Modified versions must say they were modified
+
+If you are not redistributing the original verbatim, state prominently inside the program:
+
+> This program is based on https://github.com/neurotracee/github-netcheck
+> (mirror: https://gitee.com/bio234/github-netcheck) and has been modified; it is not published by the original author.
+
+Under Apache-2.0 §4 (b): modified files must carry a prominent “modified” notice.
+
+The point is that nobody should mistake your changed version for the original author's release — especially if your version has bugs, privacy risks, or starts charging money.
+
+### Apache-2.0 itself also requires
+
+- **Ship the licence and NOTICE with distributions**: when distributing the APK or the script, include `LICENSE` and `NOTICE.md` (§4 (a)(d)).
+- **Keep the modification marks**: changed source files must say what changed (§4 (b)).
+- **Do not use the author's name as endorsement**: you may not imply the original author vouches for your version (§6).
+- **Change the name**: the program name “GitHub 网络自检 / NetCheck” and the icon are outside the licence grant (§6 trademark clause) —
+  forks should rename and replace the icon so people are not misled.
+
+Closed-source commercial use? **Apache-2.0 permits it**, but the attribution and source requirements above still apply.
+
+### ④ Icon (important — this paragraph overrides any earlier wording about the icon)
+
+**There is a GitHub cat in the icon.** In this project's icon (`assets/icon/` PNG and ICO files, plus the Windows and Android app icons), the
+cat-head silhouette comes from GitHub's mascot **Octocat**. **Octocat® is a registered trademark of GitHub, Inc.** (GitHub, Inc. is now a Microsoft company),
+and the design is also registered with the U.S. Copyright Office. Those rights **do not belong to this project's author**, and this project has **no authorisation, approval or endorsement from GitHub, Inc. or Microsoft**.
+
+The word “GitHub” in the project name only describes **what this tool checks** (connectivity to GitHub services); it is a nominative use and implies no affiliation with GitHub.
+
+| Boundary | What it means |
+| --- | --- |
+| **The project's own position** | **Personal, non-commercial use only.** The author does not sell it, does not publish it in app stores, grants no commercial licence, and earns nothing from it (donations are voluntary small support from readers and have nothing to do with licensing). **Commercial use of this project is prohibited.** |
+| **Strongly advised: do not reuse this icon** | If you fork it, extend it, rename and publish it, or intend to use it in another project, **replace the icon with one containing no third-party trademark elements**. Do not keep it as is, and do not keep a modified version either. Using it on your own machine is unaffected. |
+| **The rights holder may ask for removal** | If GitHub, Inc. or Microsoft considers this use inappropriate, filing an issue in the repository will lead to the icon being replaced and the related wording cleaned up immediately. |
+| **This notice is not a shield** | The text above only states the author's position and the intended boundary. **It grants no licence, cannot substitute for the rights holder's permission, and does not exempt users from their own legal liability.** For commercial use or wide public distribution, obtain written permission from the rights holder first. |
+
+---
+
+## What it tests
+
+Every target is measured in four stages, timed separately, so you can pin down exactly which step stalls:
+
+| Stage | Meaning | What a failure means |
+|---|---|---|
+| DNS | time to resolve the domain | cannot resolve = DNS poisoning or no network |
+| TCP | time to open a connection to port 443 | timeout = the port is unreachable, most likely blocked |
+| TLS | time for the encrypted handshake | timeout / reset = SNI interference, classically “the site will not open but ping works” |
+| HTTP | request sent to first byte received (TTFB) | timeout = the path is being cut |
+
+### The 14 endpoints
+
+| Group | Endpoint | What it is for |
+|---|---|---|
+| Baseline | Baidu `www.baidu.com` | first confirm the local broadband itself is fine |
+| GitHub | API `api.github.com/rate_limit` | agents querying repositories and metadata; also reads the current quota |
+| GitHub | Raw `raw.githubusercontent.com` | agents reading files directly out of a repository |
+| GitHub | Git transport `github.com/.../info/refs` | the channel `git clone / pull` actually uses |
+| GitHub | Archive download `codeload.github.com` | downloading a repository zip / tar |
+| GitHub | Main site `github.com` | web pages / repository home |
+| GitHub | Static assets `github.githubassets.com` | icons / page resources |
+| GitHub | Avatar CDN `avatars.githubusercontent.com` | avatars / images |
+| GitHub | Gist `gist.githubusercontent.com` | code snippets, configuration |
+| GitHub | Releases `objects.githubusercontent.com` | release downloads |
+| GitHub | Pages `github.io` | Pages sites |
+| AI | Hugging Face `huggingface.co` | models / datasets |
+| Container | Docker registry `registry-1.docker.io/v2/` | `docker pull` |
+| Container | Docker Hub `hub.docker.com` | image pages / login |
+
+The top of the report shows the **API quota** (60 requests/hour when unauthenticated) — watch that number when an agent keeps hitting rate limits.
+“GitHub family only” skips Hugging Face and Docker, testing 11 endpoints and finishing 3–8 seconds sooner.
+
+## How to read it
+
+| Label | Criterion | Meaning |
+|---|---|---|
+| Excellent | connect ≤ 120 ms | as fast as domestic sites |
+| Good | ≤ 400 ms | perfectly usable |
+| Fair | ≤ 1000 ms | works, but stutters |
+| Slow | > 1000 ms | practically unusable |
+| Limited | TCP works, TLS fails | the classic “blocked” state |
+| Dead | TCP does not even connect | fully blocked |
+
+The **real DoH resolution** in the report: the domain's real IP is fetched over encrypted DNS from Ali public DNS and compared with what the machine resolved.
+If the two differ, the local DNS has been rewritten or poisoned; if the local IP shows `127.0.0.1`, hosts has taken over the domain.
+
+## What the output looks like
+
+A real run looks like this (home broadband, 2026-11-14, full 14-endpoint mode): environment chips at the top (system proxy, hosts mappings,
+local 443 listeners, DNS servers), four summary cards in the middle, then one card per endpoint — the vertical bar on the left is the grade colour, on the right
+the DNS / TCP / TLS / HTTP milliseconds, and under the domain a line with the resolved IP and the DoH comparison.
+
+![Real report screenshot](docs/img/effect-report.png)
+
+The same data is also printed as plain text in the console, and the report is thrown into your browser when the run ends:
+
+```text
+  网络连通性自检 v1.1.0.1   GitHub / Hugging Face / Docker
+  （下面这段是 1.1.0.1 时的真实输出，当时还叫「网络连通性自检」；1.1.0.3 起同名位置显示为「GitHub 网络自检」）
+  ---------------------------------------------------------
+  作者：项目创作时为初中生 · 开发：豆包工作任务的 Agent × DeepSeek-V4.1-Flash
+  开源协议 Apache-2.0 · 原项目 https://github.com/neurotracee/github-netcheck
+  系统代理：未开启（直连模式）
+  hosts 记录：发现 45 条本地映射（可能来自瓦特工具箱等加速工具）
+  本机 443 端口：有程序在监听（本地反代很可能在运行）
+
+  [1/11] 百度（对照基准）  (www.baidu.com)   优秀   TCP 32ms / TLS 64ms / HTTP 150ms
+  [2/11] GitHub API 接口  (api.github.com)   优秀   TCP 0ms / TLS 10ms / HTTP 1297ms
+  [3/11] GitHub Raw 原始文件  (raw.githubusercontent.com)   优秀   TCP 0ms / TLS 12ms / HTTP 525ms
+  [4/11] GitHub Git 传输  (github.com)   优秀   TCP 0ms / TLS 9ms / HTTP 810ms
+  [5/11] GitHub 仓库打包  (codeload.github.com)   受限   TCP 103ms，但握手失败：读取响应超时（链路被掐断）
+  [6/11] GitHub 主站  (github.com)   优秀   TCP 0ms / TLS 1ms / HTTP 786ms
+  [7/11] GitHub 静态资源  (github.githubassets.com)   优秀   TCP 0ms / TLS 7ms / HTTP 1028ms
+  [8/11] GitHub 头像 CDN  (avatars.githubusercontent.com)   优秀   TCP 0ms / TLS 9ms / HTTP 471ms
+  [9/11] GitHub Gist  (gist.githubusercontent.com)   较慢   TCP 1141ms / TLS 280ms / HTTP 141ms
+  [10/11] GitHub Releases  (objects.githubusercontent.com)   优秀   TCP 0ms / TLS 10ms / HTTP 550ms
+  [11/11] GitHub Pages  (github.io)   优秀   TCP 0ms / TLS 9ms / HTTP 309ms
+
+  ---------------------------------------------------------
+  可连通 10 / 11    平均建连 117 ms    耗时 21 秒
+  API 配额 56 / 60
+  最快：GitHub 静态资源  0 ms
+  最慢：GitHub Gist  1141 ms
+  不通：GitHub 仓库打包
+
+  报告已生成：reports\netcheck-20261114-193319.html
+```
+
+That “TCP 0ms” is not cheating: a local reverse proxy accepts the connection locally, so connecting costs almost nothing — which is exactly proof that the traffic never leaves the machine.
+The `codeload` line — “connects, then the handshake fails” — is the state this kind of tool most needs to surface: TCP gets through, TLS is cut, and downloading a repository zip will fail.
+(The sample above is a genuine early-version console log, so its labels are still Chinese; the Windows console is Chinese-only to this day, which is why the English README shows Chinese console output — the numbers mean the same thing.)
+
+## How it relates to Watt Toolkit
+
+Watt Toolkit (formerly Steam++) accelerates like this:
+
+```
+hosts points the domain at 127.0.0.1
+      ↓
+a local YARP reverse proxy runs (listening on 80/443)
+      ↓
+the proxy dials the real server over its own route
+      ↓
+the browser believes it is connecting directly, but actually hits the local proxy (a man in the middle, decrypting with a self-signed root CA)
+```
+
+This tool is positioned differently: **it does not proxy, it only measures**.
+So the most practical habit is — run once with the accelerator off, run again with it on, compare the two reports, and you see immediately whether acceleration actually works and which domain is still dropping.
+
+The two modes behave differently, and you must account for it:
+
+- **hosts mode**: the domain resolves to 127.0.0.1, so the report shows 127.0.0.1 and the latency you measure is “you to the local proxy”, not the speed to the real server
+- **system-proxy mode**: this tool dials with raw sockets and ignores the system proxy, so what you measure is still the true direct connection — exactly what you need to answer “how bad would it be without acceleration”
+- **VPN mode on Android** (Clash-style tools): a VPN takes over traffic at the system layer, sockets cannot bypass it, so what you measure is the post-rules result. The top of the report flags “VPN enabled” — factor that in when reading the numbers
+
+## Version numbering and update checks (publishing one platform never triggers a false alarm on the other)
+
+Versions have four parts `major.minor.revision.patch`, e.g. `1.1.3.2`:
+
+- wording-only changes and small bug fixes → bump the **fourth part** only (`1.1.0.3` → `1.1.0.4`);
+- new features → bump the **third part** (`1.1.1.x` → `1.1.3.2`);
+- the first two parts rarely move; moving them means a major release, do not use lightly.
+
+The repository root holds a `version.json`, which **records a version per platform**:
+
+```json
+{
+  "android": { "version": "1.1.3.2", "url": "https://github.com/neurotracee/github-netcheck/releases" },
+  "windows": { "version": "1.1.3.2", "url": "https://github.com/neurotracee/github-netcheck/releases" }
+}
+```
+
+Both builds read this file first and **only trust their own section**: if you publish a Windows update only and set `windows.version` to `1.1.0.4`,
+the Android build still reads `1.1.3.2` and will not pop a spurious “new version available”; the reverse holds too.
+This fixed the earlier logic bug where “one release made both platforms prompt, but only one had actually changed”.
+Only when `version.json` cannot be read does it fall back to the release tag, so old environments still behave sensibly.
+
+**The update source defaults to Gitee**: both builds switch to GitHub by default only when “the UI language is not Chinese” **and** “the system time zone is not UTC+8” hold at the same time (a clear sign the user is probably outside mainland China); if either check is inconclusive (Chinese UI / UTC+8 / cannot read), Gitee is used.
+Users can pin “Gitee only” or “GitHub only” in settings; if the chosen source is unreachable it automatically retries the other one once.
+
+**Update rules (identical on both platforms)**:
+
+- **When**: once at launch only — no polling, no background resident process; switch off “check automatically” and it never touches the network.
+- **What**: only GETs two public things — `version.json` (the version number), plus the release list **read one extra time only if a newer version really exists** (to show the update notes).
+  The user agent carries nothing but its own version; no local content is uploaded.
+- **What counts as “newer”**: versions are compared as four parts with zero padding (`1.1.3` and `1.1.3.0` are the same release); only your own platform's section is trusted,
+  so **when a release only shipped a package for the other platform, it is simply not an update for this one** — the reason there are no false alarms.
+- **The dialog shows what changed in that release**: no longer a bare “new version found”, but the summary from the release body and
+  per-Windows / per-Android bullet points, in a scrollable box when the text is long.
+  **When you are several versions behind** (say you are on 1.1.2.0 while the repository has 1.1.4.0 and 1.1.5.0): it turns into a page-by-page notes browser
+  listing up to the 4 most recent releases, flipping left and right for older / newer notes; **but the download target is always that newest release**,
+  and the green box states “flipping pages only changes the notes, never the version to install”.
+- **After it is found**: one prompt, then by default **download and install in-app** (the package name and version are verified before handing it to the system installer, never through the browser);
+  “download in browser / copy link” remains as a fallback. Dismissing with “later” means it will remind you again next launch
+  (deliberately no permanent “skip this version”, which tends to make people forget to update forever).
+- **Download URLs must be our own domains**: `github.com`, `objects.githubusercontent.com`, `release-assets.githubusercontent.com`,
+  `codeload.github.com`, `gitee.com`, and https only; anything else gets the release page and no direct link.
+- **Not updating still works**: there is no “no update, no use” logic in the code; installing over keeps settings and history reports intact.
+
+## How to use it
+
+### Option 1: Windows — double-click and it runs
+
+1. Go to the **[Releases page](https://github.com/neurotracee/github-netcheck/releases/latest)** and download `NetCheck-Windows.zip` (or grab the two files in the repository's `windows/` folder; if the mainland connection is slow, use the [Gitee releases page](https://gitee.com/bio234/github-netcheck/releases/latest) — it is the same package).
+2. Unzip and double-click **一键网络自检.bat**; a menu appears:
+
+   ```
+   [1] 开始自检（14 个点位，约 30 秒）
+   [2] 只测 GitHub 系（更快）
+   [3] 关于与开源信息
+   [4] 设置（报告位置 / 先问我 / 自动打开 / 自动查更新 / 超时）
+   [5] 检查更新（只读远端版本号）
+   [0] 退出
+   ```
+
+   The top of the menu permanently carries the attribution, the licence and both project URLs — who made this tool and where it comes from sits in the most visible place.
+3. Choose 1 (or 2); the 14 targets are tested one by one, roughly 15–40 seconds depending on how bad the network is.
+4. When the run ends it **does not silently dump a pile of files**; it asks three questions first:
+   - “Generate an HTML report this time?” (Enter = yes)
+   - “Open it in the browser now?” (Enter = yes)
+   - “Remember this choice (do not ask again)?” (not remembered by default)
+
+   Answer “remember” and the choice is written into `settings.json` so it stops asking; to undo, open Settings and tick “ask me after every check”.
+   Reports go to `reports\` (`latest.html` is the newest, and each historical run keeps its own HTML + CSV under a timestamp).
+
+No PowerShell module, no Python, no online installation — it uses the PowerShell 5.1 that ships with Windows.
+If Windows says “cannot load the file because running scripts is disabled on this system”, launch it through the bat (it already passes `-ExecutionPolicy Bypass`).
+
+### Option 2: Android — install the APK
+
+1. Go to the **[Releases page](https://github.com/neurotracee/github-netcheck/releases/latest)** and download `NetCheck-<version>.apk` (Android 8.0+, universal package, any CPU architecture).
+2. Tap it to install; when the system warns about an “unknown source”, allow the current file manager to install.
+3. Open the app and tap **Start check**. While it runs you see “正在测试 3 / 14 · GitHub API 接口”.
+4. When it finishes: every row opens for detail (status code, DoH comparison, four-stage timings); **Export report** hands you an HTML file (see the save-location note below), and **Share CSV** exports the raw data.
+5. The **gear** at the top right opens Settings: UI language (中文 / English), appearance (follow system / light / dark), report
+   save location, update-check mode, update source (auto, Gitee by default / Gitee only / GitHub only), version and updates; at the very bottom **About and
+   open-source information** (attribution, licence, both URLs, privacy statement, the three hard requirements for derivative work).
+
+**Where reports are saved**: by default through the system share sheet (send to WeChat, mail, or “Files”); once you pick a folder in settings,
+exports are written straight into it and the share sheet stops appearing.
+
+Three permissions, all serving measurement and updates only: `INTERNET` (to open sockets), `ACCESS_NETWORK_STATE` (to read the current network type, proxy, private DNS and DNS servers),
+`REQUEST_INSTALL_PACKAGES` (to hand a downloaded APK to the system installer on update, which then asks once more).
+There is no storage permission — reports are written into the app's private directory, and exporting writes wherever you point it (SAF grant for that one folder).
+No analytics, no uploads; the network is used in exactly two places: the check itself, and the update check (reads one public version number, silently once at launch by default, switchable to manual only).
+
+### Option 3: run the Windows build from source
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\windows\netcheck.ps1
+```
+
+Advanced usage:
+
+```powershell
+# GitHub family only (faster)
+powershell -ExecutionPolicy Bypass -File .\windows\netcheck.ps1 -Quick
+
+# no questions, no browser — follow the remembered "want a report?" choice (for automation / CI)
+powershell -ExecutionPolicy Bypass -File .\windows\netcheck.ps1 -NoBrowser
+
+# only the "about and open-source" window
+powershell -ExecutionPolicy Bypass -File .\windows\netcheck.ps1 -About
+
+# only the settings window (report location, ask first, auto-open, auto update check, per-stage timeout)
+powershell -ExecutionPolicy Bypass -File .\windows\netcheck.ps1 -Settings
+
+# only read the latest version number, no network test
+powershell -ExecutionPolicy Bypass -File .\windows\netcheck.ps1 -CheckUpdate
+```
+
+Settings live in `settings.json` next to the script (no registry, no network); delete it to return to defaults:
+
+```json
+{
+  "ReportDir": "reports",
+  "AutoOpen": false,
+  "TimeoutMs": 3000,
+  "AutoCheckUpdate": true,
+  "AskBeforeReport": true,
+  "SaveReport": true
+}
+```
+
+`AskBeforeReport` means “ask me after every run”; `AutoOpen` / `SaveReport` apply only when the question is off;
+`AutoCheckUpdate` is the silent once-a-launch version read (a public file only, skipped if unreachable).
+
+To change the targets, open `windows/netcheck.ps1` in Notepad and edit the `$Targets` block at the top — add one line in the same format:
+
+```powershell
+@{ Name = '某个站点'; Host = 'example.com'; Path = '/'; Desc = '备注' }
+```
+
+On Android, edit the `all` list in `android/app/src/main/java/com/neurotracee/netcheck/net/Targets.kt`; the fields map one to one.
+
+## Building it yourself
+
+The Windows build needs no packaging: the `.ps1` is plain text, and the bat is just a launcher.
+
+Android APK: JDK 17 + Android SDK 34 + Gradle 8.7.
+
+```bash
+cd android
+gradle assembleRelease
+```
+
+The output lands in `android/app/build/outputs/apk/release/app-release.apk`.
+Signing reads `android/keystore.properties` (not in the repository); without that file you get an unsigned release build.
+Full steps, how to create the keystore, and how to verify the output: [docs/05-构建与发布.md](docs/05-构建与发布.md).
+
+## Known limitations
+
+- **It measures TCP/TLS handshake latency, which is not download speed.** Measuring bandwidth means moving large files; this tool does not.
+- **IPv4 and TLS 1.2 only.** Identical on both platforms: Android forces `TLSv1.2`, matching the desktop's `SslProtocols::Tls12`, so numbers from the two devices are comparable.
+  The cost is that sites supporting only TLS 1.3 are graded “limited”; none of the 14 endpoints is such a site.
+- **Certificate validation is skipped, to measure pure connectivity.** So “broken certificate chain but reachable” shows up as fine in the report.
+- **Timeout is 3 seconds everywhere.** On a very bad network a target that would have connected in 5 seconds is graded failed — rerun once to see whether it is stable.
+- **Three items Android cannot read are replaced with equivalents** (the only structural difference between the two reports):
+  - “is anything listening on local port 443” → Android forbids ordinary apps from enumerating ports, so it shows **whether a VPN is active** and **the private DNS mode** instead;
+  - “system proxy” → Android reads `ConnectivityManager`'s default proxy, not registry settings like IE;
+  - “hosts mappings” → reads `/system/etc/hosts`; on Android this file is usually empty, so you see however many lines it has.
+- **Android 7 and below are unsupported** (`minSdk 26`). To go lower, edit `app/build.gradle.kts` yourself and handle the `privateDns` API differences.
+- **Every run leaves one HTML and one CSV in the report directory**; delete them if that piles up (Windows: `reports/`; Android: the app's private directory, cleared on uninstall).
+
+## Dependencies and licences
+
+| Dependency | Version | Purpose | Licence |
+| --- | --- | --- | --- |
+| Windows PowerShell (.NET Framework) | 5.1+, ships with the OS | script runtime | distributed with Windows |
+| [AndroidX](https://developer.android.com/jetpack/androidx) (core-ktx / lifecycle / activity-compose) | 1.13.1 / 2.8.4 / 1.9.1 | Android base framework | Apache-2.0 |
+| [Jetpack Compose](https://developer.android.com/jetpack/compose) (ui / foundation / material3 / material-icons-core) | BOM 2024.06.00 | UI | Apache-2.0 |
+| [Kotlin standard library](https://kotlinlang.org/) | 1.9.24 | language runtime | Apache-2.0 |
+| Android Gradle Plugin / Gradle | 8.4.2 / 8.7 | build only (not shipped) | Apache-2.0 |
+| JUnit 4 / kotlin-test | 4.13.2 / 1.9.24 | unit tests only (not shipped) | EPL-1.0 / Apache-2.0 |
+
+**No third-party privacy or networking library needs declaring**: the probe core is native `java.net.Socket` + `javax.net.ssl`,
+the UI is Compose, and HTTP is hand-written (precisely so it can be timed in stages). So the APK contains no OkHttp, no analytics SDK, no ad SDK.
+Full declarations in [NOTICE.md](NOTICE.md).
+
+## Privacy
+
+- **No proxying, no system changes, no hosts edits.** It only opens connections and reads response headers.
+- **Nothing is reported anywhere.** Outbound connections are only: the 14 endpoints themselves, one DoH comparison query (to Ali public DNS),
+  and one update check at Android launch (reads one public version number on Gitee or GitHub, sends no local information, can be switched off in settings).
+- **Reports never leave the machine.** Windows writes into `reports/` (or the directory you chose); Android writes into the app's private directory, and leaves the app only when you tap “Export”.
+- **A report contains only**: endpoint name, domain, resolved IP, the four stage timings, HTTP status code, grade. No device identifiers, no accounts, no browsing history.
+- **Android reads no contacts, no SMS, no gallery, and asks for no storage permission.**
+- **The Windows build needs no administrator rights and writes no registry**; settings live only in `settings.json` beside the script.
+- The generated HTML report is a **static file** with no external scripts or images — it opens offline.
+
+## Licence
+
+Apache License 2.0, see [LICENSE](LICENSE).
+Attribution and source requirements (the operative wording of §4 and §6) are in [ADDITIONAL-TERMS.md](ADDITIONAL-TERMS.md); third-party component declarations are in [NOTICE.md](NOTICE.md).
+
+```
+Copyright (C) 2026 项目创作时为初中生
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
+
+## Documentation
+
+| What you want | Where |
+| --- | --- |
+| What changed and what was fixed in this version | [CHANGELOG.md](CHANGELOG.md) |
+| Documentation map: which file is where, how to find things | [DOCS.md](DOCS.md) |
+| Full operating instructions for Windows / Android | [docs/01](docs/01-使用说明-Windows.md) · [docs/02](docs/02-使用说明-安卓.md) |
+| Detection method and grading criteria | [docs/03](docs/03-检测方法与判读标准.md) |
+| FAQ | [docs/04](docs/04-常见问题.md) |
+| Build, test, release | [docs/05](docs/05-构建与发布.md) |
+| How to publish a Release (click-by-click in the web UI) | [docs/06](docs/06-发布Release操作指南.md) |
+| Want to improve it, report a defect, add an endpoint | [CONTRIBUTING.md](CONTRIBUTING.md) |
+
+Android has no separate README: capabilities, licence and attribution are shared wording across both platforms, and writing two versions guarantees one gets updated and the other forgotten.
+
+## Maintenance and feedback
+
+This project is maintained by one person in spare time, with a blunt order of priority: **inaccurate measurement, misleading verdicts, unstable results** come first; UI polish and nice-to-have features can wait. All code is public, and anyone may fork and improve it without asking, without waiting for the author to reply.
+
+- **Report a defect**: use the template at [Issues](https://github.com/neurotracee/github-netcheck/issues/new/choose), stating the version, OS/device model, which endpoints, and a report screenshot. Both ends are open — Gitee works too ([Gitee Issues](https://gitee.com/bio234/github-netcheck/issues)).
+- **Suggest an improvement / send code**: read [CONTRIBUTING.md](CONTRIBUTING.md) first — directory layout, how to run a check, and what will be asked of your commit.
+- **Replies may be slow**: it will be handled when seen; silence does not mean unseen, nor rejected.
+
+## 赞赏 / Donations
+
+If this project saved you some time, you can buy me a milk tea 🧋
+
+![WeChat donation QR](docs/img/wechat-donate.png)
+
+> **This image not showing on GitHub?** You did nothing wrong and the file was not deleted. Images inside the repository go through
+> `raw.githubusercontent.com` on GitHub pages, a domain that is frequently cut off in mainland China — the very endpoint this tool tests. The same page on Gitee shows it:
+> https://gitee.com/bio234/github-netcheck (the “赞赏” section at the end). The QR codes inside both programs are **bundled images**, no network needed,
+> and work offline: the Windows “About and open-source information” window, and the “赞赏（完全自愿）” card at the bottom of the Android About page.
+
+You can also see the code inside the programs: the Windows “About and open-source information” window and the Android About page's “赞赏（完全自愿）” card,
+with the same sentence — **if this little tool saved you a bit of time, feel free to buy me a milk tea; without a donation it works exactly the same, not one feature missing.**
+
+> **A star is more useful than a donation.** Clicking both is the most practical: the GitHub star lets people abroad and search engines find it, the Gitee star lets people who cannot get past the firewall open it;
+> click only one and the other half never sees it — one star missing, half the audience gone. If that is inconvenient, one is enough, and nothing is missing.
+> Direct links: [GitHub star](https://github.com/neurotracee/github-netcheck) ｜ [Gitee star](https://gitee.com/bio234/github-netcheck)
+>
+> Mainland users can also scan the code to buy me a milk tea — entirely voluntary; without it the tool is still free with nothing missing.
