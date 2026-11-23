@@ -22,10 +22,12 @@ param(
     [switch]$Quick,       # 加这个参数只测 GitHub 系（少测几个，快一点）
     [switch]$About,       # 只弹「关于与开源信息」窗口，不测
     [switch]$Settings,    # 只弹设置窗口（报告目录 / 自动打开 / 超时），不测
-    [switch]$CheckUpdate  # 只查最新版本号，不测
+    [switch]$CheckUpdate, # 只查最新版本号，不测
+    [switch]$Logs,        # 只打开「应用日志」窗口
+    [switch]$ClearLogs    # 命令行按日期清除日志（会问两次）
 )
 
-$script:AppVersion = '1.1.5.2'
+$script:AppVersion = '1.1.7.0'
 $script:ProjectUrl = 'https://github.com/neurotracee/github-netcheck'
 $script:MirrorUrl  = 'https://gitee.com/bio234/github-netcheck'
 
@@ -268,6 +270,14 @@ function Show-AboutWindow {
     $starGitee.Add_Click({ Start-Process $script:MirrorUrl })
     $form.Controls.Add($starGitee)
 
+    $logBtn = New-Object System.Windows.Forms.Button
+    $logBtn.Text = '应用日志'
+    $logBtn.Size = New-Object System.Drawing.Size(96, 32)
+    $logBtn.Location = New-Object System.Drawing.Point(380, 752)
+    $logBtn.FlatStyle = 'Flat'
+    $logBtn.Add_Click({ Show-LogWindow })
+    $form.Controls.Add($logBtn)
+
     $btn = New-Object System.Windows.Forms.Button
     $btn.Text = '知道了'
     $btn.Size = New-Object System.Drawing.Size(96, 32)
@@ -432,6 +442,473 @@ function Show-SettingsWindow {
     $form.ShowDialog() | Out-Null
 }
 
+
+
+# ---------- 应用日志：logs\netcheck-YYYY-MM-DD.log，保留 365 天 ----------
+#  行首统一是「日期 时间.毫秒」，复制出来就能按时间对号入座；
+#  本次运行的日志另存一份在内存里，窗口里第一屏看的就是它。
+$script:LogDir = Join-Path $ScriptDir 'logs'
+if (-not (Test-Path -LiteralPath $script:LogDir)) { New-Item -ItemType Directory -Path $script:LogDir -Force | Out-Null }
+$script:SessionLog = New-Object System.Collections.ArrayList
+$script:LogDevice = ''
+$script:LastCrashFile = Join-Path $script:LogDir 'last-crash.txt'
+
+function Get-LogDeviceText {
+    $name = 'Windows'
+    try {
+        $cv = Get-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion' -ErrorAction Stop
+        $name = [string]$cv.ProductName + ' ' + [string]$cv.DisplayVersion + '（内部版本 ' + [string]$cv.CurrentBuild + '）'
+    } catch {
+        $name = 'Windows ' + [Environment]::OSVersion.VersionString
+    }
+    return ($name + ' · ' + [string]$env:PROCESSOR_ARCHITECTURE + ' · PowerShell ' + $PSVersionTable.PSVersion.ToString())
+}
+
+function Write-AppLog {
+    param(
+        [string]$Level = 'I',
+        [string]$Tag = 'APP',
+        [string]$Message = ''
+    )
+    try {
+        $now = Get-Date
+        $line = $now.ToString('yyyy-MM-dd HH:mm:ss.fff') + ' [' + $Level + '] [' + $Tag + '] ' + $Message
+        [void]$script:SessionLog.Add($line)
+        if ($script:SessionLog.Count -gt 800) { $script:SessionLog.RemoveAt(0) }
+        $f = Join-Path $script:LogDir ('netcheck-' + $now.ToString('yyyy-MM-dd') + '.log')
+        if ((Test-Path -LiteralPath $f) -and ((Get-Item -LiteralPath $f).Length -gt 524288)) { return }
+        $enc = New-Object System.Text.UTF8Encoding($false)
+        [System.IO.File]::AppendAllText($f, $line + "`r`n", $enc)
+    } catch { }
+}
+
+function Remove-ExpiredLogs {
+    $cut = (Get-Date).Date.AddDays(-364)
+    Get-ChildItem -LiteralPath $script:LogDir -Filter 'netcheck-*.log' -ErrorAction SilentlyContinue | ForEach-Object {
+        if ($_.Name -match 'netcheck-(\d{4}-\d{2}-\d{2})\.log') {
+            $d = [datetime]::ParseExact($Matches[1], 'yyyy-MM-dd', $null)
+            if ($d -lt $cut) { Remove-Item -LiteralPath $_.FullName -Force -ErrorAction SilentlyContinue }
+        }
+    }
+}
+
+function Start-AppLog {
+    param([string]$Mode = 'run')
+    $script:LogDevice = Get-LogDeviceText
+    Remove-ExpiredLogs
+    Write-AppLog 'I' 'APP' ('启动 v' + $script:AppVersion + ' · ' + $script:LogDevice + ' · 模式 ' + $Mode)
+}
+
+function Get-SessionLogText {
+    $head = '本次启动：' + ((Get-Date).ToString('yyyy-MM-dd HH:mm:ss')) + ' · v' + $script:AppVersion + ' · ' + $script:LogDevice
+    if ($script:SessionLog.Count -eq 0) { return $head }
+    return ($head + "`r`n" + ($script:SessionLog -join "`r`n"))
+}
+
+function Get-LogDays {
+    $days = @()
+    Get-ChildItem -LiteralPath $script:LogDir -Filter 'netcheck-*.log' -ErrorAction SilentlyContinue | ForEach-Object {
+        if ($_.Name -match 'netcheck-(\d{4}-\d{2}-\d{2})\.log') { $days += $Matches[1] }
+    }
+    return ($days | Sort-Object -Descending)
+}
+
+function Test-HmText {
+    param([string]$Text)
+    if ([string]::IsNullOrWhiteSpace($Text)) { return $true }
+    return ($Text.Trim() -match '^([01][0-9]|2[0-3]):[0-5][0-9]')
+}
+
+function Read-LogRange {
+    param([string]$From, [string]$To, [string]$FromTime = '', [string]$ToTime = '')
+    $fromD = [datetime]::ParseExact($From, 'yyyy-MM-dd', $null)
+    $toD = [datetime]::ParseExact($To, 'yyyy-MM-dd', $null)
+    if ($toD -lt $fromD) { throw '结束日期早于起始日期' }
+    $fTime = if ([string]::IsNullOrWhiteSpace($FromTime)) { '00:00' } else { $FromTime.Trim() }
+    $tTime = if ([string]::IsNullOrWhiteSpace($ToTime)) { '23:59' } else { $ToTime.Trim() }
+    $sb = New-Object System.Text.StringBuilder
+    Get-ChildItem -LiteralPath $script:LogDir -Filter 'netcheck-*.log' | Sort-Object Name | ForEach-Object {
+        if ($_.Name -match 'netcheck-(\d{4}-\d{2}-\d{2})\.log') {
+            $day = [datetime]::ParseExact($Matches[1], 'yyyy-MM-dd', $null)
+            if ($day -lt $fromD -or $day -gt $toD) { return }
+            $lines = [System.IO.File]::ReadAllLines($_.FullName, (New-Object System.Text.UTF8Encoding($false)))
+            [void]$sb.AppendLine('----- ' + $Matches[1] + ' -----')
+            $keep = $false
+            foreach ($ln in $lines) {
+                $hm = $null
+                if ($ln.Length -ge 16 -and $ln.Substring(4, 1) -eq '-') { $hm = $ln.Substring(11, 5) }
+                if ($hm) { $keep = ($hm -ge $fTime -and $hm -le $tTime) }
+                if ($keep) { [void]$sb.AppendLine($ln) }
+            }
+        }
+    }
+    return $sb.ToString()
+}
+
+function Get-LogRangeCount {
+    param([string]$From, [string]$To)
+    $fromD = [datetime]::ParseExact($From, 'yyyy-MM-dd', $null)
+    $toD = [datetime]::ParseExact($To, 'yyyy-MM-dd', $null)
+    $n = 0
+    $bytes = 0
+    Get-ChildItem -LiteralPath $script:LogDir -Filter 'netcheck-*.log' -ErrorAction SilentlyContinue | ForEach-Object {
+        if ($_.Name -match 'netcheck-(\d{4}-\d{2}-\d{2})\.log') {
+            $day = [datetime]::ParseExact($Matches[1], 'yyyy-MM-dd', $null)
+            if ($day -ge $fromD -and $day -le $toD) { $n++; $bytes += $_.Length }
+        }
+    }
+    return @{ Days = $n; Bytes = $bytes }
+}
+
+function Clear-LogRange {
+    param([string]$From, [string]$To, [string]$FromTime = '', [string]$ToTime = '')
+    $fromD = [datetime]::ParseExact($From, 'yyyy-MM-dd', $null)
+    $toD = [datetime]::ParseExact($To, 'yyyy-MM-dd', $null)
+    $n = 0
+    Get-ChildItem -LiteralPath $script:LogDir -Filter 'netcheck-*.log' -ErrorAction SilentlyContinue | ForEach-Object {
+        if ($_.Name -match 'netcheck-(\d{4}-\d{2}-\d{2})\.log') {
+            $day = [datetime]::ParseExact($Matches[1], 'yyyy-MM-dd', $null)
+            if ($day -lt $fromD -or $day -gt $toD) { return }
+            if ([string]::IsNullOrWhiteSpace($FromTime) -and [string]::IsNullOrWhiteSpace($ToTime)) {
+                Remove-Item -LiteralPath $_.FullName -Force -ErrorAction SilentlyContinue
+                $n++
+            } else {
+                $fTime = if ([string]::IsNullOrWhiteSpace($FromTime)) { '00:00' } else { $FromTime.Trim() }
+                $tTime = if ([string]::IsNullOrWhiteSpace($ToTime)) { '23:59' } else { $ToTime.Trim() }
+                $kept = New-Object System.Collections.ArrayList
+                $lines = [System.IO.File]::ReadAllLines($_.FullName, (New-Object System.Text.UTF8Encoding($false)))
+                $keep = $false
+                foreach ($ln in $lines) {
+                    $hm = $null
+                    if ($ln.Length -ge 16 -and $ln.Substring(4, 1) -eq '-') { $hm = $ln.Substring(11, 5) }
+                    if ($hm) { $keep = -not ($hm -ge $fTime -and $hm -le $tTime) }
+                    if (-not $hm -and $keep) { }
+                    if ($keep) { [void]$kept.Add($ln) }
+                    elseif (-not $hm) { [void]$kept.Add($ln) }
+                }
+                if ($kept.Count -eq 0) {
+                    Remove-Item -LiteralPath $_.FullName -Force -ErrorAction SilentlyContinue
+                } else {
+                    [System.IO.File]::WriteAllLines($_.FullName, $kept, (New-Object System.Text.UTF8Encoding($false)))
+                }
+                $n++
+            }
+        }
+    }
+    return $n
+}
+
+function Get-FeedbackTemplate {
+    param([string]$Version = '')
+    $device = if ($script:LogDevice) { $script:LogDevice } else { Get-LogDeviceText }
+    $lines = @(
+        '版本号：v' + $Version,
+        '机型系统：' + $device,
+        '问题一句话：打开设置窗口再关掉，菜单里的「请选择：」不见了',
+        '',
+        '复现步骤：',
+        '1. 双击 一键网络自检.bat 打开程序',
+        '2. 输入 4 打开设置窗口，再点取消',
+        '3. 回到菜单，看「请选择：」这一行',
+        '   结果：输入提示不见了，只剩下几条灰字',
+        '',
+        '实际看到：菜单底部没有「请选择：」，直接卡住不动',
+        '预期结果：关掉设置窗口后，菜单仍然在等待输入',
+        '',
+        '日志：见附件 TXT（菜单 [6] 查看日志 → 导出 TXT；本次运行的日志在窗口第一屏）',
+        '',
+        '提交地址：',
+        'GitHub Issue：' + $script:ProjectUrl + '/issues/new/choose',
+        'Gitee Issue：' + $script:MirrorUrl + '/issues'
+    )
+    return ($lines -join "`r`n")
+}
+
+# ---------- 日志窗口：本次运行 / 按日期查 / 复制 / 导出 / 按区间清除 ----------
+function Show-LogWindow {
+    Add-Type -AssemblyName System.Windows.Forms
+    Add-Type -AssemblyName System.Drawing
+    $font = New-Object System.Drawing.Font('Microsoft YaHei UI', 9)
+    $mono = New-Object System.Drawing.Font('Consolas', 9)
+    $form = New-Object System.Windows.Forms.Form
+    $form.Text = '应用日志 · GitHub 网络自检 v' + $script:AppVersion
+    $form.Size = New-Object System.Drawing.Size(880, 700)
+    $form.StartPosition = 'CenterScreen'
+    $form.BackColor = [System.Drawing.Color]::FromArgb(244, 246, 248)
+    $form.Font = $font
+
+    $title = New-Object System.Windows.Forms.Label
+    $title.Text = '应用日志'
+    $title.Font = New-Object System.Drawing.Font('Microsoft YaHei UI', 14, [System.Drawing.FontStyle]::Bold)
+    $title.AutoSize = $true
+    $title.Location = New-Object System.Drawing.Point(18, 12)
+    $form.Controls.Add($title)
+
+    $tip = New-Object System.Windows.Forms.Label
+    $tip.Text = '保留最近 365 天，一天一个文件；只写在本机 logs 目录，不上传。清空先行两次确认。'
+    $tip.AutoSize = $true
+    $tip.ForeColor = [System.Drawing.Color]::FromArgb(107, 119, 133)
+    $tip.Location = New-Object System.Drawing.Point(20, 44)
+    $form.Controls.Add($tip)
+
+    $crash = $null
+    if (Test-Path -LiteralPath $script:LastCrashFile) {
+        try { $crash = (Get-Content -LiteralPath $script:LastCrashFile -Raw -Encoding UTF8).Trim() } catch { }
+    }
+    if ($crash) {
+        $crashLabel = New-Object System.Windows.Forms.Label
+        $crashLabel.Text = '上次运行异常退出：' + $crash
+        $crashLabel.AutoSize = $false
+        $crashLabel.Size = New-Object System.Drawing.Size(820, 20)
+        $crashLabel.ForeColor = [System.Drawing.Color]::FromArgb(154, 106, 8)
+        $crashLabel.Location = New-Object System.Drawing.Point(20, 66)
+        $form.Controls.Add($crashLabel)
+    }
+
+    $lblFrom = New-Object System.Windows.Forms.Label
+    $lblFrom.Text = '起始日期'
+    $lblFrom.AutoSize = $true
+    $lblFrom.Location = New-Object System.Drawing.Point(20, 96)
+    $form.Controls.Add($lblFrom)
+
+    $dtFrom = New-Object System.Windows.Forms.DateTimePicker
+    $dtFrom.Format = 'Custom'
+    $dtFrom.CustomFormat = 'yyyy-MM-dd'
+    $dtFrom.Size = New-Object System.Drawing.Size(120, 26)
+    $dtFrom.Location = New-Object System.Drawing.Point(84, 92)
+    $dtFrom.Value = (Get-Date).Date
+    $form.Controls.Add($dtFrom)
+
+    $lblTo = New-Object System.Windows.Forms.Label
+    $lblTo.Text = '结束日期'
+    $lblTo.AutoSize = $true
+    $lblTo.Location = New-Object System.Drawing.Point(220, 96)
+    $form.Controls.Add($lblTo)
+
+    $dtTo = New-Object System.Windows.Forms.DateTimePicker
+    $dtTo.Format = 'Custom'
+    $dtTo.CustomFormat = 'yyyy-MM-dd'
+    $dtTo.Size = New-Object System.Drawing.Size(120, 26)
+    $dtTo.Location = New-Object System.Drawing.Point(284, 92)
+    $dtTo.Value = (Get-Date).Date
+    $form.Controls.Add($dtTo)
+
+    $lblT1 = New-Object System.Windows.Forms.Label
+    $lblT1.Text = '起始时间(可空)'
+    $lblT1.AutoSize = $true
+    $lblT1.Location = New-Object System.Drawing.Point(420, 96)
+    $form.Controls.Add($lblT1)
+
+    $txtT1 = New-Object System.Windows.Forms.TextBox
+    $txtT1.Size = New-Object System.Drawing.Size(64, 26)
+    $txtT1.Location = New-Object System.Drawing.Point(510, 92)
+    $form.Controls.Add($txtT1)
+
+    $lblT2 = New-Object System.Windows.Forms.Label
+    $lblT2.Text = '结束时间'
+    $lblT2.AutoSize = $true
+    $lblT2.Location = New-Object System.Drawing.Point(586, 96)
+    $form.Controls.Add($lblT2)
+
+    $txtT2 = New-Object System.Windows.Forms.TextBox
+    $txtT2.Size = New-Object System.Drawing.Size(64, 26)
+    $txtT2.Location = New-Object System.Drawing.Point(652, 92)
+    $form.Controls.Add($txtT2)
+
+    $btnQuery = New-Object System.Windows.Forms.Button
+    $btnQuery.Text = '查询'
+    $btnQuery.Size = New-Object System.Drawing.Size(72, 28)
+    $btnQuery.Location = New-Object System.Drawing.Point(732, 90)
+    $btnQuery.FlatStyle = 'Flat'
+    $form.Controls.Add($btnQuery)
+
+    $cbDays = New-Object System.Windows.Forms.ComboBox
+    $cbDays.DropDownStyle = 'DropDownList'
+    $cbDays.Size = New-Object System.Drawing.Size(150, 26)
+    $cbDays.Location = New-Object System.Drawing.Point(20, 128)
+    $form.Controls.Add($cbDays)
+    $dayHint = New-Object System.Windows.Forms.Label
+    $dayHint.Text = '有日志的日期（选一个就填进起止）'
+    $dayHint.AutoSize = $true
+    $dayHint.ForeColor = [System.Drawing.Color]::FromArgb(107, 119, 133)
+    $dayHint.Location = New-Object System.Drawing.Point(180, 132)
+    $form.Controls.Add($dayHint)
+
+    $btnSession = New-Object System.Windows.Forms.Button
+    $btnSession.Text = '只看本次启动'
+    $btnSession.Size = New-Object System.Drawing.Size(112, 28)
+    $btnSession.Location = New-Object System.Drawing.Point(500, 126)
+    $btnSession.FlatStyle = 'Flat'
+    $form.Controls.Add($btnSession)
+
+    $rtb = New-Object System.Windows.Forms.RichTextBox
+    $rtb.ReadOnly = $true
+    $rtb.Font = $mono
+    $rtb.BorderStyle = 'FixedSingle'
+    $rtb.BackColor = [System.Drawing.Color]::White
+    $rtb.WordWrap = $false
+    $rtb.ScrollBars = 'Both'
+    $rtb.Location = New-Object System.Drawing.Point(20, 164)
+    $rtb.Size = New-Object System.Drawing.Size(824, 360)
+    $form.Controls.Add($rtb)
+
+    $btnCopy = New-Object System.Windows.Forms.Button
+    $btnCopy.Text = '复制全部'
+    $btnCopy.Size = New-Object System.Drawing.Size(96, 30)
+    $btnCopy.Location = New-Object System.Drawing.Point(20, 540)
+    $btnCopy.FlatStyle = 'Flat'
+    $form.Controls.Add($btnCopy)
+
+    $btnExport = New-Object System.Windows.Forms.Button
+    $btnExport.Text = '导出 TXT'
+    $btnExport.Size = New-Object System.Drawing.Size(96, 30)
+    $btnExport.Location = New-Object System.Drawing.Point(124, 540)
+    $btnExport.FlatStyle = 'Flat'
+    $form.Controls.Add($btnExport)
+
+    $btnTemplate = New-Object System.Windows.Forms.Button
+    $btnTemplate.Text = '复制反馈模板'
+    $btnTemplate.Size = New-Object System.Drawing.Size(112, 30)
+    $btnTemplate.Location = New-Object System.Drawing.Point(228, 540)
+    $btnTemplate.FlatStyle = 'Flat'
+    $form.Controls.Add($btnTemplate)
+
+    $btnGh = New-Object System.Windows.Forms.Button
+    $btnGh.Text = 'GitHub Issue'
+    $btnGh.Size = New-Object System.Drawing.Size(108, 30)
+    $btnGh.Location = New-Object System.Drawing.Point(348, 540)
+    $btnGh.FlatStyle = 'Flat'
+    $form.Controls.Add($btnGh)
+
+    $btnGitee = New-Object System.Windows.Forms.Button
+    $btnGitee.Text = 'Gitee Issue'
+    $btnGitee.Size = New-Object System.Drawing.Size(104, 30)
+    $btnGitee.Location = New-Object System.Drawing.Point(464, 540)
+    $btnGitee.FlatStyle = 'Flat'
+    $form.Controls.Add($btnGitee)
+
+    $btnClear = New-Object System.Windows.Forms.Button
+    $btnClear.Text = '清除这段日期'
+    $btnClear.Size = New-Object System.Drawing.Size(120, 30)
+    $btnClear.Location = New-Object System.Drawing.Point(576, 540)
+    $btnClear.ForeColor = [System.Drawing.Color]::FromArgb(208, 52, 44)
+    $btnClear.FlatStyle = 'Flat'
+    $form.Controls.Add($btnClear)
+
+    $btnClose = New-Object System.Windows.Forms.Button
+    $btnClose.Text = '关闭'
+    $btnClose.Size = New-Object System.Drawing.Size(96, 30)
+    $btnClose.Location = New-Object System.Drawing.Point(748, 540)
+    $btnClose.BackColor = [System.Drawing.Color]::FromArgb(59, 130, 196)
+    $btnClose.ForeColor = [System.Drawing.Color]::White
+    $btnClose.FlatStyle = 'Flat'
+    $form.Controls.Add($btnClose)
+
+    $foot = New-Object System.Windows.Forms.Label
+    $foot.Text = '提交反馈时请写清：版本号、机型与系统、一句话说清发生了什么，再加三步复现与实际/预期结果，日志作为 TXT 附上。'
+    $foot.AutoSize = $false
+    $foot.Size = New-Object System.Drawing.Size(824, 40)
+    $foot.ForeColor = [System.Drawing.Color]::FromArgb(107, 119, 133)
+    $foot.Location = New-Object System.Drawing.Point(20, 580)
+    $form.Controls.Add($foot)
+
+    $daysList = Get-LogDays
+    foreach ($d in $daysList) { [void]$cbDays.Items.Add($d) }
+    if ($cbDays.Items.Count -gt 0) { $cbDays.SelectedIndex = 0 }
+
+    $loadRange = {
+        $from = $dtFrom.Value.ToString('yyyy-MM-dd')
+        $to = $dtTo.Value.ToString('yyyy-MM-dd')
+        $t1 = $txtT1.Text
+        $t2 = $txtT2.Text
+        if (-not (Test-HmText $t1) -or -not (Test-HmText $t2)) {
+            [System.Windows.Forms.MessageBox]::Show('时间要写成 09:30 这种 24 小时制，留空表示整天。', '时间格式')
+            return
+        }
+        try {
+            $text = Read-LogRange -From $from -To $to -FromTime $t1 -ToTime $t2
+        } catch {
+            [System.Windows.Forms.MessageBox]::Show($_.Exception.Message, '日期范围')
+            return
+        }
+        if ([string]::IsNullOrWhiteSpace($text)) {
+            $rtb.Text = '（' + $from + ' 到 ' + $to + ' 这段时间没有日志）'
+        } else {
+            $rtb.Text = $text
+            $rtb.SelectionStart = 0
+            $rtb.SelectionLength = 0
+        }
+        Write-AppLog 'I' 'LOG' ('查询日志 ' + $from + ' → ' + $to + ' 时间 ' + $(if ($t1) { $t1 } else { '00:00' }) + '-' + $(if ($t2) { $t2 } else { '23:59' })
+        )
+    }
+
+    $btnQuery.Add_Click($loadRange)
+    $btnSession.Add_Click({
+        $rtb.Text = Get-SessionLogText
+        $rtb.SelectionStart = 0
+    })
+    $cbDays.Add_SelectedIndexChanged({
+        if ($cbDays.SelectedItem) {
+            $d = [datetime]::ParseExact([string]$cbDays.SelectedItem, 'yyyy-MM-dd', $null)
+            $dtFrom.Value = $d
+            $dtTo.Value = $d
+            $txtT1.Text = ''
+            $txtT2.Text = ''
+            & $loadRange
+        }
+    })
+    $btnCopy.Add_Click({
+        if ($rtb.Text.Length -gt 0) {
+            [System.Windows.Forms.Clipboard]::SetText($rtb.Text)
+            [System.Windows.Forms.MessageBox]::Show('已复制到剪贴板。', '复制日志')
+        }
+    })
+    $btnExport.Add_Click({
+        $dlg = New-Object System.Windows.Forms.SaveFileDialog
+        $dlg.Filter = '文本文件 (*.txt)|*.txt'
+        $dlg.FileName = 'netcheck-log-' + (Get-Date).ToString('yyyyMMdd-HHmmss') + '.txt'
+        if ($dlg.ShowDialog() -eq 'OK') {
+            $enc = New-Object System.Text.UTF8Encoding($false)
+            [System.IO.File]::WriteAllText($dlg.FileName, $rtb.Text, $enc)
+            [System.Windows.Forms.MessageBox]::Show('已保存：' + $dlg.FileName, '导出 TXT')
+        }
+    })
+    $btnTemplate.Add_Click({
+        [System.Windows.Forms.Clipboard]::SetText((Get-FeedbackTemplate -Version $script:AppVersion))
+        [System.Windows.Forms.MessageBox]::Show('反馈模板已复制。记得把日志用「复制全部」或「导出 TXT」一起附上。', '反馈模板')
+    })
+    $btnGh.Add_Click({ Start-Process ($script:ProjectUrl + '/issues/new/choose') })
+    $btnGitee.Add_Click({ Start-Process ($script:MirrorUrl + '/issues') })
+    $btnClear.Add_Click({
+        $from = $dtFrom.Value.ToString('yyyy-MM-dd')
+        $to = $dtTo.Value.ToString('yyyy-MM-dd')
+        $stats = Get-LogRangeCount -From $from -To $to
+        if ($stats.Days -eq 0) {
+            [System.Windows.Forms.MessageBox]::Show('这段时间没有日志可删。', '清除日志')
+            return
+        }
+        $first = [System.Windows.Forms.MessageBox]::Show(
+            ('将要删除 ' + $from + ' → ' + $to + ' 的日志，共 ' + $stats.Days + ' 天、约 ' + [math]::Round($stats.Bytes / 1024) + ' KB。删除后无法恢复。' + "`r`n`r`n继续吗？"),
+            '删除前的确认', 'YesNo', 'Warning')
+        if ($first -ne 'Yes') { return }
+        $second = [System.Windows.Forms.MessageBox]::Show(
+            ('再确认一次：确定永久删除 ' + $from + ' → ' + $to + ' 这些日志吗？这一步不能撤销。'),
+            '再确认一次', 'YesNo', 'Warning')
+        if ($second -ne 'Yes') { return }
+        $n = Clear-LogRange -From $from -To $to -FromTime $txtT1.Text -ToTime $txtT2.Text
+        Write-AppLog 'W' 'LOG' ('清除日志 ' + $from + ' → ' + $to + ' · ' + $n + ' 天')
+        $daysList = Get-LogDays
+        $cbDays.Items.Clear()
+        foreach ($d in $daysList) { [void]$cbDays.Items.Add($d) }
+        if ($cbDays.Items.Count -gt 0) { $cbDays.SelectedIndex = 0 } else { $rtb.Text = '（已没有历史日志）' }
+        [System.Windows.Forms.MessageBox]::Show('已删除 ' + $n + ' 天的日志。', '清除日志')
+    })
+    $btnClose.Add_Click({ $form.Close() })
+
+    $rtb.Text = Get-SessionLogText
+    $rtb.SelectionStart = 0
+    $form.ShowDialog() | Out-Null
+}
 
 
 # ---------- 测试目标清单（对齐瓦特工具箱的加速项） ----------
@@ -1060,6 +1537,48 @@ function Invoke-UpdateCheck {
 }
 
 # ---------- 参数分派（放在所有函数定义之后，保证 -About / -Settings / -CheckUpdate 都能用到函数） ----------
+if ($Logs) {
+    Start-AppLog 'logs'
+    Show-LogWindow
+    exit 0
+}
+if ($ClearLogs) {
+    Start-AppLog 'clear'
+    Write-Host ''
+    Write-Host ('  清除应用日志 · 保留目录 ' + $script:LogDir) -ForegroundColor Cyan
+    Write-Host '  ---------------------------------------------------------' -ForegroundColor DarkGray
+    $days = Get-LogDays
+    if ($days.Count -eq 0) {
+        Write-Host '  现在没有任何日志文件。' -ForegroundColor DarkGray
+        Write-Host ''
+        exit 0
+    }
+    Write-Host ('  有日志的日期（最多列 15 个）：' + (($days | Select-Object -First 15) -join '、')) -ForegroundColor DarkGray
+    $from = Read-Host '  起始日期（yyyy-MM-dd，回车取消）'
+    if ([string]::IsNullOrWhiteSpace($from)) { Write-Host '  已取消。' -ForegroundColor DarkGray; exit 0 }
+    $to = Read-Host '  结束日期（yyyy-MM-dd，直接回车 = 同起始日期）'
+    if ([string]::IsNullOrWhiteSpace($to)) { $to = $from }
+    $t1 = Read-Host '  起始时间 HH:mm（可空，回车跳过）'
+    $t2 = Read-Host '  结束时间 HH:mm（可空，回车跳过）'
+    try {
+        $stats = Get-LogRangeCount -From $from.Trim() -To $to.Trim()
+    } catch {
+        Write-Host ('  日期写错了：' + $_.Exception.Message) -ForegroundColor Yellow
+        exit 1
+    }
+    if ($stats.Days -eq 0) { Write-Host '  这段时间没有日志。' -ForegroundColor DarkGray; exit 0 }
+    Write-Host ('  将要删除 ' + $from + ' → ' + $to + ' 的日志，共 ' + $stats.Days + ' 天、约 ' + [math]::Round($stats.Bytes / 1024) + ' KB。删除后无法恢复。') -ForegroundColor Yellow
+    $a1 = Read-Host '  继续吗？(y/N)'
+    if ($a1 -notmatch '^[Yy]') { Write-Host '  已取消。' -ForegroundColor DarkGray; exit 0 }
+    $a2 = Read-Host '  再确认一次：确定永久删除这些日志吗？(y/N)'
+    if ($a2 -notmatch '^[Yy]') { Write-Host '  已取消。' -ForegroundColor DarkGray; exit 0 }
+    $n = Clear-LogRange -From $from.Trim() -To $to.Trim() -FromTime $t1 -ToTime $t2
+    Write-AppLog 'W' 'LOG' ('命令行清除 ' + $from + ' → ' + $to + ' · ' + $n + ' 天')
+    Write-Host ('  已删除 ' + $n + ' 天的日志。') -ForegroundColor Cyan
+    Write-Host ''
+    exit 0
+}
+
 if ($About) {
     Show-AboutWindow
     exit 0
@@ -1081,6 +1600,27 @@ if ($CheckUpdate) {
     }
     Write-Host ''
     exit 0
+}
+
+# ---------- 日志会话与崩溃兜底 ----------
+Start-AppLog 'run'
+trap {
+    $errText = [string]$_.Exception.Message
+    Write-AppLog 'F' 'CRASH' ('未捕获异常：' + $errText + "`r`n" + [string]$_.ScriptStackTrace)
+    try {
+        $enc = New-Object System.Text.UTF8Encoding($false)
+        [System.IO.File]::WriteAllText($script:LastCrashFile,
+            ((Get-Date).ToString('yyyy-MM-dd HH:mm:ss') + ' · v' + $script:AppVersion + ' · ' + $errText), $enc)
+    } catch { }
+    Write-Host ''
+    Write-Host ('  程序出错：' + $errText) -ForegroundColor Red
+    Write-Host ('  日志已保存在：' + $script:LogDir) -ForegroundColor Yellow
+    Write-Host '  查看方式：菜单 [6] 查看日志，或在「关于与开源信息」窗口点「应用日志」。' -ForegroundColor Yellow
+    try {
+        Add-Type -AssemblyName System.Windows.Forms
+        [System.Windows.Forms.MessageBox]::Show(('程序出错：' + $errText + "`r`n`r`n日志已保存，可在菜单 [6] 查看日志里看到本次运行的完整记录。"), 'GitHub 网络自检') | Out-Null
+    } catch { }
+    exit 1
 }
 
 # ---------- 开始测试 ----------
@@ -1157,6 +1697,9 @@ foreach ($t in $Targets) {
         Write-Host ("   " + $v.Label + "   " + $https.Error) -ForegroundColor Red
     }
 
+    $level = if ($https.Ok) { 'I' } else { 'W' }
+    Write-AppLog $level 'PROBE' ($t.Name + ' ' + $t.Host + ' → ' + $v.Label + '（DNS ' + $dns.Ms + ' / TCP ' + $https.TcpMs + ' / TLS ' + $https.TlsMs + ' / TTFB ' + $https.Ttfb + '）' + $(if ($https.Error) { ' · ' + $https.Error } else { '' }))
+
     $Results += [pscustomobject]@{
         Name    = $t.Name
         Host    = $t.Host
@@ -1199,6 +1742,9 @@ if ($Slowest) { Write-Host ("  最慢：" + $Slowest.Name + "  " + $Slowest.TcpM
 if ($FailList.Count -gt 0) {
     Write-Host ("  不通：" + (($FailList | ForEach-Object { $_.Name }) -join '、')) -ForegroundColor Red
 }
+Write-AppLog 'I' 'RUN' ('完成 · 可连通 ' + $OkCount + '/' + $Total + ' · 平均建连 ' + $AvgTcp + 'ms · 耗时 ' + $Elapsed + 's' +
+    $(if ($script:RateInfo) { ' · ' + $script:RateInfo } else { '' }) +
+    $(if ($FailList.Count -gt 0) { ' · 异常 ' + (($FailList | ForEach-Object { $_.Name }) -join '、') } else { '' }))
 Write-Host ''
 
 # ---------- 生成 HTML 报告 ----------

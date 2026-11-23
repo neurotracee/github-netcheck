@@ -109,7 +109,7 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 
 > 手机图是 v1.1.6.0 真机重拍的（11 月 20 日）：中文四张浅色、英文四张深色。之所以一浅一深，只是两种语言各担一半截图任务，不是给哪种语言配哪种主题——应用里语言和主题都能各自单独选，理由在文末英文段里也写了一遍。
 > 设置页与关于页暂时沿用旧图（功能未改，但关于页版本号仍是 1.1.5.5，且缺新增的「测试方法」段落），后面补拍。
-> 关于窗那张是 v1.1.5.2 重拍的；控制台菜单页是 v1.1.5.2 刚截的（双击 .bat 的原样）。
+> 关于窗那张是 v1.1.5.2 重拍的；控制台菜单页也是 v1.1.5.2 时截的——那会儿菜单只有 [1]–[5]，现在多了 [6] 查看日志、[7] 清除日志，这张待重截（功能本身不受影响，看代码与文字说明即可）。
 > 套壳脚本：手机 `docs/tools/frame_ui.py`（机身壳，批量用 `frame_batch.py`），Windows `docs/tools/frame_window.py`（窗口壳）；换新截图重跑一遍就行，不用手工修图。
 > 英文界面的截图统一放在本文最后（英文段内的 Screenshots 一节），不在这里和中文图混排。
 
@@ -117,13 +117,13 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 
 ## 下载（先点这里）
 
-**当前版本：安卓 v1.1.6.1 ・ Windows v1.1.5.2**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
+**当前版本：安卓 v1.1.7.0 ・ Windows v1.1.7.0**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
 
 | 你要的 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
 | 最新下载页 | https://github.com/neurotracee/github-netcheck/releases/latest | https://gitee.com/bio234/github-netcheck/releases/latest |
-| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.6.1/NetCheck-1.1.6.1.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.6.1/NetCheck-1.1.6.1.apk |
-| Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.2/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.5.2/NetCheck-Windows.zip |
+| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.0/NetCheck-1.1.7.0.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.0/NetCheck-1.1.7.0.apk |
+| Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.0/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.0/NetCheck-Windows.zip |
 | 仓库首页 | https://github.com/neurotracee/github-netcheck | https://gitee.com/bio234/github-netcheck |
 
 解压 Windows 包后双击 **一键网络自检.bat**；APK 直接安装（系统会提示「未知来源」，原因见下一节）。
@@ -139,7 +139,7 @@ Gitee 的附件总容量只有 1GB，装不下所有历史包，所以安装包�
 
 | 版本档位 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
-| **最新版**（安卓 v1.1.6.1 的 APK、Windows v1.1.5.2 的 zip） | 保留附件 | **保留附件** |
+| **最新版**（安卓 v1.1.7.0 的 APK、Windows v1.1.7.0 的 zip） | 保留附件 | **保留附件** |
 | **上一版**（v1.1.6.0 的安卓 APK、v1.1.5.1 的 Windows zip） | 保留附件 | 保留附件（方便覆盖升级过渡） |
 | **更早的旧版本** | 保留全部附件 | **附件已撤下**，只留发布说明 |
 
@@ -448,6 +448,8 @@ hosts 把域名指向 127.0.0.1
    [3] 关于与开源信息
    [4] 设置（报告位置 / 先问我 / 自动打开 / 自动查更新 / 超时）
    [5] 检查更新（只读远端版本号）
+   [6] 查看日志（本次启动 / 按日期查 / 导出 TXT）
+   [7] 清除日志（按日期，会问两次）
    [0] 退出
    ```
 
@@ -560,6 +562,7 @@ gradle assembleRelease
   - 「hosts 映射」→ 读 `/system/etc/hosts`，安卓上这个文件通常为空，读到几条就显示几条。
 - **安卓 7 及以下不支持**（`minSdk 26`）。要用更低版本得自己改 `app/build.gradle.kts` 并处理 `privateDns` 相关的 API 差异。
 - **每次运行都会在报告目录留一份 HTML 和 CSV**，觉得多了可以自己删（Windows 在 `reports/`，安卓在应用私有目录，卸载即清空）。
+- **日志也会占一点空间**：一天一个文件、单日上限 512 KB、最多留 365 天。不想留就去日志页按日期删掉，或直接删 `logs/` 目录（不影响程序使用，只是少了现场记录）。
 
 ## 依赖与许可
 
@@ -582,10 +585,48 @@ gradle assembleRelease
 - **不联网上报任何东西。** 对外只发起这些连接：14 个测试点位本身、一次 DoH 对照查询（发往阿里公共 DNS）、
   以及安卓端启动时的一次更新检查（只读 Gitee 或 GitHub 上一个公开的版本号，不传本机任何信息，可在设置里关掉）。
 - **报告不出本机。** Windows 端写在 `reports/`（或你在设置里指定的目录）；安卓端写在应用私有目录，只有你主动点「导出」才会离开应用。
+- **日志同样不出本机。** 只写在本机的 `logs/`，不联网、不上传；只有你自己点「复制」或「存为 TXT」并贴到 Issue 里，它才会离开这台设备。
 - **报告里只包含**：点位名、域名、解析到的 IP、四段耗时、HTTP 状态码、评级。不含设备标识、不含账号、不含浏览记录。
 - **安卓端不读通讯录、不读短信、不读相册、不要存储权限。**
 - **Windows 端不用管理员权限、不写注册表**，设置只存在脚本同目录的 `settings.json`。
 - 生成的 HTML 报告是**静态文件**，没有任何外链脚本或图片，断网也能打开。
+
+## 应用日志（两端都有）
+
+以前遇到「界面错位」「偶发崩溃」，用户只能口头描述，作者这边拿不到现场。这一版把运行日志做成了产品的一部分：**默认就在记，出事时自己能翻到，也能一键交给 Issue**。
+
+**记什么、放在哪**
+
+| | 安卓 | Windows |
+| --- | --- | --- |
+| 位置 | 应用私有目录 `logs/`（卸载即清空） | 脚本同目录 `logs/` |
+| 文件 | `log-2026-11-23.txt`，一天一个 | `netcheck-2026-11-23.log`，一天一个 |
+| 保留 | 365 天，超期在启动时自动删除 | 同样 365 天 |
+| 上限 | 单日 512 KB，到顶后当天停写并留一行说明 | 同样 512 KB |
+| 内容 | 启动、进入界面、自检开始 / 完成 / 停止 / 异常、每个异常点位的四段耗时、崩溃堆栈 | 启动、每个点位的判定与耗时、跑完的汇总、未捕获异常与脚本堆栈 |
+
+行首统一是 `2026-11-23 18:49:06.246 [I] [PROBE] …` 这种 24 小时制时间戳，复制出来能直接按分钟对号入座。日志**只在本机**：不联网、不上传、不写系统共享目录。
+
+**怎么看**
+
+- **安卓**：设置 → 关于与开源信息 → **应用日志**（设置页「日志与反馈」里也有同一个入口）。打开就是**本次启动**的记录；切到「历史日志」可以按起止日期 + 起止时间（`HH:mm`，留空表示整天）查，也可以直接点某一天。
+- **Windows**：菜单 **[6] 查看日志**，或在「关于与开源信息」窗口点 **应用日志**。窗口第一屏同样是本次运行的记录。
+
+**崩溃之后**：程序先落盘、再把异常交回系统（所以系统照常弹「应用已停止」），并留一个标记；下次启动会提示「上次运行异常退出，日志在 设置 → 关于 → 应用日志」，安卓的日志页顶部也会显示这次崩溃的摘要，堆栈就在同一次启动的记录里。
+Windows 端在「关于与开源信息」窗口之外，日志窗口顶部也会显示上次崩溃的时间与异常。
+
+**怎么清**：只能手动清，且**要确认两次**。选定起止日期（可再选起止时刻）后，先告诉你「删哪几天、共几天、约多少 KB」，点继续再问一次「确定永久删除吗」，两步都点确认才真删。也可以在安卓日志页直接删某一天里的某一段时间，其余记录保留。
+
+**怎么反馈**：日志页内置一份反馈模板，自动填好版本号与机型系统，格式是「一句话说清发生了什么」+ 三步复现 + 「实际看到 / 预期结果」：
+
+```
+1. 打开 App，等首页加载完
+2. 点右上角齿轮进设置，停 2 秒
+3. 按返回键回到首页
+   结果：首页顶部那张卡片的上边缘被压住，露出半行字
+```
+
+日志用「复制全部」贴进 Issue，或「存为 TXT」后作为附件上传。GitHub 与 Gitee 的 Issue 入口都在同一个页面里，哪个打得开用哪个。
 
 ## 许可
 
@@ -750,14 +791,16 @@ Nothing runs until you press 1; that is the second image below. The two dialogs 
 | Android · History | The “All / OK / Issues” row filters by run count, and issues are split into three grades again; each row states its time and result, and interrupted runs are marked “Incomplete” |
 | Android · History detail | One run, with four-stage timings per endpoint, switchable between “All / Issues” |
 | Android · Settings | Language / appearance / report location / update-check mode / update source (auto, Gitee defaults — Gitee only / GitHub only) / version and update check / About entry |
-| Android · About | Guiding author, development (Doubao work-task Agent × DeepSeek-V4.1-Flash), licence, both URLs, privacy, the three hard requirements, test method, maintenance rhythm |
+| Android · About | Guiding author, development (Doubao work-task Agent × DeepSeek-V4.1-Flash), licence, both URLs, privacy, the three hard requirements, test method, maintenance rhythm, plus the **App logs** entry |
+| Android · Logs | This launch's record, history search by date and time, copy, save as TXT, delete a range with two confirmations, feedback template with both Issue links |
 | Windows · Menu (entry) | Appears the moment the .bat is double-clicked: title block + author / development / licence / both URLs + items `[1]`–`[5]` + `[0]` quit + “请选择:” |
 | Windows · Console (result of 1) | All 14 endpoints with DNS / TCP / TLS / HTTP timings, ending with “reachable X/14, average connect time, elapsed, fastest / slowest / dead” |
-| Windows · About window | Opened by 3: the same “about and open-source” text, plus the donation QR code and direct Star buttons for both repositories |
+| Windows · About window | Opened by 3: the same “about and open-source” text, plus the donation QR code, direct Star buttons for both repositories, and an **App logs** button |
+| Windows · Log window | Menu 6 (or the About button): this run's record, date pickers with optional `HH:mm` filters, copy, export TXT, template, Issue links, range delete with two confirmations |
 
 > The Android screenshots were retaken on a real device running v1.1.6.0 (20 November): four in Chinese (light) and four in English (dark). The one-light-one-dark split is only a division of labour between the two languages, not a statement that one language gets one theme — language and theme are separate settings for everyone. The same reasoning is repeated in the Chinese section.
 > The Settings and About screenshots are still the older ones (the features did not change, but the About page still shows 1.1.5.5 and lacks the “test method” paragraph added later); they will be retaken.
-> The About window shot was retaken for v1.1.5.2; the console menu shot is also from v1.1.5.2, captured as it appears when you double-click the .bat.
+> The About window shot was retaken for v1.1.5.2; the console menu shot is also from v1.1.5.2 — the menu had only items [1]–[5] then, and now carries [6] View logs and [7] Clear logs, so that one is due for a retake (the feature itself is unaffected; read the code and the text above).
 > Framing scripts: phones use `docs/tools/frame_ui.py` (device shell; batch version `frame_batch.py`), Windows uses `docs/tools/frame_window.py` (window shell). Re-running one command after replacing a screenshot is enough — no manual image editing.
 > Endpoint names stay in Chinese inside the English screenshots on purpose: switching the app language changes the UI chrome and the interface copy, while the target names come from the shared target list and stay as they are (the Settings screen says so).
 > **The three Windows screenshots are shared by both language sections**, because the Windows build currently has a Chinese-only interface — there is no English Windows UI to photograph.
@@ -766,13 +809,13 @@ Nothing runs until you press 1; that is the second image below. The two dialogs 
 
 ## Download (start here)
 
-**Current versions: Android v1.1.6.1 ・ Windows v1.1.5.2**. Both platforms carry the same content; pick whichever opens for you (with slow mainland connectivity, prefer Gitee).
+**Current versions: Android v1.1.7.0 ・ Windows v1.1.7.0**. Both platforms carry the same content; pick whichever opens for you (with slow mainland connectivity, prefer Gitee).
 
 | What you want | GitHub | Gitee (mainland mirror) |
 | --- | --- | --- |
 | Latest release page | https://github.com/neurotracee/github-netcheck/releases/latest | https://gitee.com/bio234/github-netcheck/releases/latest |
-| Android APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.6.1/NetCheck-1.1.6.1.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.6.1/NetCheck-1.1.6.1.apk |
-| Windows package (zip) | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.5.2/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.5.2/NetCheck-Windows.zip |
+| Android APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.0/NetCheck-1.1.7.0.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.0/NetCheck-1.1.7.0.apk |
+| Windows package (zip) | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.0/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.0/NetCheck-Windows.zip |
 | Repository home | https://github.com/neurotracee/github-netcheck | https://gitee.com/bio234/github-netcheck |
 
 Unzip the Windows package and double-click **一键网络自检.bat**; install the APK directly (the system will warn about an “unknown source” — the reason is in the next section).
@@ -788,7 +831,7 @@ Gitee's total attachment quota is only 1 GB, which cannot hold every historical 
 
 | Tier | GitHub | Gitee (mainland mirror) |
 | --- | --- | --- |
-| **Latest** (Android v1.1.6.1 APK, Windows v1.1.5.2 zip) | attachments kept | **attachments kept** |
+| **Latest** (Android v1.1.7.0 APK, Windows v1.1.7.0 zip) | attachments kept | **attachments kept** |
 | **Previous** (Android v1.1.6.0 APK, Windows v1.1.5.1 zip) | attachments kept | attachments kept (for in-place upgrades in transition) |
 | **Anything older** | every attachment kept | **attachments removed**, release notes only |
 
@@ -1205,6 +1248,7 @@ Full steps, how to create the keystore, and how to verify the output: [docs/05-�
   - “hosts mappings” → reads `/system/etc/hosts`; on Android this file is usually empty, so you see however many lines it has.
 - **Android 7 and below are unsupported** (`minSdk 26`). To go lower, edit `app/build.gradle.kts` yourself and handle the `privateDns` API differences.
 - **Every run leaves one HTML and one CSV in the report directory**; delete them if that piles up (Windows: `reports/`; Android: the app's private directory, cleared on uninstall).
+- **Logs take a little space too**: one file per day, a 512 KB cap per day, kept for at most 365 days. Delete them by date in the log page, or just remove the `logs/` folder — the program still works, you only lose the on-site record.
 
 ## Dependencies and licences
 
@@ -1227,10 +1271,48 @@ Full declarations in [NOTICE.md](NOTICE.md).
 - **Nothing is reported anywhere.** Outbound connections are only: the 14 endpoints themselves, one DoH comparison query (to Ali public DNS),
   and one update check at Android launch (reads one public version number on Gitee or GitHub, sends no local information, can be switched off in settings).
 - **Reports never leave the machine.** Windows writes into `reports/` (or the directory you chose); Android writes into the app's private directory, and leaves the app only when you tap “Export”.
+- **Logs stay on the machine as well.** They are written to the local `logs/` only — no network, no upload. They leave the device only when you copy them or save them as TXT and paste them into an Issue yourself.
 - **A report contains only**: endpoint name, domain, resolved IP, the four stage timings, HTTP status code, grade. No device identifiers, no accounts, no browsing history.
 - **Android reads no contacts, no SMS, no gallery, and asks for no storage permission.**
 - **The Windows build needs no administrator rights and writes no registry**; settings live only in `settings.json` beside the script.
 - The generated HTML report is a **static file** with no external scripts or images — it opens offline.
+
+## App logs (both platforms)
+
+Previously, when a screen looked wrong or the app crashed, the user could only describe it in words and the author had no evidence at all. This release turns runtime logging into part of the product: **it records by default, the user can find it, and it can be handed straight to an Issue.**
+
+**What it records, and where it lives**
+
+| | Android | Windows |
+| --- | --- | --- |
+| Location | the app's private `logs/` (cleared on uninstall) | `logs/` next to the script |
+| Files | `log-2026-11-23.txt`, one per day | `netcheck-2026-11-23.log`, one per day |
+| Retention | 365 days; older files are deleted at launch | 365 days as well |
+| Cap | 512 KB per day; writing stops for that day and says so | 512 KB as well |
+| Contents | launch, entering the UI, check start / finish / stop / failure, the four stage timings of every failing endpoint, crash stack traces | launch, every endpoint's verdict and timings, the run summary, uncaught exceptions with the script stack |
+
+Every line starts with a 24-hour timestamp such as `2026-11-23 18:49:06.246 [I] [PROBE] …`, so a copied log lines up with the clock to the minute. Logs stay **on this machine only**: no network, no upload, nothing written to shared system folders.
+
+**Where to read it**
+
+- **Android**: Settings → About & open source → **App logs** (the Settings page's “Logs & feedback” section carries the same entry). It opens on **this launch**; switch to “History” to search by start/end date plus start/end time (`HH:mm`, blank means the whole day), or tap one of the listed days.
+- **Windows**: menu **[6] View logs**, or the **App logs** button in the “About and open-source information” window. The first screen is again this run's record.
+
+**After a crash**: the program writes the record first, then hands the exception back to the system (so the system still shows “app has stopped”), and leaves a marker; the next launch says “the last run ended unexpectedly — the log is in Settings → About → App logs”, and the Android log page shows the crash summary at the top with the stack trace in the same session's record.
+On Windows, the log window shows the time and exception of the last crash above the text.
+
+**Deleting**: manual only, and **confirmed twice**. Pick the start and end dates (optionally with start/end times), and it first tells you “these days, this many days, about this many KB”; press continue and it asks once more “permanently delete?” — only after both confirmations is anything erased. On Android you can also delete one time window inside a single day and keep the rest.
+
+**Reporting**: the log page carries a ready-made template with the version and device line pre-filled — one sentence on what happened, three reproduction steps, and “what I saw / what I expected”:
+
+```
+1. Open the app and wait for the home screen to load
+2. Tap the gear in the top right, stay 2 seconds
+3. Press back to the home screen
+   Result: the top edge of the card on the home screen is cut off
+```
+
+Paste the log into the Issue with “copy all”, or attach it after “save as TXT”. The GitHub and Gitee Issue entry points sit on the same page — use whichever opens.
 
 ## Licence
 

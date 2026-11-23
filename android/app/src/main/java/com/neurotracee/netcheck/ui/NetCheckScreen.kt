@@ -108,6 +108,7 @@ fun NetCheckScreen(
     var showSettings by remember { mutableStateOf(false) }
     var showAbout by remember { mutableStateOf(false) }
     var showHistory by remember { mutableStateOf(false) }
+    var showLogs by remember { mutableStateOf(false) }
 
     // 点击回调、后台消息这类非 Composable 上下文里也要按当前语言出字，
     // 所以这里先取一次语言，再用普通函数拼字符串（t() 只能在 Composable 里调用）。
@@ -365,6 +366,7 @@ fun NetCheckScreen(
             versionName = BuildConfig.VERSION_NAME,
             onDismiss = { showSettings = false },
             onOpenAbout = { showSettings = false; showAbout = true },
+            onOpenLogs = { showSettings = false; showLogs = true },
             onToast = { vm.message = it },
             onThemeChanged = onThemeChanged,
             onLangChanged = onLangChanged
@@ -382,8 +384,27 @@ fun NetCheckScreen(
         AboutSheet(
             versionName = BuildConfig.VERSION_NAME,
             onDismiss = { showAbout = false },
+            onOpenLogs = { showAbout = false; showLogs = true },
             onToast = { vm.message = it }
         )
+    }
+    if (showLogs) {
+        LogSheet(
+            versionName = BuildConfig.VERSION_NAME,
+            onDismiss = { showLogs = false },
+            onToast = { vm.message = it }
+        )
+    }
+
+    // 上次异常退出：启动时先说一句，并直接给一条去日志页的路，别让用户自己找
+    LaunchedEffect(Unit) {
+        val crash = com.neurotracee.netcheck.data.LogStore.pendingCrash()
+        if (crash != null) {
+            vm.message = s(
+                "上次运行异常退出。日志已留在这台机器上：设置 → 关于与开源信息 → 应用日志。",
+                "The last run ended unexpectedly. The log is kept on this device: Settings → About → App logs."
+            )
+        }
     }
 
     // 启动时静默查一次更新：查到新版才弹提示，应用内下载安装，浏览器 / 复制链接作为退路

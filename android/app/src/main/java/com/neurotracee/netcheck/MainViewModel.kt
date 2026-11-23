@@ -10,6 +10,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.neurotracee.netcheck.data.HistoryEntry
 import com.neurotracee.netcheck.data.HistoryStore
+import com.neurotracee.netcheck.data.LogStore
 import com.neurotracee.netcheck.data.ReportStore
 import com.neurotracee.netcheck.model.NetEnv
 import com.neurotracee.netcheck.model.RunResult
@@ -89,6 +90,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         currentName = "准备中"
         startedAt = System.currentTimeMillis()
         val thisRun = ++runId
+        LogStore.i("RUN", "开始自检 #$thisRun · 模式=${if (quick) "quick" else "full"} · 点位=${targets.size}")
 
         job = viewModelScope.launch {
             val began = System.currentTimeMillis()
@@ -109,6 +111,11 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                         },
                         onResult = { result ->
                             // 停止之后旧回调可能还在排队，用运行编号把它们丢掉
+                            if (!result.ok) {
+                                LogStore.w("PROBE", "${result.name} ${result.host} → ${result.label}" +
+                                    "（DNS ${result.dnsMs} / TCP ${result.tcpMs} / TLS ${result.tlsMs} / TTFB ${result.ttfbMs}）" +
+                                    if (result.error.isNotBlank()) " · ${result.error}" else "")
+                            }
                             main.post { if (thisRun == runId) results = results + result }
                         }
                     )
@@ -128,16 +135,20 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
                 )
                 run = completed
                 phase = Phase.Done
+                LogStore.i("RUN", "完成 #$thisRun · 可连通 ${completed.okCount}/${completed.total} · 耗时 ${elapsed}s" +
+                    " · 平均建连 ${completed.avgTcp}ms" + (if (completed.rateInfo.isNotBlank()) " · ${completed.rateInfo}" else ""))
                 // 一次跑完就落一条历史，最多留 100 条
                 val entry = HistoryEntry.from(completed, startedAt, quick)
                 history = withContext(Dispatchers.IO) { historyStore.add(entry) }
             } catch (e: CancellationException) {
                 phase = Phase.Idle
                 message = "已停止本次自检"
+                LogStore.i("RUN", "被用户停止 #$thisRun · 已测 ${results.size}/${progressTotal}")
                 throw e
             } catch (t: Throwable) {
                 phase = Phase.Idle
                 message = "自检中断：${t.message ?: t.javaClass.simpleName}"
+                LogStore.e("RUN", "自检异常中断 #$thisRun", t)
             }
         }
     }

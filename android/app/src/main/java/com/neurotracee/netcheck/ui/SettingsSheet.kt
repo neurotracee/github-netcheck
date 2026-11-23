@@ -59,6 +59,7 @@ fun SettingsSheet(
     versionName: String,
     onDismiss: () -> Unit,
     onOpenAbout: () -> Unit,
+    onOpenLogs: () -> Unit,
     onToast: (String) -> Unit,
     onThemeChanged: (Int) -> Unit,
     onLangChanged: (Lang) -> Unit
@@ -253,6 +254,29 @@ fun SettingsSheet(
             Box(Modifier.fillMaxWidth().height(1.dp).background(p.line))
             Spacer(Modifier.height(12.dp))
 
+            // 日志与反馈：出问题时用户多半是从设置里找入口，所以这里直接给一条路
+            Label(p, t("日志与反馈", "Logs & feedback"))
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(p.card)
+                    .border(1.dp, p.line, RoundedCornerShape(12.dp))
+                    .clickable { onOpenLogs() }
+                    .padding(horizontal = 14.dp, vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text(t("应用日志", "App logs"), fontSize = 14.sp, color = p.ink)
+                    Text(t("本次启动 + 最近 365 天 · 可复制 / 存 TXT / 按日期清除", "This launch + the last 365 days · copy / save TXT / delete by date"),
+                        fontSize = 11.sp, color = p.sub)
+                }
+                Text("›", fontSize = 18.sp, color = p.sub)
+            }
+            Hint(p, t("遇到崩溃或界面错位时，先来这里看一眼，再把日志附到 Issue 里。",
+                "When something crashes or looks wrong, check here first and attach the log to an Issue."))
+
+            Spacer(Modifier.height(8.dp))
             Row(
                 Modifier
                     .fillMaxWidth()
@@ -283,7 +307,7 @@ fun SettingsSheet(
 /** 关于页：署名、协议、地址、隐私、二次开发要求。 */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AboutSheet(versionName: String, onDismiss: () -> Unit, onToast: (String) -> Unit) {
+fun AboutSheet(versionName: String, onDismiss: () -> Unit, onOpenLogs: () -> Unit, onToast: (String) -> Unit) {
     val p = LocalPalette.current
     val context = LocalContext.current
     val state = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -324,6 +348,38 @@ fun AboutSheet(versionName: String, onDismiss: () -> Unit, onToast: (String) -> 
                             + "failure means unreachable.\n"
                             + "The DoH column queries Ali public DNS over HTTPS, to expose hosts rewrites or DNS poisoning."),
                 fontSize = 12.sp, color = p.sub, lineHeight = 19.sp
+            )
+
+            Spacer(Modifier.height(14.dp))
+            Box(Modifier.fillMaxWidth().height(1.dp).background(p.line))
+            Spacer(Modifier.height(12.dp))
+
+            // 日志入口：崩溃之后用户是被上面那句提示引到这里的，所以放在最上面几行
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(p.card)
+                    .border(1.dp, p.line, RoundedCornerShape(12.dp))
+                    .clickable { onOpenLogs() }
+                    .padding(horizontal = 14.dp, vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text(t("应用日志", "App logs"), fontSize = 14.sp, color = p.ink, fontWeight = FontWeight.Medium)
+                    Text(
+                        t("本次启动的日志 + 最近 365 天 · 可复制、存 TXT、按日期清除",
+                            "This launch's log + the last 365 days · copy, save as TXT, delete by date"),
+                        fontSize = 11.sp, color = p.sub
+                    )
+                }
+                Text("›", fontSize = 18.sp, color = p.sub)
+            }
+            Spacer(Modifier.height(6.dp))
+            Text(
+                t("程序异常退出时，本次启动的日志里会带完整的崩溃堆栈；提 Issue 时把 TXT 附上最有用。",
+                    "If the app crashed, this launch's log contains the full stack trace; attaching the TXT to an Issue helps most."),
+                fontSize = 11.sp, color = p.sub, lineHeight = 16.sp
             )
 
             Spacer(Modifier.height(14.dp))
