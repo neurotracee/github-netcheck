@@ -117,12 +117,12 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 
 ## 下载（先点这里）
 
-**当前版本：安卓 v1.1.7.0 ・ Windows v1.1.7.0**。两个平台内容一样，选能打开的就行（国内网络慢优先 Gitee）。
+**当前版本：安卓 v1.1.7.3 ・ Windows v1.1.7.0**。这次只改了安卓端界面（Windows 端内容未变），选能打开的就行（国内网络慢优先 Gitee）。
 
 | 你要的 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
 | 最新下载页 | https://github.com/neurotracee/github-netcheck/releases/latest | https://gitee.com/bio234/github-netcheck/releases/latest |
-| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.0/NetCheck-1.1.7.0.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.0/NetCheck-1.1.7.0.apk |
+| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.3/NetCheck-1.1.7.3.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.3/NetCheck-1.1.7.3.apk |
 | Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.0/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.0/NetCheck-Windows.zip |
 | 仓库首页 | https://github.com/neurotracee/github-netcheck | https://gitee.com/bio234/github-netcheck |
 
@@ -139,7 +139,7 @@ Gitee 的附件总容量只有 1GB，装不下所有历史包，所以安装包�
 
 | 版本档位 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
-| **最新版**（安卓 v1.1.7.0 的 APK、Windows v1.1.7.0 的 zip） | 保留附件 | **保留附件** |
+| **最新版**（安卓 v1.1.7.3 的 APK、Windows v1.1.7.0 的 zip） | 保留附件 | **保留附件** |
 | **上一版**（v1.1.6.0 的安卓 APK、v1.1.5.1 的 Windows zip） | 保留附件 | 保留附件（方便覆盖升级过渡） |
 | **更早的旧版本** | 保留全部附件 | **附件已撤下**，只留发布说明 |
 
@@ -609,7 +609,7 @@ gradle assembleRelease
 
 **怎么看**
 
-- **安卓**：设置 → 关于与开源信息 → **应用日志**（设置页「日志与反馈」里也有同一个入口）。打开就是**本次启动**的记录；切到「历史日志」可以按起止日期 + 起止时间（`HH:mm`，留空表示整天）查，也可以直接点某一天。
+- **安卓**：设置 → 关于与开源信息 → **应用日志**（设置页「日志与反馈」里也有同一个入口）。打开就是**本次启动**的记录；切到「历史日志」可以按起止日期 + 起止时间查，也可以直接点某一天。页面按卡片分块：本次启动、时间范围、查询结果、反馈各一张卡，日志区是纯白（深色主题纯黑）底。日期点一下弹日历，时分是上下推的双滚轮（松手 180 毫秒吸附到最近一格，轻点滚轮可直接打字输入），分轮在「时」没动过之前是灰的、推不动。
 - **Windows**：菜单 **[6] 查看日志**，或在「关于与开源信息」窗口点 **应用日志**。窗口第一屏同样是本次运行的记录。
 
 **崩溃之后**：程序先落盘、再把异常交回系统（所以系统照常弹「应用已停止」），并留一个标记；下次启动会提示「上次运行异常退出，日志在 设置 → 关于 → 应用日志」，安卓的日志页顶部也会显示这次崩溃的摘要，堆栈就在同一次启动的记录里。
@@ -809,12 +809,12 @@ Nothing runs until you press 1; that is the second image below. The two dialogs 
 
 ## Download (start here)
 
-**Current versions: Android v1.1.7.0 ・ Windows v1.1.7.0**. Both platforms carry the same content; pick whichever opens for you (with slow mainland connectivity, prefer Gitee).
+**Current versions: Android v1.1.7.3 ・ Windows v1.1.7.0**.. Only the Android UI changed in this release — the Windows side is unchanged. Pick whichever opens for you (with slow mainland connectivity, prefer Gitee).
 
 | What you want | GitHub | Gitee (mainland mirror) |
 | --- | --- | --- |
 | Latest release page | https://github.com/neurotracee/github-netcheck/releases/latest | https://gitee.com/bio234/github-netcheck/releases/latest |
-| Android APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.0/NetCheck-1.1.7.0.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.0/NetCheck-1.1.7.0.apk |
+| Android APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.3/NetCheck-1.1.7.3.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.3/NetCheck-1.1.7.3.apk |
 | Windows package (zip) | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.0/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.0/NetCheck-Windows.zip |
 | Repository home | https://github.com/neurotracee/github-netcheck | https://gitee.com/bio234/github-netcheck |
 
@@ -831,7 +831,7 @@ Gitee's total attachment quota is only 1 GB, which cannot hold every historical 
 
 | Tier | GitHub | Gitee (mainland mirror) |
 | --- | --- | --- |
-| **Latest** (Android v1.1.7.0 APK, Windows v1.1.7.0 zip) | attachments kept | **attachments kept** |
+| **Latest** (Android v1.1.7.3 APK, Windows v1.1.7.0 zip) | attachments kept | **attachments kept** |
 | **Previous** (Android v1.1.6.0 APK, Windows v1.1.5.1 zip) | attachments kept | attachments kept (for in-place upgrades in transition) |
 | **Anything older** | every attachment kept | **attachments removed**, release notes only |
 
@@ -1295,7 +1295,7 @@ Every line starts with a 24-hour timestamp such as `2026-11-23 18:49:06.246 [I] 
 
 **Where to read it**
 
-- **Android**: Settings → About & open source → **App logs** (the Settings page's “Logs & feedback” section carries the same entry). It opens on **this launch**; switch to “History” to search by start/end date plus start/end time (`HH:mm`, blank means the whole day), or tap one of the listed days.
+- **Android**: Settings → About & open source → **App logs** (the Settings page's “Logs & feedback” section carries the same entry). It opens on **this launch**; switch to “History” to search by start/end date plus start/end time, or tap one of the listed days. The page is split into cards — this launch, time range, result, feedback — and the log area sits on plain white (plain black in the dark theme). Tap a date to open a calendar; hours and minutes are two drag wheels (they snap to the nearest cell in 180 ms on release, and tapping a wheel lets you type a value). The minute wheel stays grey and immovable until the hour wheel has been moved once.
 - **Windows**: menu **[6] View logs**, or the **App logs** button in the “About and open-source information” window. The first screen is again this run's record.
 
 **After a crash**: the program writes the record first, then hands the exception back to the system (so the system still shows “app has stopped”), and leaves a marker; the next launch says “the last run ended unexpectedly — the log is in Settings → About → App logs”, and the Android log page shows the crash summary at the top with the stack trace in the same session's record.

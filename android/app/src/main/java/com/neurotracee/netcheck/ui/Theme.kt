@@ -30,7 +30,9 @@ data class Palette(
     val warnBorder: Color,
     val warnText: Color,
     val track: Color,
-    val accentSoft: Color
+    val accentSoft: Color,
+    // 日志区与选择器的「纯底」：浅色给白、深色给黑
+    val paper: Color
 ) {
     fun level(key: String): Color = when (key) {
         Levels.GOOD -> good
@@ -57,7 +59,8 @@ val LightPalette = Palette(
     warnBorder = Color(0xFFF0DFB8),
     warnText = Color(0xFF9A6A08),
     track = Color(0xFFEEF1F4),
-    accentSoft = Color(0xFFE8F7EE)
+    accentSoft = Color(0xFFE8F7EE),
+    paper = Color(0xFFFFFFFF)
 )
 
 val DarkPalette = Palette(
@@ -75,7 +78,8 @@ val DarkPalette = Palette(
     warnBorder = Color(0xFF4A3C1E),
     warnText = Color(0xFFD8B15E),
     track = Color(0xFF232A34),
-    accentSoft = Color(0xFF16311F)
+    accentSoft = Color(0xFF16311F),
+    paper = Color(0xFF000000)
 )
 
 val LocalPalette = staticCompositionLocalOf { LightPalette }
