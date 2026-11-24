@@ -338,6 +338,7 @@ fun LogSheet(
         val pickerState = rememberDatePickerState(initialSelectedDateMillis = seedMs)
         DatePickerDialog(
             onDismissRequest = { dateTarget = -1 },
+            colors = androidx.compose.material3.DatePickerDefaults.colors(containerColor = p.paper),
             confirmButton = {
                 TextButton(onClick = {
                     val ms = pickerState.selectedDateMillis
@@ -372,6 +373,9 @@ fun LogSheet(
     if (confirmStage == 1) {
         AlertDialog(
             onDismissRequest = { confirmStage = 0 },
+            containerColor = p.paper,
+            titleContentColor = p.ink,
+            textContentColor = p.ink,
             title = { Text(t("删除前的确认", "Before deleting")) },
             text = {
                 Text(
@@ -391,6 +395,9 @@ fun LogSheet(
     if (confirmStage == 2) {
         AlertDialog(
             onDismissRequest = { confirmStage = 0 },
+            containerColor = p.paper,
+            titleContentColor = p.ink,
+            textContentColor = p.ink,
             title = { Text(t("再确认一次", "Confirm once more")) },
             text = {
                 Text(t("确定永久删除 $confirmText 这些日志吗？这一步不能撤销。",
@@ -729,6 +736,9 @@ private fun TimePickerDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        containerColor = p.paper,
+        titleContentColor = p.ink,
+        textContentColor = p.ink,
         title = { Text(title, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = p.ink) },
         text = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -784,6 +794,9 @@ private fun TimePickerDialog(
         val ok = inputText.toIntOrNull()?.let { it in 0..max } == true
         AlertDialog(
             onDismissRequest = { inputTarget = -1 },
+            containerColor = p.paper,
+            titleContentColor = p.ink,
+            textContentColor = p.ink,
             title = { Text(if (inputTarget == 0) t("输入小时", "Type the hour") else t("输入分钟", "Type the minute"), fontSize = 15.sp) },
             text = {
                 OutlinedTextField(

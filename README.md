@@ -107,11 +107,19 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 | Windows · 控制台（选 1 的结果） | 14 个点位逐条给出 DNS / TCP / TLS / HTTP 四段耗时，末尾汇总「可连通 X/14、平均建连、耗时、最快 / 最慢 / 不通」 |
 | Windows · 关于窗 | 选项 3 弹出：同一份「关于与开源信息」文案，外加赞赏码与两个仓库的 Star 直达按钮 |
 
-> 手机图是 v1.1.6.0 真机重拍的（11 月 20 日）：中文四张浅色、英文四张深色。之所以一浅一深，只是两种语言各担一半截图任务，不是给哪种语言配哪种主题——应用里语言和主题都能各自单独选，理由在文末英文段里也写了一遍。
-> 设置页与关于页暂时沿用旧图（功能未改，但关于页版本号仍是 1.1.5.5，且缺新增的「测试方法」段落），后面补拍。
+> 手机图是 v1.1.7.3 真机重拍的（2026 年 11 月 24 日）：中文四张浅色、英文四张深色。之所以一浅一深，只是两种语言各担一半截图任务，不是给哪种语言配哪种主题——应用里语言和主题都能各自单独选，理由在文末英文段里也写了一遍。
+> 设置页与关于页暂时沿用旧图（功能未改，但关于页版本号仍是 1.1.5.5，且缺新增的「测试方法」段落），后面补拍。报告图已换成 2026-11-24 的真实产物。
 > 关于窗那张是 v1.1.5.2 重拍的；控制台菜单页也是 v1.1.5.2 时截的——那会儿菜单只有 [1]–[5]，现在多了 [6] 查看日志、[7] 清除日志，这张待重截（功能本身不受影响，看代码与文字说明即可）。
 > 套壳脚本：手机 `docs/tools/frame_ui.py`（机身壳，批量用 `frame_batch.py`），Windows `docs/tools/frame_window.py`（窗口壳）；换新截图重跑一遍就行，不用手工修图。
 > 英文界面的截图统一放在本文最后（英文段内的 Screenshots 一节），不在这里和中文图混排。
+
+<h3 align="center">报告长什么样</h3>
+<p align="center">一次真实运行生成的 HTML 报告（2026-11-24，14 点位）：顶部一排环境标签（系统代理 / hosts 映射 / 本机 443 监听 / DNS 服务器 / API 配额），
+下面四张汇总卡，再往下每个点位一张卡——左侧竖条是评级颜色，右侧是 DNS / TCP / TLS / HTTP 四段毫秒数，域名下面一行是解析到的 IP 与 DoH 对照结论。</p>
+
+<p align="center">
+  <img src="docs/img/effect-report.png" width="100%" alt="HTML 报告：环境标签、四张汇总卡与 14 个点位的四段耗时，左竖条是评级颜色">
+</p>
 
 ---
 
@@ -324,12 +332,7 @@ https://gitee.com/bio234/github-netcheck      # mirror / 镜像（国内访问�
 
 ## 处理效果
 
-一次真实运行的产物长这样（2026-11-14 家庭宽带实测，完整 14 点位模式）：顶部是环境标签（系统代理、hosts 映射、
-本机 443 监听、DNS 服务器），中间四张汇总卡，下面每个点位一张卡——左侧竖条是评级颜色，右边是 DNS / TCP / TLS / HTTP
-四段各自的毫秒数，域名下面一行是解析到的 IP 与 DoH 对照结论。
-
-![真实报告截图](docs/img/effect-report.png)
-
+报告版式见上面「界面」那一节的最后一张图（2026-11-24 实测，完整 14 点位）。
 同一个数据还会在控制台打一份纯文本，跑完直接把报告甩进浏览器：
 
 ```text
@@ -798,12 +801,19 @@ Nothing runs until you press 1; that is the second image below. The two dialogs 
 | Windows · About window | Opened by 3: the same “about and open-source” text, plus the donation QR code, direct Star buttons for both repositories, and an **App logs** button |
 | Windows · Log window | Menu 6 (or the About button): this run's record, date pickers with optional `HH:mm` filters, copy, export TXT, template, Issue links, range delete with two confirmations |
 
-> The Android screenshots were retaken on a real device running v1.1.6.0 (20 November): four in Chinese (light) and four in English (dark). The one-light-one-dark split is only a division of labour between the two languages, not a statement that one language gets one theme — language and theme are separate settings for everyone. The same reasoning is repeated in the Chinese section.
+> The Android screenshots were retaken on a real device running v1.1.7.3 (24 November 2026): four in Chinese (light) and four in English (dark). The one-light-one-dark split is only a division of labour between the two languages, not a statement that one language gets one theme — language and theme are separate settings for everyone. The same reasoning is repeated in the Chinese section.
 > The Settings and About screenshots are still the older ones (the features did not change, but the About page still shows 1.1.5.5 and lacks the “test method” paragraph added later); they will be retaken.
 > The About window shot was retaken for v1.1.5.2; the console menu shot is also from v1.1.5.2 — the menu had only items [1]–[5] then, and now carries [6] View logs and [7] Clear logs, so that one is due for a retake (the feature itself is unaffected; read the code and the text above).
 > Framing scripts: phones use `docs/tools/frame_ui.py` (device shell; batch version `frame_batch.py`), Windows uses `docs/tools/frame_window.py` (window shell). Re-running one command after replacing a screenshot is enough — no manual image editing.
 > Endpoint names stay in Chinese inside the English screenshots on purpose: switching the app language changes the UI chrome and the interface copy, while the target names come from the shared target list and stay as they are (the Settings screen says so).
 > **The three Windows screenshots are shared by both language sections**, because the Windows build currently has a Chinese-only interface — there is no English Windows UI to photograph.
+<h3 align="center">What the report looks like</h3>
+<p align="center">An HTML report from a real run (2026-11-24, 14 endpoints): a row of environment chips at the top (system proxy / hosts mappings / local 443 listeners / DNS servers / API quota),
+four summary cards below it, then one card per endpoint — the vertical bar on the left is the grade colour, the right side carries the DNS / TCP / TLS / HTTP milliseconds, and under the domain sits the resolved IP with the DoH comparison.</p>
+
+<p align="center">
+  <img src="docs/img/effect-report.png" width="100%" alt="HTML report: environment chips, four summary cards and the four-stage timings of 14 endpoints, with the grade colour as a left bar">
+</p>
 
 ---
 
@@ -1013,12 +1023,7 @@ If the two differ, the local DNS has been rewritten or poisoned; if the local IP
 
 ## What the output looks like
 
-A real run looks like this (home broadband, 2026-11-14, full 14-endpoint mode): environment chips at the top (system proxy, hosts mappings,
-local 443 listeners, DNS servers), four summary cards in the middle, then one card per endpoint — the vertical bar on the left is the grade colour, on the right
-the DNS / TCP / TLS / HTTP milliseconds, and under the domain a line with the resolved IP and the DoH comparison.
-
-![Real report screenshot](docs/img/effect-report.png)
-
+The report layout is the last image of the Interface section above (real run, 2026-11-24, full 14 endpoints).
 The same data is also printed as plain text in the console, and the report is thrown into your browser when the run ends:
 
 ```text
