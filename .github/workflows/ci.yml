@@ -25,7 +25,7 @@ jobs:
 
       - name: 编译 + 单元测试
         working-directory: android
-        run: gradle assembleDebug test --no-daemon --console=plain
+        run: gradle clean assembleDebug test --no-daemon --console=plain
 
       - name: 上传测试报告
         if: always()
@@ -62,7 +62,8 @@ jobs:
       - name: 检查权限清单
         run: |
           set -e
-          allowed="INTERNET|ACCESS_NETWORK_STATE|DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+          # REQUEST_INSTALL_PACKAGES 只用于把下载好的新版 APK 交给系统安装器（1.1.6 起）
+          allowed="INTERNET|ACCESS_NETWORK_STATE|DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION|REQUEST_INSTALL_PACKAGES"
           perms=$(grep -oE 'android.permission.[A-Z_]+' android/app/src/main/AndroidManifest.xml || true)
           echo "清单里的权限：$perms"
           for p in $perms; do
@@ -71,7 +72,7 @@ jobs:
               exit 1
             fi
           done
-          echo "OK：权限只有 INTERNET 与 ACCESS_NETWORK_STATE"
+          echo "OK：权限只有 INTERNET 与 ACCESS_NETWORK_STATE，外加应用内更新必需的 REQUEST_INSTALL_PACKAGES"
 
   windows:
     name: Windows 脚本语法与底线自查
