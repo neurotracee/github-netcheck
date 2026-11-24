@@ -139,7 +139,7 @@ class ReportBuilderTest {
     @Test
     fun `html 里带汇总数字与逐条区块`() {
         val html = ReportBuilder.html(run(result()))
-        assertTrue(html.contains("网络连通性报告"))
+        assertTrue(html.contains("GitHub 网络自检报告"))
         assertTrue(html.contains("1 个目标"))
         assertTrue(html.contains("class=\"row lv-g\""))
         assertTrue(html.contains("DoH 一致"))
