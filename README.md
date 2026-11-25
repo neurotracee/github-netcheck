@@ -1142,6 +1142,8 @@ Users can pin “Gitee only” or “GitHub only” in settings; if the chosen s
    [3] 关于与开源信息
    [4] 设置（报告位置 / 先问我 / 自动打开 / 自动查更新 / 超时）
    [5] 检查更新（只读远端版本号）
+   [6] 查看日志（本次启动 / 按日期查 / 导出 TXT）
+   [7] 清除日志（按日期，会问两次）
    [0] 退出
    ```
 
