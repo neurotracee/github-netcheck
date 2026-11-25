@@ -7,7 +7,7 @@
 #
 #  所有测量仍由同目录 netcheck.ps1 完成，点菜单等价于以前输入那个数字。
 #
-#  版本：1.1.7.1
+#  版本：1.1.7.2
 #  协议：Apache License 2.0
 #  原项目地址：https://github.com/neurotracee/github-netcheck
 #  镜像（Gitee）：https://gitee.com/bio234/github-netcheck
@@ -177,7 +177,7 @@ function Draw {
     $lineNo = 0
 
     $title = T 'GitHub 网络自检' 'GitHub Network Check'
-    Write-Host ("  " + $title + "   v1.1.7.1") -ForegroundColor Cyan
+    Write-Host ("  " + $title + "   v1.1.7.2") -ForegroundColor Cyan
     $lineNo++
     Write-Host ("  作者：项目创作时为初中生；需求、判读规则与验收测试由本人完成") -ForegroundColor DarkGray
     $lineNo++
@@ -240,12 +240,19 @@ function Run-Item([string]$key) {
     }
     Clear-Host
     $argLine = ($item.args -join ' ')
+    # 跑之前把缓冲区加高：菜单为了鼠标对齐把缓冲区压成一行窗口高，
+    # 那样自检的十几行结果会被滚掉，只剩最后一句提问。这里临时还原成 900 行。
+    try {
+        $win = $Host.UI.RawUI.WindowSize
+        $Host.UI.RawUI.BufferSize = New-Object System.Management.Automation.Host.Size($win.Width, 900)
+    } catch { }
     Write-Host ("  " + (T '正在执行' 'Running') + ': netcheck.ps1 ' + $argLine) -ForegroundColor Cyan
     Write-Host ''
     $argList = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $NetCheck) + @($item.args)
     & powershell.exe @argList
     Write-Host ''
     Read-Host (T '  回车回到菜单' '  Enter to return to the menu') | Out-Null
+    FitBuffer
     return 'redraw'
 }
 

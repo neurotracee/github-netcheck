@@ -27,7 +27,7 @@ param(
     [switch]$ClearLogs    # 命令行按日期清除日志（会问两次）
 )
 
-$script:AppVersion = '1.1.7.1'
+$script:AppVersion = '1.1.7.2'
 $script:ProjectUrl = 'https://github.com/neurotracee/github-netcheck'
 $script:MirrorUrl  = 'https://gitee.com/bio234/github-netcheck'
 
@@ -1689,12 +1689,20 @@ foreach ($t in $Targets) {
     if ($dns.Ip -eq '127.0.0.1' -or $dns.Ip -eq '::1') { $hint = '本地反代' }
     elseif ($https.Ok -and $https.Status -ge 500) { $hint = '服务端异常' }
 
+    $lvColor = switch ($v.Label) {
+        '优秀' { 'Green' }
+        '良好' { 'Cyan' }
+        '一般' { 'Yellow' }
+        '较慢' { 'DarkYellow' }
+        '受限' { 'Magenta' }
+        default { 'Red' }
+    }
     if ($https.Ok) {
-        Write-Host ("   " + $v.Label + "   TCP " + $https.TcpMs + "ms / TLS " + $https.TlsMs + "ms / HTTP " + $https.Ttfb + "ms") -ForegroundColor Green
+        Write-Host ("   " + $v.Label + "   TCP " + $https.TcpMs + "ms / TLS " + $https.TlsMs + "ms / HTTP " + $https.Ttfb + "ms") -ForegroundColor $lvColor
     } elseif ($https.TcpOk) {
-        Write-Host ("   " + $v.Label + "   TCP " + $https.TcpMs + "ms，但握手失败：" + $https.Error) -ForegroundColor Yellow
+        Write-Host ("   " + $v.Label + "   TCP " + $https.TcpMs + "ms，但握手失败：" + $https.Error) -ForegroundColor $lvColor
     } else {
-        Write-Host ("   " + $v.Label + "   " + $https.Error) -ForegroundColor Red
+        Write-Host ("   " + $v.Label + "   " + $https.Error) -ForegroundColor $lvColor
     }
 
     $level = if ($https.Ok) { 'I' } else { 'W' }
@@ -1736,11 +1744,26 @@ Write-Host ''
 Write-Host '  ---------------------------------------------------------' -ForegroundColor DarkGray
 $line = "  可连通 " + $OkCount + " / " + $Total + "    平均建连 " + $AvgTcp + " ms    耗时 " + $Elapsed + " 秒"
 Write-Host $line -ForegroundColor Cyan
+$LvG  = @($Results | Where-Object { $_.Label -eq '优秀' }).Count
+$LvG2 = @($Results | Where-Object { $_.Label -eq '良好' }).Count
+$LvY  = @($Results | Where-Object { $_.Label -eq '一般' }).Count
+$LvS  = @($Results | Where-Object { $_.Label -eq '较慢' }).Count
+$LvO  = @($Results | Where-Object { $_.Label -eq '受限' }).Count
+$LvR  = @($Results | Where-Object { $_.Label -eq '不通' }).Count
+$GoodTotal = $LvG + $LvG2 + $LvY + $LvS
+$BadTotal  = $LvO + $LvR
+Write-Host ("  正常 " + $GoodTotal + " 个（优秀 " + $LvG + " · 良好 " + $LvG2 + " · 一般 " + $LvY + " · 较慢 " + $LvS + "）") -ForegroundColor Green
+Write-Host ("  异常 " + $BadTotal + " 个（受限 " + $LvO + " · 不通 " + $LvR + "）") -ForegroundColor Red
 if ($script:RateInfo) { Write-Host ("  " + $script:RateInfo) -ForegroundColor DarkGray }
 if ($Fastest) { Write-Host ("  最快：" + $Fastest.Name + "  " + $Fastest.TcpMs + " ms") -ForegroundColor Green }
 if ($Slowest) { Write-Host ("  最慢：" + $Slowest.Name + "  " + $Slowest.TcpMs + " ms") -ForegroundColor Yellow }
-if ($FailList.Count -gt 0) {
-    Write-Host ("  不通：" + (($FailList | ForEach-Object { $_.Name }) -join '、')) -ForegroundColor Red
+$RestrictedList = @($Results | Where-Object { $_.Label -eq '受限' })
+$DeadList       = @($Results | Where-Object { $_.Label -eq '不通' })
+if ($RestrictedList.Count -gt 0) {
+    Write-Host ("  受限：" + (($RestrictedList | ForEach-Object { $_.Name }) -join '、')) -ForegroundColor Yellow
+}
+if ($DeadList.Count -gt 0) {
+    Write-Host ("  不通：" + (($DeadList | ForEach-Object { $_.Name }) -join '、')) -ForegroundColor Red
 }
 Write-AppLog 'I' 'RUN' ('完成 · 可连通 ' + $OkCount + '/' + $Total + ' · 平均建连 ' + $AvgTcp + 'ms · 耗时 ' + $Elapsed + 's' +
     $(if ($script:RateInfo) { ' · ' + $script:RateInfo } else { '' }) +
