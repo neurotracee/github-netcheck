@@ -7,7 +7,7 @@
 #
 #  所有测量仍由同目录 netcheck.ps1 完成，点菜单等价于以前输入那个数字。
 #
-#  版本：1.1.7.2
+#  版本：1.1.7.3
 #  协议：Apache License 2.0
 #  原项目地址：https://github.com/neurotracee/github-netcheck
 #  镜像（Gitee）：https://gitee.com/bio234/github-netcheck
@@ -181,7 +181,7 @@ function Draw {
     $lineNo = 0
 
     $title = T 'GitHub 网络自检' 'GitHub Network Check'
-    Write-Host ("  " + $title + "   v1.1.7.2") -ForegroundColor Cyan
+    Write-Host ("  " + $title + "   v1.1.7.3") -ForegroundColor Cyan
     $lineNo++
     Write-Host ("  作者：项目创作时为初中生；需求、判读规则与验收测试由本人完成") -ForegroundColor DarkGray
     $lineNo++
@@ -226,6 +226,109 @@ function Draw {
     $script:TopRow = 0   # Draw 从缓冲区第 0 行开始画，行号即菜单行号
 }
 
+# ---------------- 跑自检：自己收输出、自己在屏幕上打 ----------------
+# 不再把子进程的输出直接甩给控制台：那样在某些终端里会被缓冲区吃掉，
+# 只剩最后一句提问。这里由菜单自己读子进程的每一行再打印，同时钉一行进度条。
+$script:BarOn   = $false
+$script:BarText = ''
+
+function Format-Bar([int]$done, [int]$total) {
+    $w = 30
+    $p = 0.0
+    if ($total -gt 0) { $p = [double]$done / [double]$total }
+    $fill = [int][Math]::Round($w * $p)
+    if ($fill -lt 0) { $fill = 0 }
+    if ($fill -gt $w) { $fill = $w }
+    return ('  进度 [' + ('#' * $fill) + ('-' * ($w - $fill)) + '] ' + $done + '/' + $total + '  ' + [int]($p * 100) + '%')
+}
+
+function Write-Live([string]$text, $color) {
+    if ($script:BarOn) {
+        try {
+            $row = [Console]::CursorTop - 1
+            if ($row -lt 0) { throw 'norow' }
+            [Console]::SetCursorPosition(0, $row)
+            [Console]::Write((' ' * ([Console]::WindowWidth - 1)))
+            [Console]::SetCursorPosition(0, $row)
+            $old = [Console]::ForegroundColor
+            if ($color) { [Console]::ForegroundColor = $color }
+            [Console]::Write($text + "`n")
+            [Console]::ForegroundColor = $old
+            [Console]::Write($script:BarText + "`n")
+            return
+        } catch { $script:BarOn = $false }
+    }
+    if ($color) { Write-Host $text -ForegroundColor $color } else { Write-Host $text }
+}
+
+function Get-LineColor([string]$text) {
+    if ($text -match '优秀') { return 'Green' }
+    if ($text -match '良好') { return 'Cyan' }
+    if ($text -match '一般') { return 'Yellow' }
+    if ($text -match '较慢') { return 'DarkYellow' }
+    if ($text -match '受限') { return 'Magenta' }
+    if ($text -match '不通')  { return 'Red' }
+    return $null
+}
+
+function Invoke-Check($item) {
+    # 先问一句：这次跑完要不要报告（问在菜单里，看得见，不会被吞）
+    $wantReport = $true
+    Write-Host ''
+    Write-Host ('  ' + (T '这次跑完要生成 HTML 报告吗？(Y/n，直接回车 = 要)' 'Generate an HTML report after this run? (Y/n, Enter = yes)')) -ForegroundColor Yellow
+    Write-Host ('  ' + (T '（只想要控制台结果就按 n，跑完不会多出文件）' '（press n if you only want the console results）')) -ForegroundColor DarkGray
+    $ans = Read-Host '  >'
+    if ($ans -match '^[Nn]') { $wantReport = $false }
+
+    $parts = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', ('"' + $NetCheck + '"'))
+    foreach ($a in $item.args) { $parts += $a }
+    $parts += '-NoBrowser'
+    if ($wantReport) { $parts += '-ForceReport' } else { $parts += '-NoReport' }
+
+    $psi = New-Object System.Diagnostics.ProcessStartInfo
+    $psi.FileName = 'powershell.exe'
+    $psi.Arguments = ($parts -join ' ')
+    $psi.UseShellExecute = $false
+    $psi.RedirectStandardOutput = $true
+    $psi.RedirectStandardError = $false
+    $psi.CreateNoWindow = $false
+    try { $psi.StandardOutputEncoding = [Console]::OutputEncoding } catch { }
+
+    Clear-Host
+    Write-Host ('  ' + (T '正在执行' 'Running') + ': netcheck.ps1 ' + (($item.args -join ' ') + ' ' + $(if ($wantReport) { '-ForceReport' } else { '-NoReport' }))) -ForegroundColor Cyan
+    $script:BarText = Format-Bar 0 0
+    $script:BarOn = $true
+    Write-Host $script:BarText
+    $total = 0; $done = 0
+    $reportPath = ''
+
+    try {
+        $p = [System.Diagnostics.Process]::Start($psi)
+        while ($true) {
+            $line = $p.StandardOutput.ReadLine()
+            if ($null -eq $line) { break }
+            if ($line -match '^\s*\[(\d+)/(\d+)\]') { $done = [int]$matches[1]; $total = [int]$matches[2] }
+            if ($line -match '报告已生成[:：]\s*(.+)$') { $reportPath = $matches[1].Trim() }
+            $script:BarText = Format-Bar $done $total
+            Write-Live $line (Get-LineColor $line)
+        }
+        $p.WaitForExit()
+    } catch {
+        $script:BarOn = $false
+        Write-Host ('  运行出错：' + $_.Exception.Message) -ForegroundColor Red
+    }
+    $script:BarOn = $false
+
+    Write-Host ''
+    if ($wantReport -and $reportPath) {
+        Write-Host ('  ' + (T '报告在：' 'Report: ') + $reportPath) -ForegroundColor Cyan
+        Write-Host ('  ' + (T '双击它就能看；上面的结果也已经留在屏幕上，可以往上滚。' 'Double-click to open it; the results above stay on screen and can be scrolled back.')) -ForegroundColor DarkGray
+        Write-Host ''
+    }
+    Read-Host (T '  回车回到菜单' '  Enter to return to the menu') | Out-Null
+    return 'redraw'
+}
+
 # ---------------- 执行 ----------------
 function Run-Item([string]$key) {
     if ($key -eq 'quit') { return 'quit' }
@@ -241,6 +344,9 @@ function Run-Item([string]$key) {
         Write-Host (T '  当前文件夹里没有 netcheck.ps1，请把菜单脚本与它放在一起。' '  netcheck.ps1 is missing next to this menu.') -ForegroundColor Red
         Read-Host (T '  回车继续' '  Enter to continue') | Out-Null
         return 'redraw'
+    }
+    if ($item.key -eq 'full' -or $item.key -eq 'quick') {
+        return (Invoke-Check $item)
     }
     Clear-Host
     $argLine = ($item.args -join ' ')

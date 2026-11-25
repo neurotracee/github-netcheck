@@ -4,7 +4,7 @@
 #  测四项：DNS 解析 / TCP 建连 / TLS 握手 / HTTPS 首字节
 #  输出：控制台结果 + reports 目录下的 HTML 可视化报告
 #
-#  版本：1.1.7.1
+#  版本：1.1.7.3
 #  开源协议：Apache License 2.0
 #  原项目地址：https://github.com/neurotracee/github-netcheck
 #  镜像（Gitee）：https://gitee.com/bio234/github-netcheck
@@ -19,6 +19,8 @@
 
 param(
     [switch]$NoBrowser,   # 加这个参数则不自动打开报告
+    [switch]$ForceReport, # 直接生成报告、不再询问（菜单先问过用户时用）
+    [switch]$NoReport,    # 这次不生成报告、也不询问
     [switch]$Quick,       # 加这个参数只测 GitHub 系（少测几个，快一点）
     [switch]$About,       # 只弹「关于与开源信息」窗口，不测
     [switch]$Settings,    # 只弹设置窗口（报告目录 / 自动打开 / 超时），不测
@@ -27,7 +29,7 @@ param(
     [switch]$ClearLogs    # 命令行按日期清除日志（会问两次）
 )
 
-$script:AppVersion = '1.1.7.2'
+$script:AppVersion = '1.1.7.3'
 $script:ProjectUrl = 'https://github.com/neurotracee/github-netcheck'
 $script:MirrorUrl  = 'https://gitee.com/bio234/github-netcheck'
 
@@ -2009,7 +2011,17 @@ $html = Set-Placeholder $html '__ADVICE__'   $adviceHtml
 #     关掉时按 settings.json 里记住的 SaveReport / AutoOpen 执行。
 $wantSave = $false
 $wantOpen = $false
-if ($NoBrowser) {
+if ($NoReport) {
+    # 菜单里已经问过「这次要不要报告」，用户选了不要：直接跳过
+    $wantSave = $false
+    $wantOpen = $false
+}
+elseif ($ForceReport) {
+    # 菜单里问过且用户要报告：不再弹问，直接按设置生成
+    $wantSave = $true
+    $wantOpen = if ($NoBrowser) { $false } else { $script:AutoOpen }
+}
+elseif ($NoBrowser) {
     # -NoBrowser 是给自动化/CI 用的：不弹问、不打开浏览器，只按记住的「要不要报告」来
     $wantSave = $script:SaveReport
     $wantOpen = $false

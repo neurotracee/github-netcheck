@@ -125,13 +125,13 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 
 ## 下载（先点这里）
 
-**当前版本：安卓 v1.1.7.4 ・ Windows v1.1.7.2**。Windows 这次修好了「自检跑完看不到逐点位结果」，控制台结果也按优秀／良好／一般／较慢／受限／不通分了级；安卓沿用上一版 APK。选能打开的链接就行（国内网络慢优先 Gitee）。
+**当前版本：安卓 v1.1.7.4 ・ Windows v1.1.7.3**。Windows 这次从根上修好了「点 [1] 跑完看不到点位结果」：结果由菜单自己读出来打印、跑的时候底部有一行进度条，要不要报告改成开跑前问一句；安卓沿用上一版 APK。
 
 | 你要的 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
 | 最新下载页 | https://github.com/neurotracee/github-netcheck/releases/latest | https://gitee.com/bio234/github-netcheck/releases/latest |
 | 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.4/NetCheck-1.1.7.4.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.4/NetCheck-1.1.7.4.apk |
-| Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.5/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.5/NetCheck-Windows.zip |
+| Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.6/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.6/NetCheck-Windows.zip |
 | 仓库首页 | https://github.com/neurotracee/github-netcheck | https://gitee.com/bio234/github-netcheck |
 
 解压 Windows 包后双击 **一键网络自检.bat**；APK 直接安装（系统会提示「未知来源」，原因见下一节）。
@@ -147,7 +147,7 @@ Gitee 的附件总容量只有 1GB，装不下所有历史包，所以安装包�
 
 | 版本档位 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
-| **最新版**（安卓 v1.1.7.4 的 APK、Windows v1.1.7.2 的 zip） | 保留附件 | **保留附件** |
+| **最新版**（安卓 v1.1.7.4 的 APK、Windows v1.1.7.3 的 zip） | 保留附件 | **保留附件** |
 | **上一版**（v1.1.7.3 的安卓 APK、v1.1.7.0 的 Windows zip） | 保留附件 | 保留附件（方便覆盖升级过渡） |
 | **更早的旧版本** | 保留全部附件 | **附件已撤下**，只留发布说明 |
 
@@ -819,13 +819,13 @@ four summary cards below it, then one card per endpoint — the vertical bar on 
 
 ## Download (start here)
 
-**Current versions: Android v1.1.7.4 ・ Windows v1.1.7.2**. This Windows build fixes the missing per-target results after a run and grades the console output as Excellent / Good / Fair / Slow / Restricted / Unreachable; the Android APK is unchanged. Pick whichever link opens for you (with slow mainland connectivity, prefer Gitee).
+**Current versions: Android v1.1.7.4 ・ Windows v1.1.7.3**. This Windows build fixes the missing per-target results properly: the menu now captures the run and prints it itself, shows a progress bar, and asks about the report before the run; the Android APK is unchanged.
 
 | What you want | GitHub | Gitee (mainland mirror) |
 | --- | --- | --- |
 | Latest release page | https://github.com/neurotracee/github-netcheck/releases/latest | https://gitee.com/bio234/github-netcheck/releases/latest |
 | Android APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.4/NetCheck-1.1.7.4.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.4/NetCheck-1.1.7.4.apk |
-| Windows package (zip) | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.5/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.5/NetCheck-Windows.zip |
+| Windows package (zip) | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.6/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.6/NetCheck-Windows.zip |
 | Repository home | https://github.com/neurotracee/github-netcheck | https://gitee.com/bio234/github-netcheck |
 
 Unzip the Windows package and double-click **一键网络自检.bat**; install the APK directly (the system will warn about an “unknown source” — the reason is in the next section).
@@ -841,7 +841,7 @@ Gitee's total attachment quota is only 1 GB, which cannot hold every historical 
 
 | Tier | GitHub | Gitee (mainland mirror) |
 | --- | --- | --- |
-| **Latest** (Android v1.1.7.4 APK, Windows v1.1.7.2 zip) | attachments kept | **attachments kept** |
+| **Latest** (Android v1.1.7.4 APK, Windows v1.1.7.3 zip) | attachments kept | **attachments kept** |
 | **Previous** (Android v1.1.7.3 APK, Windows v1.1.7.0 zip) | attachments kept | attachments kept (for in-place upgrades in transition) |
 | **Anything older** | every attachment kept | **attachments removed**, release notes only |
 
@@ -1384,4 +1384,5 @@ with the same sentence — **if this little tool saved you a bit of time, feel f
 > Direct links: [GitHub star](https://github.com/neurotracee/github-netcheck) ｜ [Gitee star](https://gitee.com/bio234/github-netcheck)
 >
 > Mainland users can also scan the code to buy me a milk tea — entirely voluntary; without it the tool is still free with nothing missing.
+
 
