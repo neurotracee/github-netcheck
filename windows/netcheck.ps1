@@ -4,7 +4,7 @@
 #  测四项：DNS 解析 / TCP 建连 / TLS 握手 / HTTPS 首字节
 #  输出：控制台结果 + reports 目录下的 HTML 可视化报告
 #
-#  版本：1.1.7.3
+#  版本：1.1.7.4
 #  开源协议：Apache License 2.0
 #  原项目地址：https://github.com/neurotracee/github-netcheck
 #  镜像（Gitee）：https://gitee.com/bio234/github-netcheck
@@ -29,7 +29,7 @@ param(
     [switch]$ClearLogs    # 命令行按日期清除日志（会问两次）
 )
 
-$script:AppVersion = '1.1.7.3'
+$script:AppVersion = '1.1.7.4'
 $script:ProjectUrl = 'https://github.com/neurotracee/github-netcheck'
 $script:MirrorUrl  = 'https://gitee.com/bio234/github-netcheck'
 
@@ -1668,7 +1668,8 @@ $Results = @()
 $i = 0
 foreach ($t in $Targets) {
     $i++
-    Write-Host ("  [" + $i + "/" + $Targets.Count + "] " + $t.Name + "  (" + $t.Host + ")") -ForegroundColor White -NoNewline
+    # 先单独一行说「现在测哪个」，再测；这样菜单那边能边跑边显示当前点位
+    Write-Host ("  [" + $i + "/" + $Targets.Count + "] " + $t.Name + "  (" + $t.Host + ")") -ForegroundColor White
 
     $dns = Test-Dns -HostName $t.Host -TimeoutMs $script:TimeoutMs
     if ($dns.Ok) {

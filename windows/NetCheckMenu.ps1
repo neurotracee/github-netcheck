@@ -7,7 +7,7 @@
 #
 #  所有测量仍由同目录 netcheck.ps1 完成，点菜单等价于以前输入那个数字。
 #
-#  版本：1.1.7.3
+#  版本：1.1.7.4
 #  协议：Apache License 2.0
 #  原项目地址：https://github.com/neurotracee/github-netcheck
 #  镜像（Gitee）：https://gitee.com/bio234/github-netcheck
@@ -181,7 +181,7 @@ function Draw {
     $lineNo = 0
 
     $title = T 'GitHub 网络自检' 'GitHub Network Check'
-    Write-Host ("  " + $title + "   v1.1.7.3") -ForegroundColor Cyan
+    Write-Host ("  " + $title + "   v1.1.7.4") -ForegroundColor Cyan
     $lineNo++
     Write-Host ("  作者：项目创作时为初中生；需求、判读规则与验收测试由本人完成") -ForegroundColor DarkGray
     $lineNo++
@@ -272,35 +272,32 @@ function Get-LineColor([string]$text) {
 }
 
 function Invoke-Check($item) {
-    # 先问一句：这次跑完要不要报告（问在菜单里，看得见，不会被吞）
-    $wantReport = $true
-    Write-Host ''
-    Write-Host ('  ' + (T '这次跑完要生成 HTML 报告吗？(Y/n，直接回车 = 要)' 'Generate an HTML report after this run? (Y/n, Enter = yes)')) -ForegroundColor Yellow
-    Write-Host ('  ' + (T '（只想要控制台结果就按 n，跑完不会多出文件）' '（press n if you only want the console results）')) -ForegroundColor DarkGray
-    $ans = Read-Host '  >'
-    if ($ans -match '^[Nn]') { $wantReport = $false }
-
+    # 不再先问报告：按下就直接开跑。
+    # -NoBrowser 让子进程按 settings.json 里记住的「要不要报告」执行、全程不弹问句，
+    # 所以这里一个提示都不用回答，结果一路打在屏幕上。
     $parts = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', ('"' + $NetCheck + '"'))
     foreach ($a in $item.args) { $parts += $a }
     $parts += '-NoBrowser'
-    if ($wantReport) { $parts += '-ForceReport' } else { $parts += '-NoReport' }
 
     $psi = New-Object System.Diagnostics.ProcessStartInfo
     $psi.FileName = 'powershell.exe'
     $psi.Arguments = ($parts -join ' ')
     $psi.UseShellExecute = $false
     $psi.RedirectStandardOutput = $true
-    $psi.RedirectStandardError = $false
+    $psi.RedirectStandardError = $true
     $psi.CreateNoWindow = $false
     try { $psi.StandardOutputEncoding = [Console]::OutputEncoding } catch { }
+    try { $psi.StandardErrorEncoding = [Console]::OutputEncoding } catch { }
 
     Clear-Host
-    Write-Host ('  ' + (T '正在执行' 'Running') + ': netcheck.ps1 ' + (($item.args -join ' ') + ' ' + $(if ($wantReport) { '-ForceReport' } else { '-NoReport' }))) -ForegroundColor Cyan
+    Write-Host ('  ' + (T '菜单 v1.1.7.4 · 开始完整自检' 'Menu v1.1.7.4 - starting the full check')) -ForegroundColor Cyan
+    Write-Host ('  ' + (T '正在执行' 'Running') + ': netcheck.ps1 ' + ($item.args -join ' ')) -ForegroundColor Cyan
     $script:BarText = Format-Bar 0 0
     $script:BarOn = $true
     Write-Host $script:BarText
     $total = 0; $done = 0
     $reportPath = ''
+    $stderrText = ''
 
     try {
         $p = [System.Diagnostics.Process]::Start($psi)
@@ -312,17 +309,31 @@ function Invoke-Check($item) {
             $script:BarText = Format-Bar $done $total
             Write-Live $line (Get-LineColor $line)
         }
+        $stderrText = $p.StandardError.ReadToEnd()
         $p.WaitForExit()
+        $exitCode = $p.ExitCode
     } catch {
         $script:BarOn = $false
+        $exitCode = -1
         Write-Host ('  运行出错：' + $_.Exception.Message) -ForegroundColor Red
     }
     $script:BarOn = $false
 
+    if ($stderrText -and $stderrText.Trim()) {
+        Write-Host ''
+        Write-Host ('  ' + (T '脚本报错：' 'Script error:')) -ForegroundColor Red
+        foreach ($el in ($stderrText -split "`n")) { if ($el.Trim()) { Write-Host ('  ' + $el.TrimEnd()) -ForegroundColor DarkRed } }
+    }
+    if ($total -eq 0) {
+        Write-Host ''
+        $tail = T '。把这段截图发给我。' '. Please send me a screenshot of this.'
+        Write-Host ('  ' + (T '没跑出任何点位结果，退出码 ' 'No target results; exit code ') + $exitCode + $tail) -ForegroundColor Red
+    }
+
     Write-Host ''
-    if ($wantReport -and $reportPath) {
+    if ($reportPath) {
         Write-Host ('  ' + (T '报告在：' 'Report: ') + $reportPath) -ForegroundColor Cyan
-        Write-Host ('  ' + (T '双击它就能看；上面的结果也已经留在屏幕上，可以往上滚。' 'Double-click to open it; the results above stay on screen and can be scrolled back.')) -ForegroundColor DarkGray
+        Write-Host ('  ' + (T '双击它就能看；上面的结果已经留在屏幕上，可以往上滚。' 'Double-click it to open; the results above stay on screen and can be scrolled back.')) -ForegroundColor DarkGray
         Write-Host ''
     }
     Read-Host (T '  回车回到菜单' '  Enter to return to the menu') | Out-Null
