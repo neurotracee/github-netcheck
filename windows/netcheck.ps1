@@ -4,7 +4,7 @@
 #  测四项：DNS 解析 / TCP 建连 / TLS 握手 / HTTPS 首字节
 #  输出：控制台结果 + reports 目录下的 HTML 可视化报告
 #
-#  版本：1.1.5.2
+#  版本：1.1.7.1
 #  开源协议：Apache License 2.0
 #  原项目地址：https://github.com/neurotracee/github-netcheck
 #  镜像（Gitee）：https://gitee.com/bio234/github-netcheck
@@ -27,7 +27,7 @@ param(
     [switch]$ClearLogs    # 命令行按日期清除日志（会问两次）
 )
 
-$script:AppVersion = '1.1.7.0'
+$script:AppVersion = '1.1.7.1'
 $script:ProjectUrl = 'https://github.com/neurotracee/github-netcheck'
 $script:MirrorUrl  = 'https://gitee.com/bio234/github-netcheck'
 

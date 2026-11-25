@@ -7,7 +7,15 @@ if not exist "%~dp0netcheck.ps1" (
   pause
   exit /b 1
 )
-:menu
+
+rem ---- default: open the clickable menu window; type --console for the old text menu ----
+if /i "%~1"=="--console" goto consolemenu
+if exist "%~dp0NetCheckMenu.ps1" (
+  powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0NetCheckMenu.ps1"
+  if not errorlevel 1 goto end
+)
+
+:consolemenu
 cls
 echo.
 echo   GitHub ÍøÂç×Ô¼ì  v1.1.7.0
@@ -37,43 +45,43 @@ if "%choice%"=="5" goto update
 if "%choice%"=="6" goto logs
 if "%choice%"=="7" goto clearlogs
 if "%choice%"=="0" goto end
-goto menu
+goto consolemenu
 
 :full
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0netcheck.ps1"
 echo.
 pause
-goto menu
+goto consolemenu
 
 :quick
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0netcheck.ps1" -Quick
 echo.
 pause
-goto menu
+goto consolemenu
 
 :about
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0netcheck.ps1" -About
-goto menu
+goto consolemenu
 
 :settings
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0netcheck.ps1" -Settings
-goto menu
+goto consolemenu
 
 :update
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0netcheck.ps1" -CheckUpdate
 echo.
 pause
-goto menu
+goto consolemenu
 
 :logs
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0netcheck.ps1" -Logs
-goto menu
+goto consolemenu
 
 :clearlogs
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0netcheck.ps1" -ClearLogs
 echo.
 pause
-goto menu
+goto consolemenu
 
 :end
 endlocal

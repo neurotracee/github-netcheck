@@ -125,13 +125,13 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 
 ## 下载（先点这里）
 
-**当前版本：安卓 v1.1.7.3 ・ Windows v1.1.7.0**。这次只改了安卓端界面（Windows 端内容未变），选能打开的就行（国内网络慢优先 Gitee）。
+**当前版本：安卓 v1.1.7.4 ・ Windows v1.1.7.1**。两端都有更新：安卓修了日志页弹窗的底色，Windows 的菜单改成了可以点、也能一键切中英文，选能打开的就行（国内网络慢优先 Gitee）。
 
 | 你要的 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
 | 最新下载页 | https://github.com/neurotracee/github-netcheck/releases/latest | https://gitee.com/bio234/github-netcheck/releases/latest |
-| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.3/NetCheck-1.1.7.3.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.3/NetCheck-1.1.7.3.apk |
-| Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.0/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.0/NetCheck-Windows.zip |
+| 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.4/NetCheck-1.1.7.4.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.4/NetCheck-1.1.7.4.apk |
+| Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.4/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.4/NetCheck-Windows.zip |
 | 仓库首页 | https://github.com/neurotracee/github-netcheck | https://gitee.com/bio234/github-netcheck |
 
 解压 Windows 包后双击 **一键网络自检.bat**；APK 直接安装（系统会提示「未知来源」，原因见下一节）。
@@ -147,8 +147,8 @@ Gitee 的附件总容量只有 1GB，装不下所有历史包，所以安装包�
 
 | 版本档位 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
-| **最新版**（安卓 v1.1.7.3 的 APK、Windows v1.1.7.0 的 zip） | 保留附件 | **保留附件** |
-| **上一版**（v1.1.6.0 的安卓 APK、v1.1.5.1 的 Windows zip） | 保留附件 | 保留附件（方便覆盖升级过渡） |
+| **最新版**（安卓 v1.1.7.4 的 APK、Windows v1.1.7.1 的 zip） | 保留附件 | **保留附件** |
+| **上一版**（v1.1.7.3 的安卓 APK、v1.1.7.0 的 Windows zip） | 保留附件 | 保留附件（方便覆盖升级过渡） |
 | **更早的旧版本** | 保留全部附件 | **附件已撤下**，只留发布说明 |
 
 也就是说：**最新版和上一版的 Windows 包、安卓包在 Gitee 都能下**；只有更早的旧版本才需要到 GitHub 发布页找。
@@ -442,7 +442,7 @@ hosts 把域名指向 127.0.0.1
 
 ### 方式一：Windows，双击就跑
 
-1. 到 **[Releases 页面](https://github.com/neurotracee/github-netcheck/releases/latest)** 下载 `NetCheck-Windows.zip`（或直接下载仓库里 `windows/` 目录的两个文件；国内网络慢可以去 [Gitee 发布页](https://gitee.com/bio234/github-netcheck/releases/latest)，两边是同一个包）。
+1. 到 **[Releases 页面](https://github.com/neurotracee/github-netcheck/releases/latest)** 下载 `NetCheck-Windows.zip`（或直接下载仓库里 `windows/` 目录的三个文件：`netcheck.ps1`、`NetCheckMenu.ps1`、`一键网络自检.bat`；国内网络慢可以去 [Gitee 发布页](https://gitee.com/bio234/github-netcheck/releases/latest)，两边是同一个包）。
 2. 解压，双击 **一键网络自检.bat**，会出现一个菜单：
 
    ```
@@ -456,7 +456,7 @@ hosts 把域名指向 127.0.0.1
    [0] 退出
    ```
 
-   菜单顶部常驻署名、协议与两个项目地址——这个工具是谁做的、从哪儿来的，直接摆在最显眼的地方。
+   **这一屏可以直接用鼠标点、用笔记本触摸屏点**，不用记数字；方向键 + 回车、或直接按数字也照样能用。菜单里还有一行语言开关，点一下就在 中文 / English 之间切换，选择记进 `settings.json`。菜单顶部常驻署名、协议与两个项目地址——这个工具是谁做的、从哪儿来的，直接摆在最显眼的地方。
 3. 选 1（或 2），逐个测试 14 个目标，大约 15～40 秒（看网络差到什么程度）。
 4. 测完**不会闷头生成一堆文件**，而是先问三句：
    - 「这次要生成 HTML 报告吗？」（回车 = 是）
@@ -819,13 +819,13 @@ four summary cards below it, then one card per endpoint — the vertical bar on 
 
 ## Download (start here)
 
-**Current versions: Android v1.1.7.3 ・ Windows v1.1.7.0**.. Only the Android UI changed in this release — the Windows side is unchanged. Pick whichever opens for you (with slow mainland connectivity, prefer Gitee).
+**Current versions: Android v1.1.7.4 ・ Windows v1.1.7.1**. Both sides changed: Android fixed the dialog background on the log page, and the Windows menu can now be clicked and switched between Chinese and English. Pick whichever opens for you (with slow mainland connectivity, prefer Gitee).
 
 | What you want | GitHub | Gitee (mainland mirror) |
 | --- | --- | --- |
 | Latest release page | https://github.com/neurotracee/github-netcheck/releases/latest | https://gitee.com/bio234/github-netcheck/releases/latest |
-| Android APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.3/NetCheck-1.1.7.3.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.3/NetCheck-1.1.7.3.apk |
-| Windows package (zip) | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.0/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.0/NetCheck-Windows.zip |
+| Android APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.4/NetCheck-1.1.7.4.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.4/NetCheck-1.1.7.4.apk |
+| Windows package (zip) | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.4/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.4/NetCheck-Windows.zip |
 | Repository home | https://github.com/neurotracee/github-netcheck | https://gitee.com/bio234/github-netcheck |
 
 Unzip the Windows package and double-click **一键网络自检.bat**; install the APK directly (the system will warn about an “unknown source” — the reason is in the next section).
@@ -841,8 +841,8 @@ Gitee's total attachment quota is only 1 GB, which cannot hold every historical 
 
 | Tier | GitHub | Gitee (mainland mirror) |
 | --- | --- | --- |
-| **Latest** (Android v1.1.7.3 APK, Windows v1.1.7.0 zip) | attachments kept | **attachments kept** |
-| **Previous** (Android v1.1.6.0 APK, Windows v1.1.5.1 zip) | attachments kept | attachments kept (for in-place upgrades in transition) |
+| **Latest** (Android v1.1.7.4 APK, Windows v1.1.7.1 zip) | attachments kept | **attachments kept** |
+| **Previous** (Android v1.1.7.3 APK, Windows v1.1.7.0 zip) | attachments kept | attachments kept (for in-place upgrades in transition) |
 | **Anything older** | every attachment kept | **attachments removed**, release notes only |
 
 In other words: **the latest and the previous Windows and Android packages can both be downloaded from Gitee**; only older versions have to be fetched from the GitHub release page.
@@ -1133,7 +1133,7 @@ Users can pin “Gitee only” or “GitHub only” in settings; if the chosen s
 
 ### Option 1: Windows — double-click and it runs
 
-1. Go to the **[Releases page](https://github.com/neurotracee/github-netcheck/releases/latest)** and download `NetCheck-Windows.zip` (or grab the two files in the repository's `windows/` folder; if the mainland connection is slow, use the [Gitee releases page](https://gitee.com/bio234/github-netcheck/releases/latest) — it is the same package).
+1. Go to the **[Releases page](https://github.com/neurotracee/github-netcheck/releases/latest)** and download `NetCheck-Windows.zip` (or grab the three files in the repository's `windows/` folder — `netcheck.ps1`, `NetCheckMenu.ps1`, `一键网络自检.bat`; if the mainland connection is slow, use the [Gitee releases page](https://gitee.com/bio234/github-netcheck/releases/latest) — it is the same package).
 2. Unzip and double-click **一键网络自检.bat**; a menu appears:
 
    ```
@@ -1145,7 +1145,7 @@ Users can pin “Gitee only” or “GitHub only” in settings; if the chosen s
    [0] 退出
    ```
 
-   The top of the menu permanently carries the attribution, the licence and both project URLs — who made this tool and where it comes from sits in the most visible place.
+   **This screen can be clicked with a mouse, or tapped on a laptop touchscreen** — no numbers to remember; arrow keys + Enter, or typing the number, still work. There is also a language line at the top: click it to switch between Chinese and English, and the choice is saved in `settings.json`. The top of the menu permanently carries the attribution, the licence and both project URLs — who made this tool and where it comes from sits in the most visible place.
 3. Choose 1 (or 2); the 14 targets are tested one by one, roughly 15–40 seconds depending on how bad the network is.
 4. When the run ends it **does not silently dump a pile of files**; it asks three questions first:
    - “Generate an HTML report this time?” (Enter = yes)
