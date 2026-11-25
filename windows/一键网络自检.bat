@@ -1,6 +1,6 @@
 @echo off
 chcp 936 >nul
-title GitHub - Network Check v1.1.7.4
+title GitHub - Network Check v1.1.7.5
 setlocal enabledelayedexpansion
 if not exist "%~dp0netcheck.ps1" (
   echo [错误] 当前文件夹里没有 netcheck.ps1，请把 bat 与 ps1 放在一起

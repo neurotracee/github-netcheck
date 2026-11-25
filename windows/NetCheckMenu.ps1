@@ -7,7 +7,7 @@
 #
 #  所有测量仍由同目录 netcheck.ps1 完成，点菜单等价于以前输入那个数字。
 #
-#  版本：1.1.7.4
+#  版本：1.1.7.5
 #  协议：Apache License 2.0
 #  原项目地址：https://github.com/neurotracee/github-netcheck
 #  镜像（Gitee）：https://gitee.com/bio234/github-netcheck
@@ -181,7 +181,7 @@ function Draw {
     $lineNo = 0
 
     $title = T 'GitHub 网络自检' 'GitHub Network Check'
-    Write-Host ("  " + $title + "   v1.1.7.4") -ForegroundColor Cyan
+    Write-Host ("  " + $title + "   v1.1.7.5") -ForegroundColor Cyan
     $lineNo++
     Write-Host ("  作者：项目创作时为初中生；需求、判读规则与验收测试由本人完成") -ForegroundColor DarkGray
     $lineNo++
@@ -229,36 +229,70 @@ function Draw {
 # ---------------- 跑自检：自己收输出、自己在屏幕上打 ----------------
 # 不再把子进程的输出直接甩给控制台：那样在某些终端里会被缓冲区吃掉，
 # 只剩最后一句提问。这里由菜单自己读子进程的每一行再打印，同时钉一行进度条。
-$script:BarOn   = $false
-$script:BarText = ''
+$script:BarOn  = $false
+$script:BarRow = 1
+$script:BarFill = [string][char]0x2588
+$script:BarRest = [string][char]0x2591
 
-function Format-Bar([int]$done, [int]$total) {
-    $w = 30
-    $p = 0.0
-    if ($total -gt 0) { $p = [double]$done / [double]$total }
-    $fill = [int][Math]::Round($w * $p)
-    if ($fill -lt 0) { $fill = 0 }
-    if ($fill -gt $w) { $fill = $w }
-    return ('  进度 [' + ('#' * $fill) + ('-' * ($w - $fill)) + '] ' + $done + '/' + $total + '  ' + [int]($p * 100) + '%')
+# 一条整体进度条，钉在窗口顶部那一行，原地刷新；结果一行行往下走。
+function Update-Bar([int]$done, [int]$total) {
+    if (-not $script:BarOn) { return }
+    try {
+        $w = [Console]::WindowWidth
+        $sx = [Console]::CursorLeft
+        $sy = [Console]::CursorTop
+        $p = 0.0
+        if ($total -gt 0) { $p = [double]$done / [double]$total }
+        $cells = 26
+        $fill = [int][Math]::Round($cells * $p)
+        if ($fill -lt 0) { $fill = 0 }
+        if ($fill -gt $cells) { $fill = $cells }
+        [Console]::SetCursorPosition(0, $script:BarRow)
+        [Console]::Write((' ' * ($w - 1)))
+        [Console]::SetCursorPosition(0, $script:BarRow)
+        $old = [Console]::ForegroundColor
+        [Console]::Write('  进度 ')
+        [Console]::ForegroundColor = 'Cyan'
+        [Console]::Write(($script:BarFill * $fill))
+        [Console]::ForegroundColor = 'DarkGray'
+        [Console]::Write(($script:BarRest * ($cells - $fill)))
+        [Console]::ForegroundColor = $old
+        [Console]::Write(('   ' + $done + '/' + $total + '   ' + [int]($p * 100) + '%'))
+        [Console]::SetCursorPosition($sx, $sy)
+    } catch { $script:BarOn = $false }
 }
 
-function Write-Live([string]$text, $color) {
-    if ($script:BarOn) {
-        try {
-            $row = [Console]::CursorTop - 1
-            if ($row -lt 0) { throw 'norow' }
-            [Console]::SetCursorPosition(0, $row)
-            [Console]::Write((' ' * ([Console]::WindowWidth - 1)))
-            [Console]::SetCursorPosition(0, $row)
-            $old = [Console]::ForegroundColor
-            if ($color) { [Console]::ForegroundColor = $color }
-            [Console]::Write($text + "`n")
-            [Console]::ForegroundColor = $old
-            [Console]::Write($script:BarText + "`n")
-            return
-        } catch { $script:BarOn = $false }
-    }
-    if ($color) { Write-Host $text -ForegroundColor $color } else { Write-Host $text }
+# 把某一行就地改写成新内容（用来把「正在测 XX」换成「XX 的结果」，一条点位只占一行）
+function Write-Line-At([int]$row, [string]$text, $color) {
+    try {
+        $w = [Console]::WindowWidth - 1
+        # 按显示宽度裁（中文算 2 列），保证一条点位永远只占一行、不折行
+        $sb = New-Object System.Text.StringBuilder
+        $acc = 0
+        foreach ($ch in $text.ToCharArray()) {
+            $code = [int][char]$ch
+            $cw = 1
+            if (($code -ge 0x1100 -and $code -le 0x115F) -or ($code -ge 0x2E80 -and $code -le 0xA4CF) -or
+                ($code -ge 0xAC00 -and $code -le 0xD7A3) -or ($code -ge 0xF900 -and $code -le 0xFAFF) -or
+                ($code -ge 0xFE30 -and $code -le 0xFE4F) -or ($code -ge 0xFF00 -and $code -le 0xFF60) -or
+                ($code -ge 0xFFE0 -and $code -le 0xFFE6)) { $cw = 2 }
+            if ($acc + $cw -gt $w) { break }
+            [void]$sb.Append($ch)
+            $acc += $cw
+        }
+        $text = $sb.ToString()
+        $sx = [Console]::CursorLeft
+        $sy = [Console]::CursorTop
+        [Console]::SetCursorPosition(0, $row)
+        [Console]::Write((' ' * $w))
+        [Console]::SetCursorPosition(0, $row)
+        $old = [Console]::ForegroundColor
+        if ($color) { [Console]::ForegroundColor = $color }
+        [Console]::Write($text)
+        [Console]::ForegroundColor = $old
+        [Console]::SetCursorPosition($sx, $sy)
+        return $true
+    } catch { return $false }
 }
 
 function Get-LineColor([string]$text) {
@@ -272,42 +306,57 @@ function Get-LineColor([string]$text) {
 }
 
 function Invoke-Check($item) {
-    # 不再先问报告：按下就直接开跑。
-    # -NoBrowser 让子进程按 settings.json 里记住的「要不要报告」执行、全程不弹问句，
-    # 所以这里一个提示都不用回答，结果一路打在屏幕上。
-    $parts = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', ('"' + $NetCheck + '"'))
-    foreach ($a in $item.args) { $parts += $a }
-    $parts += '-NoBrowser'
-
-    $psi = New-Object System.Diagnostics.ProcessStartInfo
-    $psi.FileName = 'powershell.exe'
-    $psi.Arguments = ($parts -join ' ')
-    $psi.UseShellExecute = $false
-    $psi.RedirectStandardOutput = $true
-    $psi.RedirectStandardError = $true
-    $psi.CreateNoWindow = $false
-    try { $psi.StandardOutputEncoding = [Console]::OutputEncoding } catch { }
-    try { $psi.StandardErrorEncoding = [Console]::OutputEncoding } catch { }
-
     Clear-Host
-    Write-Host ('  ' + (T '菜单 v1.1.7.4 · 开始完整自检' 'Menu v1.1.7.4 - starting the full check')) -ForegroundColor Cyan
-    Write-Host ('  ' + (T '正在执行' 'Running') + ': netcheck.ps1 ' + ($item.args -join ' ')) -ForegroundColor Cyan
-    $script:BarText = Format-Bar 0 0
+    Write-Host ('  ' + (T '菜单 v1.1.7.5 · 完整自检' 'Menu v1.1.7.5 - full check')) -ForegroundColor Cyan
+    Write-Host ''
+    $script:BarRow = 1
     $script:BarOn = $true
-    Write-Host $script:BarText
+    Update-Bar 0 0
+    Write-Host ''
     $total = 0; $done = 0
     $reportPath = ''
     $stderrText = ''
+    $rowOfTarget = -1
+    $mergedName = ''
 
     try {
         $p = [System.Diagnostics.Process]::Start($psi)
         while ($true) {
             $line = $p.StandardOutput.ReadLine()
             if ($null -eq $line) { break }
-            if ($line -match '^\s*\[(\d+)/(\d+)\]') { $done = [int]$matches[1]; $total = [int]$matches[2] }
-            if ($line -match '报告已生成[:：]\s*(.+)$') { $reportPath = $matches[1].Trim() }
-            $script:BarText = Format-Bar $done $total
-            Write-Live $line (Get-LineColor $line)
+
+            if ($line -match '报告已生成[:：]\s*(.+)$') { $reportPath = $matches[1].Trim(); continue }
+
+            # 进入第一个点位之前，跳过脚本自己的署名/免责/版本那几行，省出屏幕空间给结果
+            if ($total -eq 0 -and ($line.Trim() -eq '' -or $line -match '作者：项目创作时|开源协议 Apache|图标含 GitHub|无背书|以上仅为作者立场|GitHub 网络自检 v|检查更新：|^\s*-{5,}')) { continue }
+
+            # 点位头：先打「正在测哪个」，记住这一行，等结果回来就地补成一行
+            if ($line -match '^\s*\[(\d+)/(\d+)\]\s+(.+)$') {
+                $done = [int]$matches[1]; $total = [int]$matches[2]
+                $mergedName = $matches[3].Trim()
+                Write-Host $line -ForegroundColor White
+                $rowOfTarget = [Console]::CursorTop - 1
+                Update-Bar $done $total
+                continue
+            }
+
+            # 紧跟着的就是这条点位的结果：把它并到点位那一行，一条点位只占一行
+            if ($rowOfTarget -ge 0 -and $line.Trim() -ne '') {
+                $verdict = $line.Trim()
+                $color = Get-LineColor $verdict
+                $txt = '  ' + $mergedName + '   ' + $verdict
+                if (-not (Write-Line-At $rowOfTarget $txt $color)) {
+                    Write-Host $line -ForegroundColor $color
+                }
+                $rowOfTarget = -1
+                $mergedName = ''
+                Update-Bar $done $total
+                continue
+            }
+
+            $color = Get-LineColor $line
+            if ($color) { Write-Host $line -ForegroundColor $color } else { Write-Host $line }
+            Update-Bar $done $total
         }
         $stderrText = $p.StandardError.ReadToEnd()
         $p.WaitForExit()
@@ -317,6 +366,7 @@ function Invoke-Check($item) {
         $exitCode = -1
         Write-Host ('  运行出错：' + $_.Exception.Message) -ForegroundColor Red
     }
+    if ($total -gt 0) { Update-Bar $total $total }
     $script:BarOn = $false
 
     if ($stderrText -and $stderrText.Trim()) {
@@ -332,8 +382,7 @@ function Invoke-Check($item) {
 
     Write-Host ''
     if ($reportPath) {
-        Write-Host ('  ' + (T '报告在：' 'Report: ') + $reportPath) -ForegroundColor Cyan
-        Write-Host ('  ' + (T '双击它就能看；上面的结果已经留在屏幕上，可以往上滚。' 'Double-click it to open; the results above stay on screen and can be scrolled back.')) -ForegroundColor DarkGray
+        Write-Host ('  ' + (T '报告：' 'Report: ') + $reportPath) -ForegroundColor DarkGray
         Write-Host ''
     }
     Read-Host (T '  回车回到菜单' '  Enter to return to the menu') | Out-Null

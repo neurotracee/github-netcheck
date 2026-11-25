@@ -29,7 +29,7 @@ param(
     [switch]$ClearLogs    # 命令行按日期清除日志（会问两次）
 )
 
-$script:AppVersion = '1.1.7.4'
+$script:AppVersion = '1.1.7.5'
 $script:ProjectUrl = 'https://github.com/neurotracee/github-netcheck'
 $script:MirrorUrl  = 'https://gitee.com/bio234/github-netcheck'
 

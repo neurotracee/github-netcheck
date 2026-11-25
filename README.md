@@ -1,4 +1,4 @@
-# GitHub 网络自检
+﻿# GitHub 网络自检
 
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](https://github.com/neurotracee/github-netcheck/blob/main/LICENSE)
 [![Latest release](https://img.shields.io/github/v/release/neurotracee/github-netcheck?label=latest)](https://github.com/neurotracee/github-netcheck/releases/latest)
@@ -125,13 +125,13 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 
 ## 下载（先点这里）
 
-**当前版本：安卓 v1.1.7.4 ・ Windows v1.1.7.4**。Windows 这次把「按 [1] 跑完看不到结果」改成最直接的样子：按下去立刻开测，逐行显示在测哪个站点、底部有进度条，跑完在终端给出分级结果；要不要报告按设置静默执行，中途不再弹问句。
+**当前版本：安卓 v1.1.7.4 ・ Windows v1.1.7.5**。Windows 这次把界面收干净了：窗口顶部只有一条 `█░` 进度条，原地刷新；每个站点先显示「正在测哪一个」，测完把结果补在同一行；跑完直接在终端给出分级汇总，报告只是按设置静默生成的一条路径。
 
 | 你要的 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
 | 最新下载页 | https://github.com/neurotracee/github-netcheck/releases/latest | https://gitee.com/bio234/github-netcheck/releases/latest |
 | 安卓 APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.4/NetCheck-1.1.7.4.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.4/NetCheck-1.1.7.4.apk |
-| Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.7/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.7/NetCheck-Windows.zip |
+| Windows 包（zip） | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.8/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.8/NetCheck-Windows.zip |
 | 仓库首页 | https://github.com/neurotracee/github-netcheck | https://gitee.com/bio234/github-netcheck |
 
 解压 Windows 包后双击 **一键网络自检.bat**；APK 直接安装（系统会提示「未知来源」，原因见下一节）。
@@ -147,7 +147,7 @@ Gitee 的附件总容量只有 1GB，装不下所有历史包，所以安装包�
 
 | 版本档位 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
-| **最新版**（安卓 v1.1.7.4 的 APK、Windows v1.1.7.4 的 zip） | 保留附件 | **保留附件** |
+| **最新版**（安卓 v1.1.7.4 的 APK、Windows v1.1.7.5 的 zip） | 保留附件 | **保留附件** |
 | **上一版**（v1.1.7.3 的安卓 APK、v1.1.7.0 的 Windows zip） | 保留附件 | 保留附件（方便覆盖升级过渡） |
 | **更早的旧版本** | 保留全部附件 | **附件已撤下**，只留发布说明 |
 
@@ -819,13 +819,13 @@ four summary cards below it, then one card per endpoint — the vertical bar on 
 
 ## Download (start here)
 
-**Current versions: Android v1.1.7.4 ・ Windows v1.1.7.4**. This Windows build starts the check the moment you press [1]: each target is printed as it runs, a progress bar sits at the bottom, and the graded results land in the terminal; report generation follows your settings without prompting mid-run.
+**Current versions: Android v1.1.7.4 ・ Windows v1.1.7.5**. This Windows build tidies the run view: a single `█░` bar pinned under the title refreshes in place, each target shows what it is testing and then gets its result merged into that same line, and the graded summary lands in the terminal; the report is just a path printed at the end, generated silently per your settings.
 
 | What you want | GitHub | Gitee (mainland mirror) |
 | --- | --- | --- |
 | Latest release page | https://github.com/neurotracee/github-netcheck/releases/latest | https://gitee.com/bio234/github-netcheck/releases/latest |
 | Android APK | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.4/NetCheck-1.1.7.4.apk | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.4/NetCheck-1.1.7.4.apk |
-| Windows package (zip) | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.7/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.7/NetCheck-Windows.zip |
+| Windows package (zip) | https://github.com/neurotracee/github-netcheck/releases/download/v1.1.7.8/NetCheck-Windows.zip | https://gitee.com/bio234/github-netcheck/releases/download/v1.1.7.8/NetCheck-Windows.zip |
 | Repository home | https://github.com/neurotracee/github-netcheck | https://gitee.com/bio234/github-netcheck |
 
 Unzip the Windows package and double-click **一键网络自检.bat**; install the APK directly (the system will warn about an “unknown source” — the reason is in the next section).
@@ -841,7 +841,7 @@ Gitee's total attachment quota is only 1 GB, which cannot hold every historical 
 
 | Tier | GitHub | Gitee (mainland mirror) |
 | --- | --- | --- |
-| **Latest** (Android v1.1.7.4 APK, Windows v1.1.7.4 zip) | attachments kept | **attachments kept** |
+| **Latest** (Android v1.1.7.4 APK, Windows v1.1.7.5 zip) | attachments kept | **attachments kept** |
 | **Previous** (Android v1.1.7.3 APK, Windows v1.1.7.0 zip) | attachments kept | attachments kept (for in-place upgrades in transition) |
 | **Anything older** | every attachment kept | **attachments removed**, release notes only |
 
