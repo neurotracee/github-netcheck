@@ -125,7 +125,7 @@ Windows 端是一段 PowerShell 脚本，双击就跑，不安装任何东西；
 
 ## 下载（先点这里）
 
-**当前版本：安卓 v1.1.7.4 ・ Windows v1.1.7.4**。Windows 这次从根上修好了「点 [1] 跑完看不到点位结果」：结果由菜单自己读出来打印、跑的时候底部有一行进度条，要不要报告改成开跑前问一句；安卓沿用上一版 APK。
+**当前版本：安卓 v1.1.7.4 ・ Windows v1.1.7.4**。Windows 这次把「按 [1] 跑完看不到结果」改成最直接的样子：按下去立刻开测，逐行显示在测哪个站点、底部有进度条，跑完在终端给出分级结果；要不要报告按设置静默执行，中途不再弹问句。
 
 | 你要的 | GitHub | Gitee（国内镜像） |
 | --- | --- | --- |
@@ -819,7 +819,7 @@ four summary cards below it, then one card per endpoint — the vertical bar on 
 
 ## Download (start here)
 
-**Current versions: Android v1.1.7.4 ・ Windows v1.1.7.4**. This Windows build fixes the missing per-target results properly: the menu now captures the run and prints it itself, shows a progress bar, and asks about the report before the run; the Android APK is unchanged.
+**Current versions: Android v1.1.7.4 ・ Windows v1.1.7.4**. This Windows build starts the check the moment you press [1]: each target is printed as it runs, a progress bar sits at the bottom, and the graded results land in the terminal; report generation follows your settings without prompting mid-run.
 
 | What you want | GitHub | Gitee (mainland mirror) |
 | --- | --- | --- |
@@ -1384,6 +1384,7 @@ with the same sentence — **if this little tool saved you a bit of time, feel f
 > Direct links: [GitHub star](https://github.com/neurotracee/github-netcheck) ｜ [Gitee star](https://gitee.com/bio234/github-netcheck)
 >
 > Mainland users can also scan the code to buy me a milk tea — entirely voluntary; without it the tool is still free with nothing missing.
+
 
 
 
