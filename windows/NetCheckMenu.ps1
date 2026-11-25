@@ -151,10 +151,14 @@ $items = @(
 
 # ---------------- 绘制 ----------------
 function FitBuffer {
+    # 以前这里把缓冲区压成一屏高，保证菜单从第一行画起；代价是自检那十几行结果会被顶掉。
+    # 现在只做「尽量加高」，压小这种事一律不做：加不上就沿用当前缓冲区（Windows Terminal 自己有回滚历史）。
     try {
         $raw = $Host.UI.RawUI
-        $win = $raw.WindowSize
-        $raw.BufferSize = New-Object System.Management.Automation.Host.Size($win.Width, $win.Height)
+        $w = $raw.WindowSize.Width
+        if ($raw.BufferSize.Height -lt 900) {
+            $raw.BufferSize = New-Object System.Management.Automation.Host.Size($w, 900)
+        }
     } catch { }
 }
 
@@ -240,19 +244,15 @@ function Run-Item([string]$key) {
     }
     Clear-Host
     $argLine = ($item.args -join ' ')
-    # 跑之前把缓冲区加高：菜单为了鼠标对齐把缓冲区压成一行窗口高，
-    # 那样自检的十几行结果会被滚掉，只剩最后一句提问。这里临时还原成 900 行。
-    try {
-        $win = $Host.UI.RawUI.WindowSize
-        $Host.UI.RawUI.BufferSize = New-Object System.Management.Automation.Host.Size($win.Width, 900)
-    } catch { }
+    # 跑之前确保缓冲区够高（能加高就加，加不上就算了）：
+    # 缓冲区只有一屏高时，自检的十几行结果会被顶掉，只剩最后那句提问。
+    FitBuffer
     Write-Host ("  " + (T '正在执行' 'Running') + ': netcheck.ps1 ' + $argLine) -ForegroundColor Cyan
     Write-Host ''
     $argList = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $NetCheck) + @($item.args)
     & powershell.exe @argList
     Write-Host ''
     Read-Host (T '  回车回到菜单' '  Enter to return to the menu') | Out-Null
-    FitBuffer
     return 'redraw'
 }
 
